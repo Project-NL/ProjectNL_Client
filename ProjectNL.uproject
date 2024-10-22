@@ -5,7 +5,7 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "ProjectNL_Client",
+			"Name": "ProjectNL",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
