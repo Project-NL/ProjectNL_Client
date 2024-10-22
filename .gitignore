@@ -74,5 +74,13 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
-/Content/*
-!/Content/**/BP_*
+
+# 기본 에셋과 맵 정보는 제외
+*.uasset
+*.umap
+
+# 블루프린트와 GAS의 블루프린트 양식 파일은 제외한다.
+!BP_*.uasset
+!GA_*.uasset
+!GC_*.uasset
+!GE_*.uasset
