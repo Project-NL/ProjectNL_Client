@@ -32,10 +32,7 @@ public:
 		TSubclassOf<UGameplayEffect> Effect);
 protected:
 	virtual void BeginPlay() override;
-
-	virtual float TakeDamage(float DamageAmount, const FDamageEvent& DamageEvent
-													, AController* EventInstigator
-													, AActor* DamageCauser) override;
+	
 	UPROPERTY()
 	UNLAbilitySystemComponent* AbilitySystemComponent;
 	

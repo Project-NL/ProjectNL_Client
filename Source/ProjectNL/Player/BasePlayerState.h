@@ -6,6 +6,7 @@
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "BasePlayerState.generated.h"
 
+class UPlayerAttributeSet;
 
 UCLASS()
 class PROJECTNL_API ABasePlayerState : public APlayerState, public IAbilitySystemInterface

@@ -1,4 +1,5 @@
 ﻿#include "BasePlayerState.h"
+#include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 
 ABasePlayerState::ABasePlayerState()
 {
