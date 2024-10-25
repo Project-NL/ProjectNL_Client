@@ -4,7 +4,6 @@
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 
-
 APlayerCharacter::APlayerCharacter()
 {
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -69,7 +68,6 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(

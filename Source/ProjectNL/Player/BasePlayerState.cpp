@@ -1,4 +1,6 @@
 ﻿#include "BasePlayerState.h"
+
+#include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 
 ABasePlayerState::ABasePlayerState()
@@ -13,5 +15,5 @@ ABasePlayerState::ABasePlayerState()
 
 UAbilitySystemComponent* ABasePlayerState::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+	return Cast<UNLAbilitySystemComponent>(AbilitySystemComponent.Get());
 }
