@@ -17,6 +17,11 @@ void ABasePlayerController::BeginPlayingState()
 	{
 		return;
 	}
+
+	if (!PlayerStatusHUDClass)
+	{
+		return;
+	}
 	
 	if (!IsLocalPlayerController())
 	{

@@ -6,9 +6,9 @@ void UValuePercentBar::InitializePercent(const float CurrentValue, const float M
 	PercentNum.Key = CurrentValue;
 	PercentNum.Value = MaxValue;
 
-	// const float Percent = PercentNum.Key / PercentNum.Value;
-	ViewPercentBar->SetPercent(1.f);
-	DelayViewPercentBar->SetPercent(1.f);
+	const float Percent = PercentNum.Key / PercentNum.Value;
+	ViewPercentBar->SetPercent(Percent);
+	DelayViewPercentBar->SetPercent(Percent);
 }
 
 void UValuePercentBar::SetCurrentValue(const float NewValue)
