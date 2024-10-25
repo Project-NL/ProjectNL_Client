@@ -26,11 +26,11 @@ protected:
 private:
 	// N초 뒤 실행할 변수 값
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	float DelayedTime = 2;
+	float DelayedTime = 1.2;
 
 	// 줄어드는 시간 단위
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	float PercentDecreaseTime = 0.02;
+	float PercentDecreaseTime = 0.05;
 	
 	FTimerHandle SetDelayViewPercentTimerHandle;
 	

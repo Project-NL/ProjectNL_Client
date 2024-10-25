@@ -18,9 +18,12 @@ void UValuePercentBar::SetCurrentValue(const float NewValue)
 	{
 		const float PrevCurrentValue = PercentNum.Key;
 		PercentNum.Key = NewValue;
+		
+		const float PrevPercent = PrevCurrentValue / PercentNum.Value;
 		const float NewPercent = PercentNum.Key / PercentNum.Value;
+		
 		ViewPercentBar->SetPercent(NewPercent);
-		DecreaseDelayPercentBar(PrevCurrentValue, NewPercent, true);
+		DecreaseDelayPercentBar(PrevPercent, NewPercent, true);
 	}
 	else
 	{
@@ -45,11 +48,15 @@ void UValuePercentBar::SetMaxValue(const float NewValue)
 
 void UValuePercentBar::DecreaseDelayPercentBar(const float CurrentPercent, const float FinalPercent, const bool IsStart)
 {
-	if (CurrentPercent - 0.1 > FinalPercent)
+	DelayViewPercentBar->SetPercent(CurrentPercent);
+	if (CurrentPercent - 0.01 > FinalPercent)
 	{
+		const float NewPercent = CurrentPercent - 0.01;
+		// TODO: SetTimer를 사용할 때 기존의 Parameter 정보가 유실되는 이슈 확인
+		// 정확한 원인이 뭔지 파악할 필요가 있음
 		GetWorld()->GetTimerManager().SetTimer(SetDelayViewPercentTimerHandle, FTimerDelegate::CreateLambda([&]
 		{
-			DecreaseDelayPercentBar(CurrentPercent - 0.1, FinalPercent, false);
+			DecreaseDelayPercentBar(NewPercent, FinalPercent, false);
 		}), IsStart ? DelayedTime : PercentDecreaseTime, false);
 	} else
 	{
