@@ -12,6 +12,8 @@ struct FDecreaseDelayPercentInfo
 	float FinalPercent;
 };
 
+// TODO: 추후 WBP 내부에서 색상 지정과 길이 조정 기능 등을 자유롭게 하는 기능
+// 고도화 작업이 필요함.
 UCLASS()
 class PROJECTNL_API UValuePercentBar : public UUserWidget
 {
