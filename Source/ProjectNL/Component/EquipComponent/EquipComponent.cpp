@@ -1,5 +1,6 @@
 ﻿#include "EquipComponent.h"
 
+#include "CombatAnimationData.h"
 #include "GameFramework/Character.h"
 #include "ProjectNL/Helper/StateHelper.h"
 #include "ProjectNL/Weapon/BaseWeapon.h"
@@ -46,4 +47,43 @@ void UEquipComponent::BeginPlay()
 void UEquipComponent::UpdateEquipWeaponAnimationData()
 {
 	PlayerCombatWeaponState = FStateHelper::GetCharacterWeaponState(MainWeapon, SubWeapon);
+	SetAnimationsByWeaponState();
+}
+
+// TODO: 추후 별도의 Manager로 옮겨야 할 지 고려할 필요 있음
+void UEquipComponent::SetAnimationsByWeaponState()
+{
+	const FString AttackAnimName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState) + "AttackAnim";
+
+	if (const FCombatAnimationData* Animation = CombatAnimData.DataTable->FindRow<
+		FCombatAnimationData>(*AttackAnimName, ""))
+	{
+		ComboAttackAnim = Animation->AnimGroup;
+	} else
+	{
+		ComboAttackAnim = TArray<UAnimMontage*>();
+	}
+
+	const FString EquipAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState) + "EquipAnim";
+	if (const FCombatAnimationData* NewEquipAnim = CombatAnimData.DataTable->FindRow<
+		FCombatAnimationData>(*EquipAnimRowName, ""))
+	{
+		EquipAnim = NewEquipAnim->AnimGroup.Top();
+	} else
+	{
+		EquipAnim = nullptr;
+	}
+	
+	const FString UnEquipAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState) + "UbEquipAnim";
+	if (const FCombatAnimationData* NewUnEquipAnim = CombatAnimData.DataTable->FindRow<
+		FCombatAnimationData>(*UnEquipAnimRowName, ""))
+	{
+		UnEquipAnim = NewUnEquipAnim->AnimGroup.Top();
+	} else
+	{
+		UnEquipAnim = nullptr;
+	}
 }
