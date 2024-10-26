@@ -9,6 +9,14 @@
 - 카메라 관리 코드 컨벤션 변경
 - 1번 스킬 개발
 
+## 영상 자료 첨부 (선택)
+자신이 개발한 내용의 영상을 녹화해 유튜브 링크로 첨부하면 더 좋습니다. (선택)
+
+## PR Dependency (선택)
+해당 작업이 만약 다른 feature 기반으로 만들어진 것이 있다면 반드시 종속된 PR을 같이 올려주세요.
+해당 PR이 완료된 이후 Merge 를 진행해야 합니다.
+https://github.com/Project-NL/ProjectNL/pull/[PR 번호]
+
 # 티켓 링크
 https://project-nl.atlassian.net/browse/NL-[본인 티켓 번호]
 
