@@ -1,7 +1,9 @@
 ﻿#include "PlayerCharacter.h"
 #include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 #include "ProjectNL/Helper/EnumHelper.h"
@@ -87,5 +89,50 @@ void APlayerCharacter::SetupPlayerInputComponent(
 	UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<
+		UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(MoveInputAction, ETriggerEvent::Triggered
+																			, this, &ThisClass::MoveTo);
+		EnhancedInputComponent->BindAction(LookInputAction, ETriggerEvent::Triggered
+																			, this, &ThisClass::Look);
+	}
 }
 
+
+void APlayerCharacter::MoveTo(const FInputActionValue& Value)
+{
+	const FVector2D MovementVector = Value.Get<FVector2D>();
+	if (const TObjectPtr<AController> ActorController = GetController())
+	{
+		const FRotator Rotation = ActorController->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		/**
+		 * Move를 하나로 통일시켜도 정상 동작 하는 이유는 Input Mapping에서 전달하는 X,Y,Z값을
+		 * 상하좌우에 따라 X,Y,Z 정렬 순서를 바꾸기 때문에 동일 동작이 가능하다
+		 * ex. 상의 경우 Y,X,Z 순서대로 제공함으로써 EAxis::X = Y가 매핑되는 방식이다
+		 * ex. 좌의 경우 X,Z,Y 순서대로 매핑되어서 EAxis:X = X가 매핑된다
+		 */
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		this->AddMovementInput(ForwardDirection, static_cast<float>(MovementVector.Y));
+		this->AddMovementInput(RightDirection, static_cast<float>(MovementVector.X));
+	}
+}
+
+void APlayerCharacter::Look(const FInputActionValue& Value)
+{
+	const FVector2D LookAxisVector = Value.Get<FVector2D>();
+	if (Controller != nullptr)
+	{
+		const float NewPitch = LookAxisVector.Y *
+			UGameplayStatics::GetWorldDeltaSeconds(this) * 60.f;
+		const float NewYaw = LookAxisVector.X *
+			UGameplayStatics::GetWorldDeltaSeconds(this) * 60.f;
+
+		AddControllerYawInput(NewYaw);
+		AddControllerPitchInput(NewPitch);
+	}
+}
