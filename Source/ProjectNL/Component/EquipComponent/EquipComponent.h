@@ -18,11 +18,14 @@ public:
 	UEquipComponent();
 
 	void UpdateEquipWeaponAnimationData();
-	SETTER(EPlayerCombatWeaponState, PlayerCombatWeaponState)
+	
+	// ABP에서 주로 사용함.
+	GETTER(EPlayerCombatWeaponState, PlayerCombatWeaponState)
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EPlayerCombatWeaponState PlayerCombatWeaponState;
 	
 	UPROPERTY(Category="Property", EditDefaultsOnly, meta = (AllowPrivateAccess = true))
