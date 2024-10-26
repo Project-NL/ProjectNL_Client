@@ -6,6 +6,12 @@
 
 class UProgressBar;
 
+struct FDecreaseDelayPercentInfo
+{
+	float CurrentPercent;
+	float FinalPercent;
+};
+
 UCLASS()
 class PROJECTNL_API UValuePercentBar : public UUserWidget
 {
@@ -17,10 +23,10 @@ public:
 
 	void SetMaxValue(const float NewValue);
 protected:
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> ViewPercentBar;
 	
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> DelayViewPercentBar;
 
 private:
@@ -30,11 +36,12 @@ private:
 
 	// 줄어드는 시간 단위
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	float PercentDecreaseTime = 0.05;
+	float PercentDecreaseTime = 0.025;
 	
 	FTimerHandle SetDelayViewPercentTimerHandle;
-	
-	void DecreaseDelayPercentBar(const float CurrentPercent, const float FinalPercent, const bool IsStart);
+
+	FDecreaseDelayPercentInfo DelayPercentInfo;
+	void DecreaseDelayPercentBar();
 	
 	// 0번째 현재 값, 1번째 최대 값
 	TPair<float, float> PercentNum;

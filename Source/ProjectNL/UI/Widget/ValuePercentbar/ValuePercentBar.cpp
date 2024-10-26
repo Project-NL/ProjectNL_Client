@@ -23,7 +23,8 @@ void UValuePercentBar::SetCurrentValue(const float NewValue)
 		const float NewPercent = PercentNum.Key / PercentNum.Value;
 		
 		ViewPercentBar->SetPercent(NewPercent);
-		DecreaseDelayPercentBar(PrevPercent, NewPercent, true);
+		DelayPercentInfo = {PrevPercent, NewPercent};
+		DecreaseDelayPercentBar();
 	}
 	else
 	{
@@ -42,24 +43,29 @@ void UValuePercentBar::SetMaxValue(const float NewValue)
 	PercentNum.Value = NewValue;
 	const float NewPercent = PercentNum.Key / PercentNum.Value;
 	
+	DelayPercentInfo.FinalPercent = NewPercent;
 	ViewPercentBar->SetPercent(NewPercent);
 	DelayViewPercentBar->SetPercent(NewPercent);
 }
 
-void UValuePercentBar::DecreaseDelayPercentBar(const float CurrentPercent, const float FinalPercent, const bool IsStart)
+void UValuePercentBar::DecreaseDelayPercentBar()
 {
-	DelayViewPercentBar->SetPercent(CurrentPercent);
-	if (CurrentPercent - 0.01 > FinalPercent)
+
+	// 타이머를 등록해 DelayViewPercentBar 정보가 계속 줄어들게 설정
+	GetWorld()->GetTimerManager().SetTimer(SetDelayViewPercentTimerHandle, FTimerDelegate::CreateLambda([&]
 	{
-		const float NewPercent = CurrentPercent - 0.01;
-		// TODO: SetTimer를 사용할 때 기존의 Parameter 정보가 유실되는 이슈 확인
-		// 정확한 원인이 뭔지 파악할 필요가 있음
-		GetWorld()->GetTimerManager().SetTimer(SetDelayViewPercentTimerHandle, FTimerDelegate::CreateLambda([&]
+		// TODO: 추후 CurveTable을 이용해 수학 로직을 넣어 커스텀하게 조정하기 
+		DelayPercentInfo.CurrentPercent -= 0.01;
+		
+		DelayViewPercentBar->SetPercent(DelayPercentInfo.CurrentPercent);
+		
+		// 만약 현재 Percent값과 최종적으로 반영되야할 값이랑 같거나 작게되는 경우 sync를 맞추고
+		// timer를 clear 시키는 작업을 수행한다.
+		if (DelayPercentInfo.CurrentPercent <= DelayPercentInfo.FinalPercent)
 		{
-			DecreaseDelayPercentBar(NewPercent, FinalPercent, false);
-		}), IsStart ? DelayedTime : PercentDecreaseTime, false);
-	} else
-	{
-		GetWorld()->GetTimerManager().ClearTimer(SetDelayViewPercentTimerHandle);
-	}
+			DelayPercentInfo.CurrentPercent = DelayPercentInfo.FinalPercent;
+			DelayViewPercentBar->SetPercent(DelayPercentInfo.CurrentPercent);
+			GetWorld()->GetTimerManager().ClearTimer(SetDelayViewPercentTimerHandle);
+		}
+	}), PercentDecreaseTime, true, DelayedTime);
 }
