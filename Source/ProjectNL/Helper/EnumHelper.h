@@ -35,3 +35,48 @@ enum class EInputIDType: uint8
 	, FixedCamera UMETA(DisplayName = "FixedCamera")
 	, Skill1 UMETA(DisplayName = "Skill1"), Skill2 UMETA(DisplayName = "Skill2")
 	, Skill3 UMETA(DisplayName = "Skill3"), Skill4 UMETA(DisplayName = "Skill4")};
+
+enum class EUEquippedHandType : uint8
+{
+	Empty UMETA(DisplayName = "Empty"), OneHand UMETA(DisplayName = "OneHand")
+	, TwoHand UMETA(DisplayName = "TwoHand"),
+};
+
+UENUM(BlueprintType)
+enum class EUWeaponType : uint8
+{
+	None UMETA(DisplayName = "None"), Axe UMETA(DisplayName = "Axe")
+	, Sword UMETA(DisplayName = "Sword"), Shield UMETA(DisplayName = "Shield")
+	, Spear UMETA(DisplayName = "Spear") , Dagger UMETA(DisplayName = "Dagger")
+	, Hammer UMETA(DisplayName = "Hammer"), Staff UMETA(DisplayName = "Staff")
+	, GreatSword UMETA(DisplayName = "GreatSword")
+	, NinjaStar UMETA(DisplayName = "NinjaStar")
+	, Gauntlet UMETA(DisplayName = "Gauntlet")
+	, Bow UMETA(DisplayName = "Bow"), Katana UMETA(DisplayName = "Katana")};
+
+
+UENUM(BlueprintType)
+enum class EWeaponAttachPosition: uint8
+{
+	Back UMETA(DisplayName = "Back"), WaistBack UMETA(DisplayName ="WaistBack")};
+
+UENUM(BlueprintType)
+enum class EPlayerCombatWeaponState: uint8
+{
+	// 일반 공격 무기
+	None UMETA(DisplayName = "None")
+	, OnlyOneHandWeapon UMETA(DisplayName = "OnlyOneHandWeapon")
+	, OneHandWeaponAndShield UMETA(DisplayName = "OneHandWeaponAndShield")
+	, DualHandWeapon UMETA(DisplayName = "DualHandWeapon")
+	, OnlyOneHandDagger UMETA(DisplayName = "OnlyOneHandDagger")
+	, OneHandDaggerAndShield UMETA(DisplayName = "OneHandDaggerAndShield")
+	, TwoHandGreatSword UMETA(DisplayName = "TwoHandGreatSword")
+	, TwoHandSpear UMETA(DisplayName = "TwoHandSpear")
+	, TwoHandBlunt UMETA(DisplayName = "TwoHandBlunt")
+	// 특수 공격 무기
+	, OnlyDualFist UMETA(DisplayName = "OnlyDualFist")
+	, OneHandDaggerAndNinjaStar UMETA(DisplayName = "OneHandDaggerAndNinjaStar")
+	, TwoHandBow UMETA(DisplayName = "TwoHandBow")
+	, TwoHandKatana UMETA(DisplayName = "TwoHandKatana")
+	, TwoHandMagicStaff UMETA(DisplayName = "TwoHandMagicStaff")};
+

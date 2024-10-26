@@ -6,7 +6,6 @@
 #include "ProjectNL/Player/BasePlayerState.h"
 #include "ProjectNL/Helper/EnumHelper.h"
 
-
 APlayerCharacter::APlayerCharacter()
 {
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);

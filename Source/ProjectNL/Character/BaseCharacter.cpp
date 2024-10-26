@@ -1,10 +1,13 @@
 ﻿#include "BaseCharacter.h"
 #include "ProjectNL/Helper/EnumHelper.h"
 
+#include "ProjectNL/Component/EquipComponent/EquipComponent.h"
+
 
 ABaseCharacter::ABaseCharacter()
 {
 	EntityType = EEntityCategory::Undefined;
+	EquipComponent = CreateDefaultSubobject<UEquipComponent>("Equip Component");
 }
 
 void ABaseCharacter::BeginPlay()
