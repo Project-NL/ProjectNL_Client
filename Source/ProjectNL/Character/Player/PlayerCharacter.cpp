@@ -1,8 +1,10 @@
 ﻿#include "PlayerCharacter.h"
+#include "EnhancedInputSubsystems.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
+#include "ProjectNL/Helper/EnumHelper.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -68,6 +70,17 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (const APlayerController* PC = Cast<APlayerController>(
+		GetController()))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+				PC->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(

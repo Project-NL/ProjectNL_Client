@@ -5,7 +5,6 @@
 #include "AbilitySystemInterface.h"
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "ProjectNL/GAS/NLAbilitySystemInitializationData.h"
-#include "ProjectNL/Helper/EnumHelper.h"
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "BaseCharacter.generated.h"
 
@@ -44,7 +43,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))
-	EEntityCategory EntityType = EEntityCategory::Undefined;
+	EEntityCategory EntityType;
 	GETTER_SETTER(EEntityCategory, EntityType);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem"

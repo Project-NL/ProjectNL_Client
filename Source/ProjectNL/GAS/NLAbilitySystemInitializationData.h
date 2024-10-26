@@ -8,6 +8,7 @@ class UBaseAttributeSet;
 class UGameplayAbility;
 class UAttributeSet;
 class UGameplayEffect;
+class UBaseInputTriggerAbility;
 
 USTRUCT(BlueprintType)
 struct FNLAbilitySystemInitializationData
@@ -17,8 +18,8 @@ struct FNLAbilitySystemInitializationData
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<TSubclassOf<UBaseAttributeSet>> AttributeSets;
 
-	// UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	// TArray<TSubclassOf<UBaseInputTriggerAbility>> GameplayAbilities;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TArray<TSubclassOf<UBaseInputTriggerAbility>> GameplayAbilities;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UGameplayAbility> FirstNameAbility;
