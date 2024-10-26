@@ -1,8 +1,10 @@
 ﻿#include "BaseCharacter.h"
+#include "ProjectNL/Helper/EnumHelper.h"
 
 
 ABaseCharacter::ABaseCharacter()
 {
+	EntityType = EEntityCategory::Undefined;
 }
 
 void ABaseCharacter::BeginPlay()

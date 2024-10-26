@@ -1,6 +1,7 @@
 ﻿#include "NLAbilitySystemComponent.h"
 
 #include "NLAbilitySystemInitializationData.h"
+#include "Ability/Utility/BaseInputTriggerAbility.h"
 
 
 UNLAbilitySystemComponent::UNLAbilitySystemComponent()
@@ -19,6 +20,20 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 
 	if (GetOwnerRole() == ROLE_Authority)
 	{
+		if (!InitData.GameplayAbilities.IsEmpty())
+		{
+			for (TSubclassOf<UBaseInputTriggerAbility> Ability : InitData.
+					GameplayAbilities)
+			{
+				UBaseInputTriggerAbility* InputAbility = Ability->GetDefaultObject<
+					UBaseInputTriggerAbility>();
+
+				GiveAbility(FGameplayAbilitySpec(
+					Ability, InputAbility->GetAbilityLevel()
+					, static_cast<uint32>(InputAbility->GetInputID()), this));
+			}
+		}
+		
 		if (IsValid(InitData.FirstNameAbility))
 		{
 			UGameplayAbility* Ability = InitData.FirstNameAbility->GetDefaultObject<
