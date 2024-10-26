@@ -1,8 +1,11 @@
 ﻿#include "BaseCharacter.h"
 
+#include "ProjectNL/Component/EquipComponent/EquipComponent.h"
+
 
 ABaseCharacter::ABaseCharacter()
 {
+	EquipComponent = CreateDefaultSubobject<UEquipComponent>("Equip Component");
 }
 
 void ABaseCharacter::BeginPlay()
