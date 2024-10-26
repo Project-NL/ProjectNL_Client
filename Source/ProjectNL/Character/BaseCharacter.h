@@ -9,6 +9,7 @@
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "BaseCharacter.generated.h"
 
+class UEquipComponent;
 enum class EEntityCategory : uint8;
 
 UCLASS()
@@ -35,6 +36,9 @@ protected:
 	
 	UPROPERTY()
 	UNLAbilitySystemComponent* AbilitySystemComponent;
+
+	UPROPERTY()
+	UEquipComponent* EquipComponent;
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"

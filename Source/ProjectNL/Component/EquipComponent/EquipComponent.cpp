@@ -1,4 +1,6 @@
 ﻿#include "EquipComponent.h"
+
+#include "ProjectNL/Helper/StateHelper.h"
 #include "ProjectNL/Weapon/BaseWeapon.h"
 
 UEquipComponent::UEquipComponent()
@@ -7,6 +9,8 @@ UEquipComponent::UEquipComponent()
 	// 다만 플레이어가 아닌 다른 엔티티 기준으로는 테스트 코드가 아닌 컴파일 과정에서 바로 Weapon 객체를 주입하게 됨
 	MainWeapon = MainWeaponClass.GetDefaultObject();
 	SubWeapon = SubWeaponClass.GetDefaultObject();
+	// 혹시 몰라 초기값 할당
+	PlayerCombatWeaponState = EPlayerCombatWeaponState::None;
 }
 
 
@@ -18,5 +22,5 @@ void UEquipComponent::BeginPlay()
 
 void UEquipComponent::UpdateEquipWeaponAnimationData()
 {
-	
+	SetPlayerCombatWeaponState(FStateHelper::GetCharacterWeaponState(MainWeapon, SubWeapon));
 }
