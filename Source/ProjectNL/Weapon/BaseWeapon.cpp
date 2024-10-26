@@ -9,6 +9,9 @@ ABaseWeapon::ABaseWeapon()
 	WeaponSkeleton = CreateDefaultSubobject<USkeletalMeshComponent>(
 		TEXT("Weapon Bone"));
 	WeaponSkeleton->SetupAttachment(RootComponent);
+	
+	EquippedHandType = EUEquippedHandType::Empty;
+	AttachPosition = EWeaponAttachPosition::Back;
 }
 
 void ABaseWeapon::BeginPlay()

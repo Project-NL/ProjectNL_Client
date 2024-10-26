@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ProjectNL/Helper/EnumHelper.h"
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "BaseWeapon.generated.h"
 
@@ -43,5 +42,5 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Assets
 		, meta = (AllowPrivateAccess = "true"))
-	EWeaponAttachPosition AttachPosition = EWeaponAttachPosition::Back;
+	EWeaponAttachPosition AttachPosition;
 };
