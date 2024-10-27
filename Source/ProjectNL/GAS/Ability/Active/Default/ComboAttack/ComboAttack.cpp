@@ -24,7 +24,7 @@ void UComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		{
 			Task->ExternalCancel();
 		}
-
+		GetWorld()->GetTimerManager().ClearTimer(ComboClearTimerHandle);
 		const TArray<TObjectPtr<UAnimMontage>> ComboAttack = CurrentCharacter->
 			GetEquipComponent()->GetComboAttackAnim();
 		MaxCombo = ComboAttack.Num();
@@ -39,6 +39,9 @@ void UComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		SetCurrentMontage(ComboAttack[ComboIndex]);
 
 		// TODO: 메인 서브 선택해서 Delegate 실행되게끔 처리
+		// TODO: 매번마다 Delegate를 연결하는 방식이 아닌, 최소한의 연결 방식을 활용하고 싶으나
+		// 당장 나은 방식을 찾지는 못함. 별도의 트리거 변수를 사용한다면 가능할 수는 있으나
+		// 코드가 난잡해지는 문제가 있을 수 있어 정확하게 효과적인지 비교는 해봐야함
 		ComboAttackNotifyState = UAnimNotifyManager::FindNotifyStateByClass<
 			UComboAttackNotifyState>(GetCurrentMontage());
 
@@ -56,8 +59,7 @@ void UComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 																							, GetCurrentMontage()
 																							, FGameplayTagContainer());
 		Task->OnCancelled.AddDynamic(this, &UComboAttack::OnCancelled);
-		Task->OnInterrupted.AddDynamic(this, &UComboAttack::OnCancelled);
-		Task->OnBlendOut.AddDynamic(this, &UComboAttack::OnCancelled);
+		Task->OnBlendOut.AddDynamic(this, &UComboAttack::OnCompleted);
 		Task->OnCompleted.AddDynamic(this, &UComboAttack::OnCompleted);
 		Task->ReadyForActivation();
 	}
@@ -75,8 +77,11 @@ void UComboAttack::HandleComboNotifyEnd(const EHandEquipStatus AttackHand)
 
 void UComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	ComboIndex = 0;
 	ClearDelegate();
+	GetWorld()->GetTimerManager().SetTimer(ComboClearTimerHandle, FTimerDelegate::CreateLambda([&]
+	{
+		ComboIndex = 0;
+	}), ComboClearCooldown, false);
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
 						, false);
 }
@@ -85,7 +90,7 @@ void UComboAttack::OnCancelled(FGameplayTag EventTag, FGameplayEventData EventDa
 {
 	ClearDelegate();
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
-						, false);
+						, true);
 }
 
 void UComboAttack::ClearDelegate()
