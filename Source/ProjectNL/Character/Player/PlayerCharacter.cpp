@@ -57,6 +57,11 @@ void APlayerCharacter::OnRep_PlayerState()
 
 		PlayerAttributeSet = PS->AttributeSet;
 		PlayerAttributeSet->InitBaseAttribute();
+
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+				PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
+				this, &ABaseCharacter::MovementSpeedChanged);
+		
 		if (AbilitySystemComponent)
 		{
 			AbilitySystemComponent->InitializeAbilitySystem(InitializeData);

@@ -50,4 +50,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem"
 		, meta = (AllowPrivateAccess = "true"))
 	FNLAbilitySystemInitializationData InitializeData;
+
+	void MovementSpeedChanged(const FOnAttributeChangeData& Data);
 };

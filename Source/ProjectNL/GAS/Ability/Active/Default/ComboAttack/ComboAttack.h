@@ -34,7 +34,7 @@ private:
 	uint8 MaxCombo = 0;
 
 	UPROPERTY(EditDefaultsOnly ,meta = (AllowPrivateAccess = true))
-	uint8 ComboClearCooldown = 3;
+	uint8 ComboClearCooldown;
 
 	FTimerHandle ComboClearTimerHandle;
 
