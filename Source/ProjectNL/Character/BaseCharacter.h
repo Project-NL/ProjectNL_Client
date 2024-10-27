@@ -30,7 +30,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_RemoveActiveGameplayEffectBySourceEffect(
 		TSubclassOf<UGameplayEffect> Effect);
-	
+
+	GETTER(UEquipComponent*, EquipComponent)
 	
 protected:
 	virtual void BeginPlay() override;
