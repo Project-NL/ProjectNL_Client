@@ -6,6 +6,8 @@
 #include "ProjectNL/Character/BaseCharacter.h"
 #include "PlayerCharacter.generated.h"
 
+class UPlayerSpringArmComponent;
+class UPlayerCameraComponent;
 class UPlayerAttributeSet;
 class UInputAction;
 class UInputMappingContext;
@@ -45,4 +47,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input"
 		, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookInputAction;
+	/** 플레이어 카메라 스프링 암 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPlayerSpringArmComponent* PlayerCameraSpringArm;
+	
+	/** 플레이어 카메라 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPlayerCameraComponent* PlayerCamera;
 };
