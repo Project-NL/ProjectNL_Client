@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
-#include "Sprint.generated.h"
+#include "GA_Sprint.generated.h"
 
 
 UCLASS()
-class PROJECTNL_API USprint : public UBaseInputTriggerAbility
+class PROJECTNL_API UGA_Sprint : public UBaseInputTriggerAbility
 {
 	GENERATED_BODY()
 
 public:
-	USprint(const FObjectInitializer& ObjectInitializer);
+	UGA_Sprint(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle

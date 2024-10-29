@@ -1,17 +1,17 @@
-﻿#include "ComboAttack.h"
+﻿#include "GA_ComboAttack.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Active/Default/ComboAttack/AnimNotify/ComboAttackNotifyState.h"
 #include "ProjectNL/Manager/AnimNotifyManager.h"
 
-UComboAttack::UComboAttack(const FObjectInitializer& ObjectInitializer)
+UGA_ComboAttack::UGA_ComboAttack(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	ComboClearCooldown = 0;
 }
 
-bool UComboAttack::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
+bool UGA_ComboAttack::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {
 	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags
 																, OptionalRelevantTags))
@@ -22,7 +22,7 @@ bool UComboAttack::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 }
 
 
-void UComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
+void UGA_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 																	, const FGameplayAbilityActorInfo* ActorInfo
 																	, const FGameplayAbilityActivationInfo
 																	ActivationInfo
@@ -60,27 +60,27 @@ void UComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		if (IsValid(ComboAttackNotifyState))
 		{
 			ComboAttackNotifyState->OnNotifiedBegin.AddDynamic(
-				this, &UComboAttack::HandleComboNotifyStart);
+				this, &UGA_ComboAttack::HandleComboNotifyStart);
 			ComboAttackNotifyState->OnNotifiedEnd.AddDynamic(
-				this, &UComboAttack::HandleComboNotifyEnd);
+				this, &UGA_ComboAttack::HandleComboNotifyEnd);
 		}
 
 		Task = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 																							, GetCurrentMontage()
 																							, FGameplayTagContainer());
-		Task->OnCancelled.AddDynamic(this, &UComboAttack::OnCancelled);
-		Task->OnBlendOut.AddDynamic(this, &UComboAttack::OnCompleted);
-		Task->OnCompleted.AddDynamic(this, &UComboAttack::OnCompleted);
+		Task->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
+		Task->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+		Task->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 		Task->ReadyForActivation();
 	}
 }
 
-void UComboAttack::HandleComboNotifyStart(const EHandEquipStatus AttackHand)
+void UGA_ComboAttack::HandleComboNotifyStart(const EHandEquipStatus AttackHand)
 {
 	// TODO: 공격 시 line-trace 관련 코드 여기에 추가하면 좋다.
 }
 
-void UComboAttack::HandleComboNotifyEnd(const EHandEquipStatus AttackHand)
+void UGA_ComboAttack::HandleComboNotifyEnd(const EHandEquipStatus AttackHand)
 {
 	ComboIndex = ComboIndex == MaxCombo - 1 ? 0 : ComboIndex + 1;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
@@ -88,7 +88,7 @@ void UComboAttack::HandleComboNotifyEnd(const EHandEquipStatus AttackHand)
 	ClearDelegate();
 }
 
-void UComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
+void UGA_ComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	ClearDelegate();
 	GetWorld()->GetTimerManager().SetTimer(ComboClearTimerHandle, FTimerDelegate::CreateLambda([&]
@@ -97,14 +97,14 @@ void UComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventDa
 	}), ComboClearCooldown, false);
 }
 
-void UComboAttack::OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
+void UGA_ComboAttack::OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	ClearDelegate();
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
 						, true);
 }
 
-void UComboAttack::ClearDelegate()
+void UGA_ComboAttack::ClearDelegate()
 {
 	if (ComboAttackNotifyState)
 	{
@@ -113,7 +113,7 @@ void UComboAttack::ClearDelegate()
 	}
 }
 
-void UComboAttack::EndAbility(const FGameplayAbilitySpecHandle Handle
+void UGA_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle Handle
 															, const FGameplayAbilityActorInfo* ActorInfo
 															, const FGameplayAbilityActivationInfo
 															ActivationInfo, bool bReplicateEndAbility

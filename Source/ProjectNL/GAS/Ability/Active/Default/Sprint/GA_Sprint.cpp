@@ -1,14 +1,14 @@
-﻿#include "Sprint.h"
+﻿#include "GA_Sprint.h"
 
 #include "AbilitySystemComponent.h"
 
-USprint::USprint(const FObjectInitializer& ObjectInitializer)
+UGA_Sprint::UGA_Sprint(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	bActivateAbilityInputTrigger = true;
 }
 
-bool USprint::CanActivateAbility(const FGameplayAbilitySpecHandle Handle
+bool UGA_Sprint::CanActivateAbility(const FGameplayAbilitySpecHandle Handle
 																, const FGameplayAbilityActorInfo* ActorInfo
 																, const FGameplayTagContainer* SourceTags
 																, const FGameplayTagContainer* TargetTags
@@ -25,7 +25,7 @@ const
 }
 
 // TODO: Release될때만 실행되는 이슈 수정
-void USprint::OnTriggeredInputAction(const FInputActionValue& Value)
+void UGA_Sprint::OnTriggeredInputAction(const FInputActionValue& Value)
 {
 	Super::OnTriggeredInputAction(Value);
 
@@ -47,7 +47,7 @@ void USprint::OnTriggeredInputAction(const FInputActionValue& Value)
 }
 
 
-void USprint::CancelAbility(const FGameplayAbilitySpecHandle Handle
+void UGA_Sprint::CancelAbility(const FGameplayAbilitySpecHandle Handle
 														, const FGameplayAbilityActorInfo* ActorInfo
 														, const FGameplayAbilityActivationInfo
 														ActivationInfo, bool bReplicateCancelAbility)

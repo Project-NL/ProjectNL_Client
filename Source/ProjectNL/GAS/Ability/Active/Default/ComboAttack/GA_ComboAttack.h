@@ -2,18 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
-#include "ComboAttack.generated.h"
+#include "GA_ComboAttack.generated.h"
 
 class UPlayMontageWithEvent;
 class UComboAttackNotifyState;
 enum class EHandEquipStatus: uint8;
 
 UCLASS()
-class PROJECTNL_API UComboAttack : public UBaseInputTriggerAbility
+class PROJECTNL_API UGA_ComboAttack : public UBaseInputTriggerAbility
 {
 	GENERATED_BODY()
 public:
-	UComboAttack(const FObjectInitializer& ObjectInitializer);
+	UGA_ComboAttack(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const override;
