@@ -59,11 +59,13 @@ void UBaseInputTriggerAbility::ActivateAbility(
 	, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
+	
 	if (const APawn* AvatarPawn = Cast<APawn>(ActorInfo->AvatarActor.Get()))
 	{
 		if (const AController* PawnController = AvatarPawn->GetController())
 		{
+			// TODO: 해당 로직이 Autonomous Proxy에서 Authority로 넘어가지 않는 이슈가 있음
+			// Authority가 아닌 환경에서 PawnController->InputComponent가 존재하지 않는다.
 			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<
 				UEnhancedInputComponent>(PawnController->InputComponent.Get()))
 			{
@@ -92,6 +94,7 @@ void UBaseInputTriggerAbility::EndAbility(
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility
 										, bWasCancelled);
+	
 	if (const APawn* AvatarPawn = Cast<APawn>(ActorInfo->AvatarActor.Get()))
 	{
 		if (const AController* PawnController = AvatarPawn->GetController())

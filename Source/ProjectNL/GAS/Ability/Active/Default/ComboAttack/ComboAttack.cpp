@@ -8,7 +8,19 @@ UComboAttack::UComboAttack(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	ComboClearCooldown = 0;
 }
+
+bool UComboAttack::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (!Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags
+																, OptionalRelevantTags))
+	{
+		return false;
+	}
+	return true;
+}
+
 
 void UComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 																	, const FGameplayAbilityActorInfo* ActorInfo
@@ -19,11 +31,11 @@ void UComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	if (ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(
 		GetAvatarActorFromActorInfo()))
 	{
-
 		if (IsValid(Task))
 		{
 			Task->ExternalCancel();
 		}
+		
 		GetWorld()->GetTimerManager().ClearTimer(ComboClearTimerHandle);
 		const TArray<TObjectPtr<UAnimMontage>> ComboAttack = CurrentCharacter->
 			GetEquipComponent()->GetComboAttackAnim();
@@ -47,10 +59,8 @@ void UComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 
 		if (IsValid(ComboAttackNotifyState))
 		{
-			ComboAttackNotifyState->OnNotifiedBegin.Clear();
 			ComboAttackNotifyState->OnNotifiedBegin.AddDynamic(
 				this, &UComboAttack::HandleComboNotifyStart);
-			ComboAttackNotifyState->OnNotifiedEnd.Clear();
 			ComboAttackNotifyState->OnNotifiedEnd.AddDynamic(
 				this, &UComboAttack::HandleComboNotifyEnd);
 		}
@@ -73,6 +83,9 @@ void UComboAttack::HandleComboNotifyStart(const EHandEquipStatus AttackHand)
 void UComboAttack::HandleComboNotifyEnd(const EHandEquipStatus AttackHand)
 {
 	ComboIndex = ComboIndex == MaxCombo - 1 ? 0 : ComboIndex + 1;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
+						, false);
+	ClearDelegate();
 }
 
 void UComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
@@ -82,8 +95,6 @@ void UComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventDa
 	{
 		ComboIndex = 0;
 	}), ComboClearCooldown, false);
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
-						, false);
 }
 
 void UComboAttack::OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
