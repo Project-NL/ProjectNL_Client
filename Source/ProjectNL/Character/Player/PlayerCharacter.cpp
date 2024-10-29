@@ -4,6 +4,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
+#include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 #include "ProjectNL/Helper/EnumHelper.h"
@@ -25,6 +27,17 @@ APlayerCharacter::APlayerCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 280;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+	
+	//플레이어 스프링 암을 만듭니다
+	PlayerCameraSpringArm = CreateDefaultSubobject<UPlayerSpringArmComponent>(TEXT("PlayerCameraSpringArm"));
+	PlayerCameraSpringArm->SetupAttachment(RootComponent);
+	PlayerCameraSpringArm->TargetArmLength = 400.0f; 
+	PlayerCameraSpringArm->bUsePawnControlRotation = true;
+
+	PlayerCamera = CreateDefaultSubobject<UPlayerCameraComponent>(TEXT("PlayerCamera"));
+	PlayerCamera->SetupAttachment(PlayerCameraSpringArm, USpringArmComponent::SocketName);
+	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	PlayerCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	SetEntityType(EEntityCategory::Player);
 }
