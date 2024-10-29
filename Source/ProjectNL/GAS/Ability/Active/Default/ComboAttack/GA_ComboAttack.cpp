@@ -1,4 +1,6 @@
 ﻿#include "GA_ComboAttack.h"
+
+#include "AnimNotify/ComboAttackEndNotify.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Active/Default/ComboAttack/AnimNotify/ComboAttackNotifyState.h"
@@ -54,15 +56,21 @@ void UGA_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		// TODO: 매번마다 Delegate를 연결하는 방식이 아닌, 최소한의 연결 방식을 활용하고 싶으나
 		// 당장 나은 방식을 찾지는 못함. 별도의 트리거 변수를 사용한다면 가능할 수는 있으나
 		// 코드가 난잡해지는 문제가 있을 수 있어 정확하게 효과적인지 비교는 해봐야함
+		ComboAttackEndNotify = UAnimNotifyManager::FindNotifyByClass<UComboAttackEndNotify>(GetCurrentMontage());
 		ComboAttackNotifyState = UAnimNotifyManager::FindNotifyStateByClass<
 			UComboAttackNotifyState>(GetCurrentMontage());
 
+		if (IsValid(ComboAttackEndNotify))
+		{
+			ComboAttackEndNotify->OnNotified.AddDynamic(this, &ThisClass::)
+		}
+		
 		if (IsValid(ComboAttackNotifyState))
 		{
 			ComboAttackNotifyState->OnNotifiedBegin.AddDynamic(
-				this, &UGA_ComboAttack::HandleComboNotifyStart);
+				this, &ThisClass::HandleComboNotifyStart);
 			ComboAttackNotifyState->OnNotifiedEnd.AddDynamic(
-				this, &UGA_ComboAttack::HandleComboNotifyEnd);
+				this, &ThisClass::HandleComboNotifyEnd);
 		}
 
 		Task = UPlayMontageWithEvent::InitialEvent(this, NAME_None
@@ -83,10 +91,16 @@ void UGA_ComboAttack::HandleComboNotifyStart(const EHandEquipStatus AttackHand)
 void UGA_ComboAttack::HandleComboNotifyEnd(const EHandEquipStatus AttackHand)
 {
 	ComboIndex = ComboIndex == MaxCombo - 1 ? 0 : ComboIndex + 1;
+	// TODO: 공격 line-trace 탐색 중단을 선언 하는 코드 추가
+}
+
+void UGA_ComboAttack::HandleComboEndNotify()
+{
+	ClearDelegate();
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
 						, false);
-	ClearDelegate();
 }
+
 
 void UGA_ComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
 {
@@ -110,6 +124,10 @@ void UGA_ComboAttack::ClearDelegate()
 	{
 		ComboAttackNotifyState->OnNotifiedBegin.RemoveAll(this);
 		ComboAttackNotifyState->OnNotifiedEnd.RemoveAll(this);
+	}
+	if (ComboAttackEndNotify)
+	{
+		ComboAttackEndNotify->OnNotified.RemoveAll(this);
 	}
 }
 

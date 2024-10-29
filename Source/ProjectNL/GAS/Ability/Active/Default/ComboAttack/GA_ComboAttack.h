@@ -4,6 +4,7 @@
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
 #include "GA_ComboAttack.generated.h"
 
+class UComboAttackEndNotify;
 class UPlayMontageWithEvent;
 class UComboAttackNotifyState;
 enum class EHandEquipStatus: uint8;
@@ -47,6 +48,9 @@ private:
 	void HandleComboNotifyEnd(const EHandEquipStatus AttackHand);
 
 	UFUNCTION()
+	void HandleComboEndNotify();
+
+	UFUNCTION()
 	void OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData);
 
 	UFUNCTION()
@@ -57,4 +61,6 @@ private:
 	TObjectPtr<UPlayMontageWithEvent> Task;
 	
 	TObjectPtr<UComboAttackNotifyState> ComboAttackNotifyState;
+
+	TObjectPtr<UComboAttackEndNotify> ComboAttackEndNotify;
 };
