@@ -75,4 +75,5 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
-/Content
+# 기본 에셋과 맵 정보는 제외
+/Content/Assets
