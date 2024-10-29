@@ -1,4 +1,0 @@
-[core]
-    remote = aws-storage
-['remote "aws-storage"']
-    url = s3://project-nl-s3/Content
