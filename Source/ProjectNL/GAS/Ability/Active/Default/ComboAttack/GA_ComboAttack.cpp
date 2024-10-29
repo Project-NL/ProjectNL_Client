@@ -39,9 +39,11 @@ void UGA_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		}
 		
 		GetWorld()->GetTimerManager().ClearTimer(ComboClearTimerHandle);
+		
 		const TArray<TObjectPtr<UAnimMontage>> ComboAttack = CurrentCharacter->
 			GetEquipComponent()->GetComboAttackAnim();
 		MaxCombo = ComboAttack.Num();
+		
 		if (!IsValid(ComboAttack[ComboIndex]))
 		{
 			UE_LOG(LogTemp, Error, TEXT("Fail to Load Combo Animation Try Again"));
@@ -56,21 +58,23 @@ void UGA_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 		// TODO: 매번마다 Delegate를 연결하는 방식이 아닌, 최소한의 연결 방식을 활용하고 싶으나
 		// 당장 나은 방식을 찾지는 못함. 별도의 트리거 변수를 사용한다면 가능할 수는 있으나
 		// 코드가 난잡해지는 문제가 있을 수 있어 정확하게 효과적인지 비교는 해봐야함
-		ComboAttackEndNotify = UAnimNotifyManager::FindNotifyByClass<UComboAttackEndNotify>(GetCurrentMontage());
-		ComboAttackNotifyState = UAnimNotifyManager::FindNotifyStateByClass<
-			UComboAttackNotifyState>(GetCurrentMontage());
 
-		if (IsValid(ComboAttackEndNotify))
+		for (FAnimNotifyEvent NotifyEvent : GetCurrentMontage()->Notifies)
 		{
-			ComboAttackEndNotify->OnNotified.AddDynamic(this, &ThisClass::)
-		}
-		
-		if (IsValid(ComboAttackNotifyState))
-		{
-			ComboAttackNotifyState->OnNotifiedBegin.AddDynamic(
-				this, &ThisClass::HandleComboNotifyStart);
-			ComboAttackNotifyState->OnNotifiedEnd.AddDynamic(
-				this, &ThisClass::HandleComboNotifyEnd);
+			if (const TObjectPtr<UComboAttackEndNotify> AttackEndNotify = Cast<UComboAttackEndNotify>(NotifyEvent.Notify))
+			{
+				ComboAttackEndNotify = AttackEndNotify;
+				ComboAttackEndNotify->OnNotified.AddDynamic(this, &ThisClass::HandleComboEndNotify);
+			}
+
+			if (const TObjectPtr<UComboAttackNotifyState> AttackNotifyState = Cast<UComboAttackNotifyState>(NotifyEvent.NotifyStateClass))
+			{
+				ComboAttackNotifyState = AttackNotifyState;	
+				ComboAttackNotifyState->OnNotifiedBegin.AddDynamic(
+					this, &ThisClass::HandleComboNotifyStart);
+				ComboAttackNotifyState->OnNotifiedEnd.AddDynamic(
+					this, &ThisClass::HandleComboNotifyEnd);
+			}
 		}
 
 		Task = UPlayMontageWithEvent::InitialEvent(this, NAME_None
@@ -86,17 +90,19 @@ void UGA_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 void UGA_ComboAttack::HandleComboNotifyStart(const EHandEquipStatus AttackHand)
 {
 	// TODO: 공격 시 line-trace 관련 코드 여기에 추가하면 좋다.
+	UE_LOG(LogTemp, Display, TEXT("Test Combo Notify Start"))
 }
 
 void UGA_ComboAttack::HandleComboNotifyEnd(const EHandEquipStatus AttackHand)
 {
-	ComboIndex = ComboIndex == MaxCombo - 1 ? 0 : ComboIndex + 1;
+	UE_LOG(LogTemp, Display, TEXT("Test Combo Notify End"))
 	// TODO: 공격 line-trace 탐색 중단을 선언 하는 코드 추가
 }
 
 void UGA_ComboAttack::HandleComboEndNotify()
 {
 	ClearDelegate();
+	ComboIndex = ComboIndex == MaxCombo - 1 ? 0 : ComboIndex + 1;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
 						, false);
 }
@@ -125,6 +131,7 @@ void UGA_ComboAttack::ClearDelegate()
 		ComboAttackNotifyState->OnNotifiedBegin.RemoveAll(this);
 		ComboAttackNotifyState->OnNotifiedEnd.RemoveAll(this);
 	}
+	
 	if (ComboAttackEndNotify)
 	{
 		ComboAttackEndNotify->OnNotified.RemoveAll(this);
