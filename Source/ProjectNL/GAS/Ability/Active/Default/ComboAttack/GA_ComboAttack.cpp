@@ -4,7 +4,6 @@
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Active/Default/ComboAttack/AnimNotify/ComboAttackNotifyState.h"
-#include "ProjectNL/Manager/AnimNotifyManager.h"
 
 UGA_ComboAttack::UGA_ComboAttack(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
