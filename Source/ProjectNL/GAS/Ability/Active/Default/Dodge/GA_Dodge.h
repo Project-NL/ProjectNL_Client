@@ -4,19 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
-#include "GA_TargetingEnemy.generated.h"
+#include "GA_Dodge.generated.h"
 
-class UAT_TargetingEnemy;
-class UPlayMontageWithEvent;
 /**
  * 
  */
 UCLASS()
-class PROJECTNL_API UGA_TargetingEnemy : public UBaseInputTriggerAbility
+class PROJECTNL_API UGA_Dodge : public UBaseInputTriggerAbility
 {
 	GENERATED_BODY()
 public:
-	UGA_TargetingEnemy(const FObjectInitializer& ObjectInitializer);
+	UGA_Dodge(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle
@@ -32,11 +30,20 @@ protected:
 													, bool bReplicateEndAbility
 													, bool bWasCancelled) override;
 	
+	void PlayDirectionalDodgeAnimation();
 
+	UFUNCTION()
+	void OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData);
+	
+	UFUNCTION()
+	void OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
+	
+	void ClearDelegate();
 private:
 
-	UPROPERTY()
-	TObjectPtr<UAT_TargetingEnemy> TargetingEnemyTask;
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS")
+	TArray<TObjectPtr<UAnimMontage>> DodgeAnimMontage;
 	
+	TObjectPtr<class UPlayMontageWithEvent> Task;
 };
-	

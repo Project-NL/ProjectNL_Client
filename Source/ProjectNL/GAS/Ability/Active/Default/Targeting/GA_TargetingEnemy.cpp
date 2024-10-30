@@ -28,14 +28,3 @@ void UGA_TargetingEnemy::EndAbility(const FGameplayAbilitySpecHandle Handle, con
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UGA_TargetingEnemy::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
-{
-}
-
-void UGA_TargetingEnemy::OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
-{
-}
-
-void UGA_TargetingEnemy::ClearDelegate()
-{
-}
