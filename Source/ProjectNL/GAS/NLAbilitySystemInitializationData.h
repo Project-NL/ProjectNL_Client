@@ -16,6 +16,9 @@ struct FNLAbilitySystemInitializationData
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TArray<TSubclassOf<UBaseAttributeSet>> AttributeSets;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<TSubclassOf<UBaseInputTriggerAbility>> GameplayAbilities;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)

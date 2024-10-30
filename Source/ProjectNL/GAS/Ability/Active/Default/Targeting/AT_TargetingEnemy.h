@@ -20,15 +20,18 @@ public:
 	static UAT_TargetingEnemy* InitialEvent(UGameplayAbility* OwningAbility);
 	
 	virtual void Activate() override;
-	virtual void TickTask(float DeltaTime) override;
-
-	virtual void TargetNearestEnemy();
+	
+	
 	void ReleaseLockOnTarget();
 	AActor* FindNearestTarget() const;
 	void CameraRotation(float DeltaTime);
 
 	void LockOnTarget(AActor* NewTarget);
 
+protected:
+	virtual void TickTask(float DeltaTime) override;
+	virtual void TargetNearestEnemy();
+private:
 	UPROPERTY()
 	TObjectPtr<AActor> CurrentTarget;
 	

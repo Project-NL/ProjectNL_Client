@@ -1,7 +1,5 @@
 ﻿#include "BaseCharacter.h"
 #include "ProjectNL/Helper/EnumHelper.h"
-#include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 
@@ -15,6 +13,7 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
 void ABaseCharacter::Server_ApplyGameplayEffectToSelf_Implementation(
@@ -53,11 +52,4 @@ ABaseCharacter::Server_RemoveActiveGameplayEffectBySourceEffect_Implementation(
 
 	AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(
 		Effect, AbilitySystemComponent);
-}
-
-void ABaseCharacter::MovementSpeedChanged(const FOnAttributeChangeData& Data)
-{
-	const float MovementSpeed = Data.NewValue;
-
-	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }

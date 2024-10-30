@@ -30,8 +30,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_RemoveActiveGameplayEffectBySourceEffect(
 		TSubclassOf<UGameplayEffect> Effect);
-
-	GETTER(UEquipComponent*, EquipComponent)
+	
 	
 protected:
 	virtual void BeginPlay() override;
@@ -50,6 +49,4 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem"
 		, meta = (AllowPrivateAccess = "true"))
 	FNLAbilitySystemInitializationData InitializeData;
-
-	void MovementSpeedChanged(const FOnAttributeChangeData& Data);
 };

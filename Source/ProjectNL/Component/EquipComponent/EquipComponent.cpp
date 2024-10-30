@@ -77,7 +77,7 @@ void UEquipComponent::SetAnimationsByWeaponState()
 	}
 	
 	const FString UnEquipAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
-		PlayerCombatWeaponState) + "UnEquipAnim";
+		PlayerCombatWeaponState) + "UbEquipAnim";
 	if (const FCombatAnimationData* NewUnEquipAnim = CombatAnimData.DataTable->FindRow<
 		FCombatAnimationData>(*UnEquipAnimRowName, ""))
 	{

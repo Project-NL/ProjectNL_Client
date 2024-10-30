@@ -206,13 +206,7 @@ void UPlayMontageWithEvent::OnMontageEnded(UAnimMontage* Montage
 
 bool UPlayMontageWithEvent::StopPlayingMontage()
 {
-	if (!Ability)
-	{
-		return false;	
-	}
-	
 	const FGameplayAbilityActorInfo* ActorInfo = Ability->GetCurrentActorInfo();
-	
 	if (!ActorInfo)
 	{
 		return false;

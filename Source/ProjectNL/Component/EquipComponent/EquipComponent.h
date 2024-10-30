@@ -51,15 +51,15 @@ private:
 	FDataTableRowHandle CombatAnimData;
 
 	// 애니메이션 관련 정보
-	UPROPERTY(BlueprintReadOnly, Category = Animation
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
 		, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> EquipAnim;
 
-	UPROPERTY(BlueprintReadOnly, Category = Animation
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
 		, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> UnEquipAnim;
 
-	UPROPERTY(BlueprintReadOnly, Category = Animation
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
 		, meta = (AllowPrivateAccess = true))
 	TArray<TObjectPtr<UAnimMontage>> ComboAttackAnim;
 };
