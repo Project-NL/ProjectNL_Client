@@ -57,14 +57,13 @@ void APlayerCharacter::OnRep_PlayerState()
 
 		PlayerAttributeSet = PS->AttributeSet;
 		PlayerAttributeSet->InitBaseAttribute();
-
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-				PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
-				this, &ABaseCharacter::MovementSpeedChanged);
 		
 		if (AbilitySystemComponent)
 		{
 			AbilitySystemComponent->InitializeAbilitySystem(InitializeData);
+			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+					PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
+					this, &ABaseCharacter::MovementSpeedChanged);
 		}
 	}
 }
@@ -84,6 +83,9 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		PlayerAttributeSet->InitBaseAttribute();
 
 		AbilitySystemComponent->InitializeAbilitySystem(InitializeData);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+				PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
+				this, &ABaseCharacter::MovementSpeedChanged);
 	}
 }
 
