@@ -31,6 +31,7 @@ public:
 	void Server_RemoveActiveGameplayEffectBySourceEffect(
 		TSubclassOf<UGameplayEffect> Effect);
 	
+	GETTER(UEquipComponent*, EquipComponent)
 	
 protected:
 	virtual void BeginPlay() override;
@@ -40,6 +41,8 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UEquipComponent* EquipComponent;
+
+	void MovementSpeedChanged(const FOnAttributeChangeData& Data);
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))

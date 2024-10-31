@@ -44,6 +44,13 @@ enum class EUEquippedHandType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EHandEquipStatus : uint8
+{
+	Empty UMETA(DisplayName = "Empty"), OnlyMain UMETA(DisplayName = "OnlyMain")
+	, OnlySub UMETA(DisplayName = "OnlySub"), Dual UMETA(DisplayName = "Dual"),
+};
+
+UENUM(BlueprintType)
 enum class EUWeaponType : uint8
 {
 	None UMETA(DisplayName = "None"), Axe UMETA(DisplayName = "Axe")
