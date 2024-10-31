@@ -2,6 +2,7 @@
 
 #include "CombatAnimationData.h"
 #include "GameFramework/Character.h"
+#include "ProjectNL/Character/BaseCharacter.h"
 #include "ProjectNL/Helper/StateHelper.h"
 #include "ProjectNL/Weapon/BaseWeapon.h"
 
@@ -14,12 +15,17 @@ UEquipComponent::UEquipComponent()
 void UEquipComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	if (ACharacter* Character = Cast<ACharacter>(GetOwner()))
+	if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetOwner()))
 	{
 		MainWeapon = GetWorld()->SpawnActor<ABaseWeapon>(MainWeaponClass);
 		SubWeapon = GetWorld()->SpawnActor<ABaseWeapon>(SubWeaponClass);
 		if (IsFirstEquipWeapon)
 		{
+			if (UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent())
+			{
+				ASC->SetLooseGameplayTagCount(NlGameplayTags::Status_Combat, 1);
+			}
+			
 			if (MainWeapon)
             {
              	MainWeapon->EquipCharacterWeapon(Character, true);
@@ -77,7 +83,7 @@ void UEquipComponent::SetAnimationsByWeaponState()
 	}
 	
 	const FString UnEquipAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
-		PlayerCombatWeaponState) + "UbEquipAnim";
+		PlayerCombatWeaponState) + "UnEquipAnim";
 	if (const FCombatAnimationData* NewUnEquipAnim = CombatAnimData.DataTable->FindRow<
 		FCombatAnimationData>(*UnEquipAnimRowName, ""))
 	{
