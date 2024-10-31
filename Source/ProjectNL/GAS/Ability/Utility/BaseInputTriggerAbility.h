@@ -42,21 +42,11 @@ protected:
 	virtual void OnRemoveAbility(const FGameplayAbilityActorInfo* ActorInfo
 															, const FGameplayAbilitySpec& Spec) override;
 
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle
-															, const FGameplayAbilityActorInfo* ActorInfo
-															, const FGameplayAbilityActivationInfo
-															ActivationInfo
-															, const FGameplayEventData*
-															TriggerEventData) override;
-
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle
 													, const FGameplayAbilityActorInfo* ActorInfo
 													, const FGameplayAbilityActivationInfo ActivationInfo
 													, bool bReplicateEndAbility
 													, bool bWasCancelled) override;
-
-
-	virtual void OnTriggeredInputAction(const FInputActionValue& Value);
 
 private:
 	// InputID가 -1인 경우 InputID를 할당받지 않은 상태라고 인지함

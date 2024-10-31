@@ -14,6 +14,8 @@ public:
 	UGA_Sprint(const FObjectInitializer& ObjectInitializer);
 
 protected:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle
 																	, const FGameplayAbilityActorInfo* ActorInfo
 																	, const FGameplayTagContainer* SourceTags
@@ -27,8 +29,7 @@ protected:
 														ActivationInfo
 														, bool bReplicateCancelAbility) override;
 
-	virtual void OnTriggeredInputAction(const FInputActionValue& Value) override;
-
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 private:
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
 		, meta=(AllowPrivateAccess = true))
@@ -36,4 +37,7 @@ private:
 
 	FGameplayEffectContextHandle EffectContext;
 	FGameplayEffectSpecHandle SpecHandle;
+
+	// TODO: 추후 이 트리거에 대해 공통 Ability Class를 만드는 것 도 좋아보임
+	bool bIsActivated;
 };

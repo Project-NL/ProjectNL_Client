@@ -6,6 +6,7 @@ UGA_Sprint::UGA_Sprint(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	bActivateAbilityInputTrigger = true;
+	bIsActivated = false;
 }
 
 bool UGA_Sprint::CanActivateAbility(const FGameplayAbilitySpecHandle Handle
@@ -23,12 +24,14 @@ const
 
 	return true;
 }
-
-// TODO: Release될때만 실행되는 이슈 수정
-void UGA_Sprint::OnTriggeredInputAction(const FInputActionValue& Value)
+void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	Super::OnTriggeredInputAction(Value);
-
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	if (bIsActivated)
+	{
+		return;
+	}
+	bIsActivated = true;
 	if (BuffEffect)
 	{
 		EffectContext = GetAbilitySystemComponentFromActorInfo()->
@@ -46,14 +49,19 @@ void UGA_Sprint::OnTriggeredInputAction(const FInputActionValue& Value)
 	}
 }
 
-
 void UGA_Sprint::CancelAbility(const FGameplayAbilitySpecHandle Handle
 														, const FGameplayAbilityActorInfo* ActorInfo
 														, const FGameplayAbilityActivationInfo
 														ActivationInfo, bool bReplicateCancelAbility)
 {
+	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
+	bIsActivated = false;
 	GetAbilitySystemComponentFromActorInfo()->
-		RemoveActiveGameplayEffectBySourceEffect(BuffEffect
-																						, GetAbilitySystemComponentFromActorInfo());
-	EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility, false);
+		RemoveActiveGameplayEffectBySourceEffect(BuffEffect, GetAbilitySystemComponentFromActorInfo());
+}
+
+void UGA_Sprint::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	bIsActivated = false;
 }

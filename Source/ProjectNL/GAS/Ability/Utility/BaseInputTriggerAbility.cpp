@@ -38,7 +38,7 @@ void UBaseInputTriggerAbility::SetupEnhancedInputBindings(
 						if (IsValid(AbilityInstance->ActivationInputAction))
 						{
 							EnhancedInputComponent->BindAction(
-								ActivationInputAction, ETriggerEvent::Started, AbilityInstance
+								ActivationInputAction, ETriggerEvent::Triggered, AbilityInstance
 								, &ThisClass::OnAbilityInputPressed, ActorInfo);
 
 							EnhancedInputComponent->BindAction(
@@ -50,38 +50,6 @@ void UBaseInputTriggerAbility::SetupEnhancedInputBindings(
 			}
 		}
 	}
-}
-
-void UBaseInputTriggerAbility::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle
-	, const FGameplayAbilityActorInfo* ActorInfo
-	, const FGameplayAbilityActivationInfo ActivationInfo
-	, const FGameplayEventData* TriggerEventData)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (const APawn* AvatarPawn = Cast<APawn>(ActorInfo->AvatarActor.Get()))
-	{
-		if (const AController* PawnController = AvatarPawn->GetController())
-		{
-			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<
-				UEnhancedInputComponent>(PawnController->InputComponent.Get()))
-			{
-				const FEnhancedInputActionEventBinding& TriggeredEventBinding =
-					EnhancedInputComponent->BindAction(ActivationInputAction
-																						, ETriggerEvent::Triggered, this
-																						, &
-																						ThisClass::OnTriggeredInputAction);
-
-				TriggeredEventHandle = TriggeredEventBinding.GetHandle();
-				CommitAbility(Handle, ActorInfo, ActivationInfo);
-				return;
-			}
-		}
-	}
-
-	constexpr bool bReplicateCancelAbility = true;
-	CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
 void UBaseInputTriggerAbility::EndAbility(
@@ -112,7 +80,6 @@ void UBaseInputTriggerAbility::InputReleased(
 	, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
-
 	if (bActivateAbilityInputTrigger)
 	{
 		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
@@ -161,9 +128,4 @@ void UBaseInputTriggerAbility::OnAbilityInputReleased(
 		Owner->GetAbilitySystemComponent()->AbilityLocalInputReleased(
 			static_cast<uint32>(InputID));
 	}
-};
-
-void UBaseInputTriggerAbility::OnTriggeredInputAction(
-	const FInputActionValue& Value)
-{
 }
