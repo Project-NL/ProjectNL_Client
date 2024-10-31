@@ -15,7 +15,6 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ABaseCharacter::Server_ApplyGameplayEffectToSelf_Implementation(
