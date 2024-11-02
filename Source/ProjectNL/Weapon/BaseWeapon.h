@@ -25,6 +25,7 @@ public:
 	GETTER(EUEquippedHandType, EquippedHandType)
 	GETTER(EWeaponAttachPosition, AttachPosition)
 	GETTER(EUWeaponType, WeaponType)
+	GETTER(USkeletalMeshComponent*, WeaponSkeleton)
 protected:
 	virtual void BeginPlay() override;
 	
