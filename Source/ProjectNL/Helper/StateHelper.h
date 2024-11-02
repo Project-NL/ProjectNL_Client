@@ -1,5 +1,7 @@
 ﻿#pragma once
+#include "AbilitySystemComponent.h"
 #include "ProjectNL/Helper/EnumHelper.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Weapon/BaseWeapon.h"
 
 class FStateHelper
@@ -109,5 +111,18 @@ public:
 		}
 
 		return EPlayerCombatWeaponState::None;
+	}
+
+	FORCEINLINE static bool IsPlayerIdle(const UAbilitySystemComponent* Ability)
+	{
+		return Ability->GetGameplayTagCount(NlGameplayTags::State_Idle) == 1;
+	}
+
+	FORCEINLINE static void ChangePlayerState(UAbilitySystemComponent* Ability
+																						, const FGameplayTag PreviousTag
+																						, const FGameplayTag NewTag)
+	{
+		Ability->SetLooseGameplayTagCount(PreviousTag, 0);
+		Ability->SetLooseGameplayTagCount(NewTag, 1);
 	}
 };
