@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ValuePercentBar.generated.h"
 
+class UOverlay;
 class UProgressBar;
 
 struct FDecreaseDelayPercentInfo
@@ -24,6 +25,7 @@ public:
 	void SetCurrentValue(const float NewValue);
 
 	void SetMaxValue(const float NewValue);
+	
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> ViewPercentBar;
@@ -31,6 +33,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> DelayViewPercentBar;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UOverlay> PercentBarOverlay;
+	
 private:
 	// N초 뒤 실행할 변수 값
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
