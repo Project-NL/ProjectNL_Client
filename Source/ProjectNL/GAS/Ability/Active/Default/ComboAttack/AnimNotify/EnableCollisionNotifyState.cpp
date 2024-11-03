@@ -34,29 +34,18 @@ void UEnableCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UA
     }
     UE_LOG(LogTemp, Log, TEXT("Notify End"));
 }
+
 FVector BezierCurve(const FVector& P0, const FVector& P1, const FVector& P2, float t)
 {
-    float u = 1 - t;
-    float tt = t * t;
-    float uu = u * u;
-
-    FVector point = uu * P0; // (1 - t)^2 * P0
-    point += 2 * u * t * P1; // 2(1 - t)t * P1
-    point += tt * P2;        // t^2 * P2
-
-    return point;
-}
-FVector SplineCurve(const FVector& P0, const FVector& P1, const FVector& P2, float t)
-{
     // t는 곡선에서의 위치를 나타내며, 0 <= t <= 1
-    float t2 = t * t;
-    float oneMinusT = 1.0f - t;
+    float t2 = t * t;                  // t^2 계산
+    float oneMinusT = 1.0f - t;        // (1 - t) 계산
 
-    // 2차 스플라인 곡선 공식
-    FVector point = (oneMinusT * oneMinusT) * P0;     // (1 - t)^2 * P0
-    point += 2 * oneMinusT * t * P1;                 // 2 * (1 - t) * t * P1
-    point += t2 * P2;                                // t^2 * P2
-
+    // 2차 베지어 곡선 공식: B(t) = (1 - t)^2 * P0 + 2 * (1 - t) * t * P1 + t^2 * P2
+    FVector point = (oneMinusT * oneMinusT) * P0;  // (1 - t)^2 * P0: 시작점에서 곡선이 시작하게 만듦
+    point += 2 * oneMinusT * t * P1;               // 2 * (1 - t) * t * P1: 제어점의 영향을 적용하여 곡선의 형태를 조정
+    point += t2 * P2;                              // t^2 * P2: 끝점에 도달하게 만듦
+    
     return point;
 }
 void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)

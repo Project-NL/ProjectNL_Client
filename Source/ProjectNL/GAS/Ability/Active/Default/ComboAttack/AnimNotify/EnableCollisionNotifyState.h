@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "EnableCollisionNotifyState.generated.h"
-
+class UGameplayEffect;
 /**
  * 
  */
@@ -32,7 +32,7 @@ private:
 	TSet<AActor*> HitActors;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<class UGameplayEffect> AttackDamageEffect;
+	TSubclassOf<UGameplayEffect> AttackDamageEffect;
 	// 이전 프레임의 소켓 위치를 저장하는 벡터
 	FVector PrevStartLocation;
 	FVector PrevEndLocation;
