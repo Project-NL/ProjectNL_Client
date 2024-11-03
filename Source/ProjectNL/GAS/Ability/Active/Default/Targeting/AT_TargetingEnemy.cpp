@@ -11,7 +11,7 @@
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
-
+#include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 UAT_TargetingEnemy* UAT_TargetingEnemy::InitialEvent(UGameplayAbility* OwningAbility)
 {
 	UAT_TargetingEnemy* NewEvent = NewAbilityTask<UAT_TargetingEnemy>(
@@ -36,9 +36,9 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 //	UE_LOG(LogTemp, Warning, TEXT("UAT_TargetingEnemy Tasking"));
 	if (NearestEnemy && NearestEnemyCheck)
 	{
-		FGameplayTagContainer ActiveTags;
-		//활성화된 컨테이너태그를 ActiveTAgs에 저장
-		Cast<APlayerCharacter>(GetAvatarActor())->GetAbilitySystemComponent()->GetOwnedGameplayTags(ActiveTags);
+		// FGameplayTagContainer ActiveTags;
+		// //활성화된 컨테이너태그를 ActiveTAgs에 저장
+		// Cast<APlayerCharacter>(GetAvatarActor())->GetAbilitySystemComponent()->GetOwnedGameplayTags(ActiveTags);
 
 		LockOnTarget(NearestEnemy);
 
@@ -48,7 +48,7 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 
 void UAT_TargetingEnemy::TargetNearestEnemy()
 {
-	NearestEnemyCheck = (NearestEnemyCheck) ? false : true;
+	NearestEnemyCheck = !NearestEnemyCheck;
 	NearestEnemy = FindNearestTarget();
 	if (!NearestEnemyCheck)
 	{
@@ -194,13 +194,20 @@ void UAT_TargetingEnemy::ReleaseLockOnTarget()
 	NearestEnemyCheck = false;
 	AActor* OwnerActor = GetAvatarActor();
 	//캐릭터 속도를 다시 높임
-	Cast<ACharacter>(GetAvatarActor())->GetCharacterMovement()->MaxWalkSpeed = OriginalCharacterSpeed;
+	float BaseSpeed=Cast<UBaseAttributeSet>(Cast<APlayerCharacter>(GetAvatarActor())->GetAbilitySystemComponent()->GetAttributeSet(UBaseAttributeSet::StaticClass()))->GetMovementSpeed();
+	Cast<ACharacter>(GetAvatarActor())->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
 	APlayerController* PlayerController = Cast<APlayerController>(Cast<ACharacter>(OwnerActor)->GetController());
-	// 플레이어 컨트롤러의 회전 입력을 다시 활성화
-	PlayerController->SetIgnoreLookInput(false);
-	// 플레이어 컨트롤러의 뷰 타겟을 플레이어로 설정 (필요시)
-	PlayerController->SetViewTarget(OwnerActor);
-	RestoreSpringArmSettings(GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>());
+	if(PlayerController)
+	{
+		// 플레이어 컨트롤러의 회전 입력을 다시 활성화
+		PlayerController->SetIgnoreLookInput(false);
+		// 플레이어 컨트롤러의 뷰 타겟을 플레이어로 설정 (필요시)
+		PlayerController->SetViewTarget(OwnerActor);
+	}
+	if(UPlayerSpringArmComponent* playerspringarm=GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>())
+	{
+		RestoreSpringArmSettings(playerspringarm);
+	}
 	OnCanceled.Broadcast();
 }
 
@@ -249,15 +256,11 @@ void UAT_TargetingEnemy::RestoreSpringArmSettings(USpringArmComponent* SpringArm
 {
 	if (SpringArm)
 	{
-		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(
-			GetAvatarActor()->GetActorLocation(), NearestEnemy->GetActorLocation());
 		SpringArm->TargetArmLength = SavedTargetArmLength;
 		SpringArm->bUsePawnControlRotation = bSavedUsePawnControlRotation;
 		SpringArm->bInheritPitch = bSavedInheritPitch;
 		SpringArm->bInheritYaw = bSavedInheritYaw;
 		SpringArm->bInheritRoll = bSavedInheritRoll;
 		SpringArm->bEnableCameraLag = bSavedEnableCameraLag;
-		FRotator TarsgetRotation(-40, 19.f, 43.0f);
-		SpringArm->SetWorldRotation(TarsgetRotation);
 	}
 }

@@ -30,56 +30,51 @@ public:
 
 	virtual void TargetNearestEnemy();
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY()
 	FOnAbilityTaskCleared OnCanceled;
 
 protected:
 	virtual void TickTask(float DeltaTime) override;
+	UFUNCTION()
 	void ReleaseLockOnTarget();
+	UFUNCTION()
 	AActor* FindNearestTarget() const;
+	UFUNCTION()
 	void CameraRotation(float DeltaTime);
-
+	UFUNCTION()
 	void LockOnTarget(AActor* NewTarget);
-
 	// 스프링암 설정을 저장하는 함수
-	UFUNCTION(BlueprintCallable, Category = "SpringArm")
+	UFUNCTION()
 	void SaveSpringArmSettings(USpringArmComponent* SpringArm);
 
 	// 스프링암 설정을 복원하는 함수
-	UFUNCTION(BlueprintCallable, Category = "SpringArm")
+	UFUNCTION()
 	void RestoreSpringArmSettings(USpringArmComponent* SpringArm);
 
 private:
 	UPROPERTY()
-	TObjectPtr<AActor> CurrentTarget{};
+	TObjectPtr<AActor> CurrentTarget;
 	
 	UPROPERTY()
-	TObjectPtr<AActor> NearestEnemy{};
+	TObjectPtr<AActor> NearestEnemy;
 	
 	UPROPERTY(EditAnywhere, Category = "Targeting")
 	float TargetingRange = 1000.0f;
 
-	UPROPERTY()
-	float OriginalCharacterSpeed{};
-	UPROPERTY()
+	
+	float OriginalCharacterSpeed;
+
 	int8 NearestEnemyCheck=false;
 	
 	// 저장된 스프링암 설정
-	UPROPERTY()
+	
 	FRotator SavedRotation;
-	UPROPERTY()
 	FVector SavedLocation;
-	UPROPERTY()
 	float SavedTargetArmLength;
-	UPROPERTY()
 	int8 bSavedUsePawnControlRotation;
-	UPROPERTY()
 	int8 bSavedInheritPitch;
-	UPROPERTY()
 	int8 bSavedInheritYaw;
-	UPROPERTY()
 	int8 bSavedInheritRoll;
-	UPROPERTY()
 	int8 bSavedEnableCameraLag;
 	
 
