@@ -21,6 +21,7 @@ public:
 	
 	// ABP에서 주로 사용함.
 	GETTER(TArray<TObjectPtr<UAnimMontage>>, ComboAttackAnim)
+
 	GETTER(TObjectPtr<UAnimMontage>, EquipAnim)
 	GETTER(TObjectPtr<UAnimMontage>, UnEquipAnim)
 
