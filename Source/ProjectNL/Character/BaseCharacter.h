@@ -32,6 +32,7 @@ public:
 		TSubclassOf<UGameplayEffect> Effect);
 	
 	GETTER(UEquipComponent*, EquipComponent)
+	GETTER_SETTER(EEntityCategory, EntityType)
 	
 protected:
 	virtual void BeginPlay() override;
@@ -41,15 +42,16 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UEquipComponent* EquipComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem"
+		, meta = (AllowPrivateAccess = "true"))
+	FNLAbilitySystemInitializationData InitializeData;
 
 	void MovementSpeedChanged(const FOnAttributeChangeData& Data);
+	
+	void Initialize();
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))
 	EEntityCategory EntityType;
-	GETTER_SETTER(EEntityCategory, EntityType);
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem"
-		, meta = (AllowPrivateAccess = "true"))
-	FNLAbilitySystemInitializationData InitializeData;
 };

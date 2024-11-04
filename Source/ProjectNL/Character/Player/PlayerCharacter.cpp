@@ -63,6 +63,8 @@ void APlayerCharacter::OnRep_PlayerState()
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
+
+		Initialize();
 	}
 }
 
@@ -85,6 +87,8 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
+		
+		Initialize();
 	}
 }
 

@@ -19,13 +19,9 @@ void UEquipComponent::BeginPlay()
 	{
 		MainWeapon = GetWorld()->SpawnActor<ABaseWeapon>(MainWeaponClass);
 		SubWeapon = GetWorld()->SpawnActor<ABaseWeapon>(SubWeaponClass);
+		
 		if (IsFirstEquipWeapon)
 		{
-			if (UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent())
-			{
-				ASC->SetLooseGameplayTagCount(NlGameplayTags::Status_Combat, 1);
-			}
-			
 			if (MainWeapon)
             {
              	MainWeapon->EquipCharacterWeapon(Character, true);
