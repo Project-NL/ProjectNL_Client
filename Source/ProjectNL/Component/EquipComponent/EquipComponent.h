@@ -18,6 +18,8 @@ public:
 	UEquipComponent();
 
 	void UpdateEquipWeaponAnimationData();
+
+	GETTER(bool, IsFirstEquipWeapon)
 	
 	// ABP에서 주로 사용함.
 	GETTER(TArray<TObjectPtr<UAnimMontage>>, ComboAttackAnim)

@@ -4,6 +4,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 
 
 ABaseCharacter::ABaseCharacter()
@@ -16,6 +17,18 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
+void ABaseCharacter::Initialize()
+{
+	if (AbilitySystemComponent)
+	{
+		if (GetEquipComponent()->GetIsFirstEquipWeapon())
+		{
+			AbilitySystemComponent->AddLooseGameplayTag(NlGameplayTags::Status_Combat);
+		}
+	}
+}
+
 
 void ABaseCharacter::Server_ApplyGameplayEffectToSelf_Implementation(
 	TSubclassOf<UGameplayEffect> Effect, const uint32 Level)
