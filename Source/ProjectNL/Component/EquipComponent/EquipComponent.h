@@ -21,7 +21,12 @@ public:
 	
 	// ABP에서 주로 사용함.
 	GETTER(TArray<TObjectPtr<UAnimMontage>>, ComboAttackAnim)
-	GETTER(TObjectPtr<ABaseWeapon>,MainWeapon)
+
+	GETTER(TObjectPtr<UAnimMontage>, EquipAnim)
+	GETTER(TObjectPtr<UAnimMontage>, UnEquipAnim)
+
+	GETTER(TObjectPtr<ABaseWeapon>, MainWeapon)
+	GETTER(TObjectPtr<ABaseWeapon>, SubWeapon)
 protected:
 	virtual void BeginPlay() override;
 
