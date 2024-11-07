@@ -48,6 +48,11 @@ protected:
 													, bool bReplicateEndAbility
 													, bool bWasCancelled) override;
 
+	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle
+														, const FGameplayAbilityActorInfo* ActorInfo
+														, const FGameplayAbilityActivationInfo
+														ActivationInfo) override;
+
 private:
 	// InputID가 -1인 경우 InputID를 할당받지 않은 상태라고 인지함
 	UPROPERTY(EditAnywhere, Category = "Input", meta=(AllowPrivateAccess="true"))
@@ -56,9 +61,4 @@ private:
 	void OnAbilityInputPressed(const FGameplayAbilityActorInfo* ActorInfo);
 
 	void OnAbilityInputReleased(const FGameplayAbilityActorInfo* ActorInfo);
-
-	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle
-														, const FGameplayAbilityActorInfo* ActorInfo
-														, const FGameplayAbilityActivationInfo
-														ActivationInfo) override;
 };
