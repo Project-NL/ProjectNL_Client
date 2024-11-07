@@ -77,3 +77,5 @@ DerivedDataCache/*
 
 # 기본 에셋과 맵 정보는 제외
 /Content/Assets
+/Content/*
+!/Content/Blueprints

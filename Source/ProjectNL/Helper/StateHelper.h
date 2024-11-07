@@ -46,11 +46,6 @@ public:
 			{
 				return EPlayerCombatWeaponState::OnlyOneHandDagger;
 			}
-			// 메인 무기가 단검이고 보조 무기가 표창인 경우는 특수 세트로 처리된다.
-			if (SubWeapon->GetWeaponType() == EUWeaponType::NinjaStar)
-			{
-				return EPlayerCombatWeaponState::OneHandDaggerAndNinjaStar;
-			}
 			// SubWeapon으로 방패를 착용하고 있는 경우
 			if (SubWeapon->GetWeaponType() == EUWeaponType::Shield)
 			{

@@ -58,7 +58,6 @@ enum class EUWeaponType : uint8
 	, Spear UMETA(DisplayName = "Spear") , Dagger UMETA(DisplayName = "Dagger")
 	, Hammer UMETA(DisplayName = "Hammer"), Staff UMETA(DisplayName = "Staff")
 	, GreatSword UMETA(DisplayName = "GreatSword")
-	, NinjaStar UMETA(DisplayName = "NinjaStar")
 	, Gauntlet UMETA(DisplayName = "Gauntlet")
 	, Bow UMETA(DisplayName = "Bow"), Katana UMETA(DisplayName = "Katana")};
 
@@ -83,7 +82,6 @@ enum class EPlayerCombatWeaponState: uint8
 	, TwoHandBlunt UMETA(DisplayName = "TwoHandBlunt")
 	// 특수 공격 무기
 	, OnlyDualFist UMETA(DisplayName = "OnlyDualFist")
-	, OneHandDaggerAndNinjaStar UMETA(DisplayName = "OneHandDaggerAndNinjaStar")
 	, TwoHandBow UMETA(DisplayName = "TwoHandBow")
 	, TwoHandKatana UMETA(DisplayName = "TwoHandKatana")
 	, TwoHandMagicStaff UMETA(DisplayName = "TwoHandMagicStaff")};
