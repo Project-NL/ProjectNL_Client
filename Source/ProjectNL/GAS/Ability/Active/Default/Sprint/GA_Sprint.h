@@ -46,5 +46,5 @@ private:
 	FDateTime ActiveTime;
 
 	UFUNCTION()
-	void Test(FGameplayTag EventTag, FGameplayEventData EventData);
+	void EndEvade(FGameplayTag EventTag, FGameplayEventData EventData);
 };

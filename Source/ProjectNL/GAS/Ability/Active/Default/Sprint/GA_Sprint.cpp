@@ -26,11 +26,13 @@ const
 
 	return true;
 }
+
 void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	ActiveTime = FDateTime::Now();
+	
 	if (BuffEffect)
 	{
 		FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->
@@ -63,17 +65,17 @@ void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FG
 	{
 		if (ABaseCharacter* OwnerCharacter = Cast<ABaseCharacter>(ActorInfo->AvatarActor.Get()))
 		{
-			SetCurrentMontage(OwnerCharacter->GetEquipComponent()->GetEquipAnim());
+			SetCurrentMontage(OwnerCharacter->GetEquipComponent()->GetEvadeAnim().F_Animation);
 
 			UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
 				NAME_None, GetCurrentMontage(), FGameplayTagContainer());
-			Task->OnCompleted.AddDynamic(this, &ThisClass::Test);
+			Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
 			Task->ReadyForActivation();
 		}
 	}
 }
 
-void UGA_Sprint::Test(FGameplayTag EventTag, FGameplayEventData EventData)
+void UGA_Sprint::EndEvade(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo,
 		true, false);
