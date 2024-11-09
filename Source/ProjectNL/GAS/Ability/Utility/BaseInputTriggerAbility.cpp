@@ -113,8 +113,5 @@ void UBaseInputTriggerAbility::OnAbilityInputReleased(
 	{
 		Owner->GetAbilitySystemComponent()->AbilityLocalInputReleased(
 			static_cast<uint32>(InputID));
-		FGameplayAbilitySpec* Spec = Owner->GetAbilitySystemComponent()->FindAbilitySpecFromInputID(
-			static_cast<uint8>(InputID));
-		Owner->GetAbilitySystemComponent()->ServerSetInputReleased(Spec->Handle);
 	}
 }
