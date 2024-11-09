@@ -7,6 +7,11 @@
 class FStateHelper
 {
 public:
+	FORCEINLINE static bool GetIsCharacterTargetMode(const UAbilitySystemComponent* Ability)
+	{
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Targeting);
+	}
+	
 	FORCEINLINE static EPlayerCombatWeaponState GetCharacterWeaponState(ABaseWeapon* MainWeapon, ABaseWeapon* SubWeapon)
 {
 		// 0. MainWeapon이 장착되지 않은 것은 비지니스 로직 상 SubWeapon도 장착되지 않는다.

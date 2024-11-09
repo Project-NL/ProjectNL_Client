@@ -3,6 +3,9 @@
 #include "AbilitySystemComponent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
+#include "ProjectNL/Helper/EnumHelper.h"
+#include "ProjectNL/Helper/LocateHelper.h"
+#include "ProjectNL/Helper/StateHelper.h"
 
 UGA_Sprint::UGA_Sprint(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -64,13 +67,29 @@ void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FG
 	{
 		if (ABaseCharacter* OwnerCharacter = Cast<ABaseCharacter>(ActorInfo->AvatarActor.Get()))
 		{
-			SetCurrentMontage(OwnerCharacter->GetEquipComponent()->GetEvadeAnim().F_Animation);
-
-			UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
-				NAME_None, GetCurrentMontage(), FGameplayTagContainer());
-			Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
-			Task->ReadyForActivation();
+			const EMovementDirection CurrentDirection =
+				FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
+					? FLocateHelper::GetDirectionByVector(OwnerCharacter->GetMovementVector()) : EMovementDirection::F;
+			
+			if (UAnimMontage* EvadeAnim = OwnerCharacter->GetEquipComponent()
+				->GetEvadeAnim().GetAnimationByDirection(CurrentDirection))
+			{
+				SetCurrentMontage(EvadeAnim);
+				
+				UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
+                				NAME_None, GetCurrentMontage(), FGameplayTagContainer());
+                Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
+                Task->ReadyForActivation();
+			} else
+			{
+				EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo,
+					true, false);
+			}
 		}
+	} else
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo,
+					true, false);
 	}
 }
 
