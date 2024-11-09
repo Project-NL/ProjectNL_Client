@@ -4,7 +4,6 @@
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
 #include "GA_Sprint.generated.h"
 
-
 UCLASS()
 class PROJECTNL_API UGA_Sprint : public UBaseInputTriggerAbility
 {
@@ -30,14 +29,22 @@ protected:
 														, bool bReplicateCancelAbility) override;
 
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+
+	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
+	
 private:
+	UPROPERTY(EditDefaultsOnly,Category="Ability|Effect"
+		, meta=(AllowPrivateAccess = true))
+	uint8 HoldExistTime;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
 		, meta=(AllowPrivateAccess = true))
 	TSubclassOf<UGameplayEffect> BuffEffect;
 
-	FGameplayEffectContextHandle EffectContext;
-	FGameplayEffectSpecHandle SpecHandle;
+	FActiveGameplayEffectHandle ActiveHandle;
 
-	// TODO: 추후 이 트리거에 대해 공통 Ability Class를 만드는 것 도 좋아보임
-	bool bIsActivated;
+	FDateTime ActiveTime;
+
+	UFUNCTION()
+	void EndEvade(FGameplayTag EventTag, FGameplayEventData EventData);
 };

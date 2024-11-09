@@ -126,7 +126,7 @@ void APlayerCharacter::SetupPlayerInputComponent(
 
 void APlayerCharacter::MoveTo(const FInputActionValue& Value)
 {
-	const FVector2D MovementVector = Value.Get<FVector2D>();
+	MovementVector = Value.Get<FVector2D>();
 	if (const TObjectPtr<AController> ActorController = GetController())
 	{
 		const FRotator Rotation = ActorController->GetControlRotation();

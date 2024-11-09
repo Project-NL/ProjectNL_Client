@@ -26,10 +26,6 @@ public:
 	UInputAction* ActivationInputAction = nullptr;
 
 	GETTER(EInputIDType, InputID)
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bActivateAbilityInputTrigger;
-
 protected:
 	uint32 TriggeredEventHandle = -1;
 
@@ -56,9 +52,4 @@ private:
 	void OnAbilityInputPressed(const FGameplayAbilityActorInfo* ActorInfo);
 
 	void OnAbilityInputReleased(const FGameplayAbilityActorInfo* ActorInfo);
-
-	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle
-														, const FGameplayAbilityActorInfo* ActorInfo
-														, const FGameplayAbilityActivationInfo
-														ActivationInfo) override;
 };
