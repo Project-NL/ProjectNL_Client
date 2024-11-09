@@ -7,7 +7,6 @@
 UGA_Sprint::UGA_Sprint(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	bActivateAbilityInputTrigger = true;
 	HoldExistTime = 1;
 }
 

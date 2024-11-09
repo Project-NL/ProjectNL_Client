@@ -6,7 +6,6 @@
 UBaseInputTriggerAbility::UBaseInputTriggerAbility(
 	const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, bActivateAbilityInputTrigger(false)
 {
 	InputID = EInputIDType::None;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -73,19 +72,6 @@ void UBaseInputTriggerAbility::EndAbility(
 		TriggeredEventHandle = -1;
 	}
 }
-
-void UBaseInputTriggerAbility::InputReleased(
-	const FGameplayAbilitySpecHandle Handle
-	, const FGameplayAbilityActorInfo* ActorInfo
-	, const FGameplayAbilityActivationInfo ActivationInfo)
-{
-	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
-	if (bActivateAbilityInputTrigger)
-	{
-		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
-	}
-}
-
 
 void UBaseInputTriggerAbility::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
