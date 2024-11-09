@@ -86,3 +86,15 @@ enum class EPlayerCombatWeaponState: uint8
 	, TwoHandKatana UMETA(DisplayName = "TwoHandKatana")
 	, TwoHandMagicStaff UMETA(DisplayName = "TwoHandMagicStaff")};
 
+
+UENUM(BlueprintType)
+enum class EMovementDirection: uint8
+{
+	F UMETA(DisplayName = "Forward")
+	, FL UMETA(DisplayName = "ForwardLeft")
+	, FR UMETA(DisplayName = "ForwardRight")
+	, L UMETA(DisplayName = "Left")
+	, R UMETA(DisplayName = "Right")
+	, B UMETA(DisplayName = "Backward")
+	, BL UMETA(DisplayName = "BackwardLeft")
+	, BR UMETA(DisplayName = "BackwardRight")};
