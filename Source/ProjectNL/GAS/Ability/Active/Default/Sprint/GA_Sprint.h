@@ -35,7 +35,7 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly,Category="Ability|Effect"
 		, meta=(AllowPrivateAccess = true))
-	uint8 HoldExistTime;
+	float HoldExistTime;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
 		, meta=(AllowPrivateAccess = true))
