@@ -33,6 +33,7 @@ enum class EInputIDType: uint8
 	, Attack UMETA(DisplayName = "Attack"), Sprint UMETA(DisplayName = "Sprint")
 	, ToggleCombatMode UMETA(DisplayName = "ToggleCombatMode")
 	, FixedCamera UMETA(DisplayName = "FixedCamera")
+	, Dodge UMETA(DisplayName = "Dodge")
 	, Skill1 UMETA(DisplayName = "Skill1"), Skill2 UMETA(DisplayName = "Skill2")
 	, Skill3 UMETA(DisplayName = "Skill3"), Skill4 UMETA(DisplayName = "Skill4")};
 

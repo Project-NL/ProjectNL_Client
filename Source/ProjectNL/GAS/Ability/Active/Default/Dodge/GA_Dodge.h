@@ -1,14 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
 #include "GA_Dodge.generated.h"
 
-/**
- * 
- */
+class UPlayMontageWithEvent;
+
 UCLASS()
 class PROJECTNL_API UGA_Dodge : public UBaseInputTriggerAbility
 {
@@ -29,21 +26,10 @@ protected:
 													, const FGameplayAbilityActivationInfo ActivationInfo
 													, bool bReplicateEndAbility
 													, bool bWasCancelled) override;
-	
-	void PlayDirectionalDodgeAnimation();
 
 	UFUNCTION()
 	void OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData);
 	
 	UFUNCTION()
 	void OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
-	
-	void ClearDelegate();
-private:
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS")
-	TArray<TObjectPtr<UAnimMontage>> DodgeAnimMontage;
-	
-	TObjectPtr<class UPlayMontageWithEvent> Task;
 };

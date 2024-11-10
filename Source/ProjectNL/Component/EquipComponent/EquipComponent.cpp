@@ -99,4 +99,15 @@ void UEquipComponent::SetAnimationsByWeaponState()
 	{
 		EvadeAnim = {};
 	}
+
+	const FString StepAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState) + "StepAnim";
+	if (const FCombatAnimationByRotationData* NewStepAnim = CombatAnimByDirectionData.DataTable->FindRow<
+		FCombatAnimationByRotationData>(*StepAnimRowName, ""))
+	{
+		StepAnim = NewStepAnim->AnimGroup;
+	} else
+	{
+		StepAnim = {};
+	}
 }
