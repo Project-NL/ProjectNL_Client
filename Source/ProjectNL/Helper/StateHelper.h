@@ -115,7 +115,12 @@ public:
 
 	FORCEINLINE static bool IsPlayerIdle(const UAbilitySystemComponent* Ability)
 	{
-		return Ability->GetGameplayTagCount(NlGameplayTags::State_Idle) == 1;
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::State_Idle);
+	}
+
+	FORCEINLINE static bool IsPlayerStatusGuard(const UAbilitySystemComponent* Ability)
+	{
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Guard);
 	}
 
 	FORCEINLINE static void ChangePlayerState(UAbilitySystemComponent* Ability

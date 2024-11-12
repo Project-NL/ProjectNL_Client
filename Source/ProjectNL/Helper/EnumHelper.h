@@ -30,7 +30,8 @@ UENUM(BlueprintType)
 enum class EInputIDType: uint8
 {
 	None UMETA(DisplayName = "None"), Jump UMETA(DisplayName = "Jump")
-	, Attack UMETA(DisplayName = "Attack"), Sprint UMETA(DisplayName = "Sprint")
+	, Attack UMETA(DisplayName = "Attack"), Guard UMETA(DisplayName = "Guard")
+	, Sprint UMETA(DisplayName = "Sprint")
 	, ToggleCombatMode UMETA(DisplayName = "ToggleCombatMode")
 	, FixedCamera UMETA(DisplayName = "FixedCamera")
 	, Dodge UMETA(DisplayName = "Dodge")

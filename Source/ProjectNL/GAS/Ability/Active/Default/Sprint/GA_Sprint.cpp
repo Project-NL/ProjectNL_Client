@@ -26,6 +26,11 @@ const
 		return false;
 	}
 
+	if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+	{
+		return false;
+	}
+	
 	return true;
 }
 
