@@ -72,7 +72,11 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 	{
 		AddLooseGameplayTags(InitData.GameplayTags);
 	}
-
-
+	
 	SetIsInitialized(true);
+}
+
+void UNLAbilitySystemComponent::ReceiveDamage(const float Damage) const
+{
+	OnDamage.Broadcast(Damage);
 }
