@@ -88,6 +88,17 @@ void UEquipComponent::SetAnimationsByWeaponState()
 	{
 		UnEquipAnim = nullptr;
 	}
+	
+	const FString BlockAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState) + "BlockAnim";
+	if (const FCombatAnimationData* NewBlockAnim = CombatAnimData.DataTable->FindRow<
+		FCombatAnimationData>(*BlockAnimRowName, ""))
+	{
+		BlockAnim = NewBlockAnim->AnimGroup.Top();
+	} else
+	{
+		BlockAnim = nullptr;
+	}
 
 	const FString EvadeAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
 		PlayerCombatWeaponState) + "EvadeAnim";

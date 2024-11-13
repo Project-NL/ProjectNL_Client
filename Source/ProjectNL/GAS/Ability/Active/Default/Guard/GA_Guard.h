@@ -5,6 +5,7 @@
 #include "GA_Guard.generated.h"
 
 class UAT_PutDamageWithEvent;
+class UPlayMontageWithEvent;
 
 UCLASS()
 class PROJECTNL_API UGA_Guard : public UBaseInputTriggerAbility
@@ -21,7 +22,11 @@ protected:
 
 private:
 	TObjectPtr<UAT_PutDamageWithEvent> DamageWithEventTask;
+	TObjectPtr<UPlayMontageWithEvent> AnimationTask;
 
 	UFUNCTION()
 	void GuardDamage(float Damage);
+
+	UFUNCTION()
+	void EndBlock(FGameplayTag EventTag, FGameplayEventData EventData);
 };

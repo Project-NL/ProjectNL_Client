@@ -27,6 +27,7 @@ public:
 
 	GETTER(TObjectPtr<UAnimMontage>, EquipAnim)
 	GETTER(TObjectPtr<UAnimMontage>, UnEquipAnim)
+	GETTER(TObjectPtr<UAnimMontage>, BlockAnim)
 	GETTER(FAnimationByRotation, EvadeAnim)
 	GETTER(FAnimationByRotation, StepAnim)
 
@@ -70,6 +71,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UAnimMontage> UnEquipAnim;
+	
+	UPROPERTY()
+	TObjectPtr<UAnimMontage> BlockAnim;
 
 	UPROPERTY()
 	TArray<TObjectPtr<UAnimMontage>> ComboAttackAnim;
