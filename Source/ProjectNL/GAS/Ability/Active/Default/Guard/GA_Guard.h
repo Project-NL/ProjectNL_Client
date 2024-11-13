@@ -4,6 +4,7 @@
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
 #include "GA_Guard.generated.h"
 
+class UBlockStartNotify;
 class UAT_PutDamageWithEvent;
 class UPlayMontageWithEvent;
 
@@ -24,8 +25,13 @@ private:
 	TObjectPtr<UAT_PutDamageWithEvent> DamageWithEventTask;
 	TObjectPtr<UPlayMontageWithEvent> AnimationTask;
 
+	TObjectPtr<UBlockStartNotify> BlockStartNotify;
+
 	UFUNCTION()
 	void GuardDamage(float Damage);
+
+	UFUNCTION()
+	void OnBlockStart();
 
 	UFUNCTION()
 	void EndBlock(FGameplayTag EventTag, FGameplayEventData EventData);
