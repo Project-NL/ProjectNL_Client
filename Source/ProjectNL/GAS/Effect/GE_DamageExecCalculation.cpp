@@ -17,6 +17,6 @@ void UGE_DamageExecCalculation::Execute_Implementation(const FGameplayEffectCust
 
 	if (UNLAbilitySystemComponent* TargetASC = Cast<UNLAbilitySystemComponent>(TargetAbilitySystemComponent))
 	{
-		TargetASC->ReceiveDamage(10.f);
+		TargetASC->ReceiveDamage(DamageValue);
 	}
 }

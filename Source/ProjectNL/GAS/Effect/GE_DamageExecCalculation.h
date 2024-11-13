@@ -15,4 +15,11 @@ public:
 
 protected:
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
+	float DamageValue = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category="Value", meta = (AllowPrivateAccess = true))
+	FGameplayTag DamageCalcTag;
 };

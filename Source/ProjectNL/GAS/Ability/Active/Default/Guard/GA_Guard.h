@@ -4,6 +4,8 @@
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
 #include "GA_Guard.generated.h"
 
+class UAT_PutDamageWithEvent;
+
 UCLASS()
 class PROJECTNL_API UGA_Guard : public UBaseInputTriggerAbility
 {
@@ -16,4 +18,10 @@ protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
+
+private:
+	TObjectPtr<UAT_PutDamageWithEvent> DamageWithEventTask;
+
+	UFUNCTION()
+	void GuardDamage(float Damage);
 };
