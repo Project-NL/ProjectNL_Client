@@ -22,7 +22,12 @@ bool UBTDecorator_CheckGamePlayTag::CalculateRawConditionValue(UBehaviorTreeComp
 
 bool UBTDecorator_CheckGamePlayTag::PerformConditionCheckAI(AAIController* OwnerController, APawn* ControlledPawn) const
 {
-	if (!OwnerController || !ControlledPawn)
+	if (!OwnerController)
+	{
+		return false;
+	}
+	
+	if (!ControlledPawn)
 	{
 		return false;
 	}
