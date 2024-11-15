@@ -22,11 +22,28 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	// 태그 컨테이너 선언
-	if(!GetCharacterMovement())
+	// if(!GetCharacterMovement())
+	// {
+	// 	return;
+	// }
+	// // Check if the character is falling
+	
+}
+
+void ABaseCharacter::Initialize()
+{
+	if (AbilitySystemComponent)
 	{
-		return;
+		if (GetEquipComponent()->GetIsFirstEquipWeapon())
+		{
+			AbilitySystemComponent->AddLooseGameplayTag(NlGameplayTags::Status_Combat);
+		}
 	}
-	// Check if the character is falling
+}
+
+void ABaseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
 	if(AbilitySystemComponent)
 	{
 		if (GetCharacterMovement()->IsFalling())
@@ -46,17 +63,6 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 				AbilitySystemComponent->AddLooseGameplayTag(NlGameplayTags::Status_Movement_Grounded);
 			}
 			AbilitySystemComponent->RemoveLooseGameplayTag(NlGameplayTags::Status_Movement_Falling);
-		}
-	}
-}
-
-void ABaseCharacter::Initialize()
-{
-	if (AbilitySystemComponent)
-	{
-		if (GetEquipComponent()->GetIsFirstEquipWeapon())
-		{
-			AbilitySystemComponent->AddLooseGameplayTag(NlGameplayTags::Status_Combat);
 		}
 	}
 }
