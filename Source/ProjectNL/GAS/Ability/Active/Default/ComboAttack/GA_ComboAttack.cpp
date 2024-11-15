@@ -1,12 +1,10 @@
 ﻿#include "GA_ComboAttack.h"
 
-//#include "AT_HeavyAttack.h"
 #include "AnimNotify/ComboAttackEndNotify.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Active/Default/ComboAttack/AnimNotify/ComboAttackNotifyState.h"
 #include"Abilities/Tasks/AbilityTask_WaitDelay.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 
 
@@ -135,13 +133,6 @@ void UGA_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle Handle
 
 }
 
-void UGA_ComboAttack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-                                   const FGameplayAbilityActivationInfo ActivationInfo)
-{
-	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
-
-	UE_LOG(LogTemp, Display, TEXT("Test Combo InputPressed"));
-}
 
 void UGA_ComboAttack::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
                                     const FGameplayAbilityActivationInfo ActivationInfo)
@@ -149,10 +140,7 @@ void UGA_ComboAttack::InputReleased(const FGameplayAbilitySpecHandle Handle, con
 	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
 	const FTimespan HoldDuration = FDateTime::Now() - InputPressedTime;
 	UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo();
-	if(!AbilitySystem)
-	{
-		return;
-	}
+	check(AbilitySystem);
 	// 태그에 따라 조건 분기
 	if (AbilitySystem->HasMatchingGameplayTag(NlGameplayTags::Status_Movement_Falling))
 	{
