@@ -4,6 +4,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 
 
 ABaseCharacter::ABaseCharacter()
@@ -16,6 +17,35 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
+void ABaseCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	// 태그 컨테이너 선언
+	// if(!GetCharacterMovement())
+	// {
+	// 	return;
+	// }
+	// // Check if the character is falling
+	
+}
+
+void ABaseCharacter::Initialize()
+{
+	if (AbilitySystemComponent)
+	{
+		if (GetEquipComponent()->GetIsFirstEquipWeapon())
+		{
+			AbilitySystemComponent->AddLooseGameplayTag(NlGameplayTags::Status_Combat);
+		}
+	}
+}
+
+void ABaseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+}
+
 
 void ABaseCharacter::Server_ApplyGameplayEffectToSelf_Implementation(
 	TSubclassOf<UGameplayEffect> Effect, const uint32 Level)

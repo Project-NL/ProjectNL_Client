@@ -63,6 +63,8 @@ void APlayerCharacter::OnRep_PlayerState()
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
+
+		Initialize();
 	}
 }
 
@@ -85,6 +87,8 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
+		
+		Initialize();
 	}
 }
 
@@ -122,7 +126,7 @@ void APlayerCharacter::SetupPlayerInputComponent(
 
 void APlayerCharacter::MoveTo(const FInputActionValue& Value)
 {
-	const FVector2D MovementVector = Value.Get<FVector2D>();
+	MovementVector = Value.Get<FVector2D>();
 	if (const TObjectPtr<AController> ActorController = GetController())
 	{
 		const FRotator Rotation = ActorController->GetControlRotation();

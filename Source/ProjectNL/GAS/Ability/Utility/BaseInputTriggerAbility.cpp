@@ -1,16 +1,15 @@
 ﻿#include "BaseInputTriggerAbility.h"
-
 #include "ProjectNL/Helper/EnumHelper.h"
 #include "AbilitySystemComponent.h"
 
 UBaseInputTriggerAbility::UBaseInputTriggerAbility(
 	const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, bActivateAbilityInputTrigger(false)
 {
 	InputID = EInputIDType::None;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	//NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 }
 
 void UBaseInputTriggerAbility::OnAvatarSet(
@@ -74,19 +73,6 @@ void UBaseInputTriggerAbility::EndAbility(
 	}
 }
 
-void UBaseInputTriggerAbility::InputReleased(
-	const FGameplayAbilitySpecHandle Handle
-	, const FGameplayAbilityActorInfo* ActorInfo
-	, const FGameplayAbilityActivationInfo ActivationInfo)
-{
-	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
-	if (bActivateAbilityInputTrigger)
-	{
-		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
-	}
-}
-
-
 void UBaseInputTriggerAbility::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -127,5 +113,7 @@ void UBaseInputTriggerAbility::OnAbilityInputReleased(
 	{
 		Owner->GetAbilitySystemComponent()->AbilityLocalInputReleased(
 			static_cast<uint32>(InputID));
+		FGameplayAbilitySpec* Spec = Owner->GetAbilitySystemComponent()->FindAbilitySpecFromInputID(static_cast<uint8>(InputID));
+		Owner->GetAbilitySystemComponent()->ServerSetInputReleased(Spec->Handle);
 	}
 }

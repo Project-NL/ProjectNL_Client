@@ -7,6 +7,11 @@
 class FStateHelper
 {
 public:
+	FORCEINLINE static bool GetIsCharacterTargetMode(const UAbilitySystemComponent* Ability)
+	{
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Targeting);
+	}
+	
 	FORCEINLINE static EPlayerCombatWeaponState GetCharacterWeaponState(ABaseWeapon* MainWeapon, ABaseWeapon* SubWeapon)
 {
 		// 0. MainWeapon이 장착되지 않은 것은 비지니스 로직 상 SubWeapon도 장착되지 않는다.
@@ -45,11 +50,6 @@ public:
 			if (SubWeapon == nullptr)
 			{
 				return EPlayerCombatWeaponState::OnlyOneHandDagger;
-			}
-			// 메인 무기가 단검이고 보조 무기가 표창인 경우는 특수 세트로 처리된다.
-			if (SubWeapon->GetWeaponType() == EUWeaponType::NinjaStar)
-			{
-				return EPlayerCombatWeaponState::OneHandDaggerAndNinjaStar;
 			}
 			// SubWeapon으로 방패를 착용하고 있는 경우
 			if (SubWeapon->GetWeaponType() == EUWeaponType::Shield)
@@ -115,7 +115,12 @@ public:
 
 	FORCEINLINE static bool IsPlayerIdle(const UAbilitySystemComponent* Ability)
 	{
-		return Ability->GetGameplayTagCount(NlGameplayTags::State_Idle) == 1;
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::State_Idle);
+	}
+
+	FORCEINLINE static bool IsPlayerStatusGuard(const UAbilitySystemComponent* Ability)
+	{
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Guard);
 	}
 
 	FORCEINLINE static void ChangePlayerState(UAbilitySystemComponent* Ability

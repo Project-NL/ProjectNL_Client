@@ -19,13 +19,9 @@ void UEquipComponent::BeginPlay()
 	{
 		MainWeapon = GetWorld()->SpawnActor<ABaseWeapon>(MainWeaponClass);
 		SubWeapon = GetWorld()->SpawnActor<ABaseWeapon>(SubWeaponClass);
+		
 		if (IsFirstEquipWeapon)
 		{
-			if (UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent())
-			{
-				ASC->SetLooseGameplayTagCount(NlGameplayTags::Status_Combat, 1);
-			}
-			
 			if (MainWeapon)
             {
              	MainWeapon->EquipCharacterWeapon(Character, true);
@@ -91,5 +87,38 @@ void UEquipComponent::SetAnimationsByWeaponState()
 	} else
 	{
 		UnEquipAnim = nullptr;
+	}
+	
+	const FString BlockAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState) + "BlockAnim";
+	if (const FCombatAnimationData* NewBlockAnim = CombatAnimData.DataTable->FindRow<
+		FCombatAnimationData>(*BlockAnimRowName, ""))
+	{
+		BlockAnim = NewBlockAnim->AnimGroup.Top();
+	} else
+	{
+		BlockAnim = nullptr;
+	}
+
+	const FString EvadeAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState) + "EvadeAnim";
+	if (const FCombatAnimationByRotationData* NewEvadeAnim = CombatAnimByDirectionData.DataTable->FindRow<
+		FCombatAnimationByRotationData>(*EvadeAnimRowName, ""))
+	{
+		EvadeAnim = NewEvadeAnim->AnimGroup;
+	} else
+	{
+		EvadeAnim = {};
+	}
+
+	const FString StepAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState) + "StepAnim";
+	if (const FCombatAnimationByRotationData* NewStepAnim = CombatAnimByDirectionData.DataTable->FindRow<
+		FCombatAnimationByRotationData>(*StepAnimRowName, ""))
+	{
+		StepAnim = NewStepAnim->AnimGroup;
+	} else
+	{
+		StepAnim = {};
 	}
 }
