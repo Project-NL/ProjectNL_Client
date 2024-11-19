@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "CombatAnimationData.h"
 #include "Components/ActorComponent.h"
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "EquipComponent.generated.h"
@@ -28,6 +29,9 @@ public:
 	
 	GETTER(TObjectPtr<UAnimMontage>, EquipAnim)
 	GETTER(TObjectPtr<UAnimMontage>, UnEquipAnim)
+	GETTER(TObjectPtr<UAnimMontage>, BlockAnim)
+	GETTER(FAnimationByRotation, EvadeAnim)
+	GETTER(FAnimationByRotation, StepAnim)
 
 	GETTER(TObjectPtr<ABaseWeapon>, MainWeapon)
 	GETTER(TObjectPtr<ABaseWeapon>, SubWeapon)
@@ -61,18 +65,21 @@ private:
 	// TODO: 타입 제한이 가능한지 다시 check할 필요가 있음
 	UPROPERTY(Category="Property|Weapon", EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	FDataTableRowHandle CombatAnimData;
+	
+	UPROPERTY(Category="Property|Weapon", EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	FDataTableRowHandle CombatAnimByDirectionData;
 
 	// 애니메이션 관련 정보
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
-		, meta = (AllowPrivateAccess = true))
+	UPROPERTY()
 	TObjectPtr<UAnimMontage> EquipAnim;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
-		, meta = (AllowPrivateAccess = true))
+	UPROPERTY()
 	TObjectPtr<UAnimMontage> UnEquipAnim;
+	
+	UPROPERTY()
+	TObjectPtr<UAnimMontage> BlockAnim;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
-		, meta = (AllowPrivateAccess = true))
+	UPROPERTY()
 	TArray<TObjectPtr<UAnimMontage>> ComboAttackAnim;
 	//강공격
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
@@ -82,4 +89,8 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
 		, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> JumpAttackAnim;
+
+	FAnimationByRotation EvadeAnim;
+	
+	FAnimationByRotation StepAnim;
 };

@@ -7,6 +7,11 @@
 class FStateHelper
 {
 public:
+	FORCEINLINE static bool GetIsCharacterTargetMode(const UAbilitySystemComponent* Ability)
+	{
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Targeting);
+	}
+	
 	FORCEINLINE static EPlayerCombatWeaponState GetCharacterWeaponState(ABaseWeapon* MainWeapon, ABaseWeapon* SubWeapon)
 {
 		// 0. MainWeapon이 장착되지 않은 것은 비지니스 로직 상 SubWeapon도 장착되지 않는다.
@@ -110,7 +115,12 @@ public:
 
 	FORCEINLINE static bool IsPlayerIdle(const UAbilitySystemComponent* Ability)
 	{
-		return Ability->GetGameplayTagCount(NlGameplayTags::State_Idle) == 1;
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::State_Idle);
+	}
+
+	FORCEINLINE static bool IsPlayerStatusGuard(const UAbilitySystemComponent* Ability)
+	{
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Guard);
 	}
 
 	FORCEINLINE static void ChangePlayerState(UAbilitySystemComponent* Ability

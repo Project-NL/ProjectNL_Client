@@ -30,9 +30,11 @@ UENUM(BlueprintType)
 enum class EInputIDType: uint8
 {
 	None UMETA(DisplayName = "None"), Jump UMETA(DisplayName = "Jump")
-	, Attack UMETA(DisplayName = "Attack"), Sprint UMETA(DisplayName = "Sprint")
+	, Attack UMETA(DisplayName = "Attack"), Guard UMETA(DisplayName = "Guard")
+	, Sprint UMETA(DisplayName = "Sprint")
 	, ToggleCombatMode UMETA(DisplayName = "ToggleCombatMode")
 	, FixedCamera UMETA(DisplayName = "FixedCamera")
+	, Dodge UMETA(DisplayName = "Dodge")
 	, Skill1 UMETA(DisplayName = "Skill1"), Skill2 UMETA(DisplayName = "Skill2")
 	, Skill3 UMETA(DisplayName = "Skill3"), Skill4 UMETA(DisplayName = "Skill4")};
 
@@ -86,3 +88,15 @@ enum class EPlayerCombatWeaponState: uint8
 	, TwoHandKatana UMETA(DisplayName = "TwoHandKatana")
 	, TwoHandMagicStaff UMETA(DisplayName = "TwoHandMagicStaff")};
 
+
+UENUM(BlueprintType)
+enum class EMovementDirection: uint8
+{
+	F UMETA(DisplayName = "Forward")
+	, FL UMETA(DisplayName = "ForwardLeft")
+	, FR UMETA(DisplayName = "ForwardRight")
+	, L UMETA(DisplayName = "Left")
+	, R UMETA(DisplayName = "Right")
+	, B UMETA(DisplayName = "Backward")
+	, BL UMETA(DisplayName = "BackwardLeft")
+	, BR UMETA(DisplayName = "BackwardRight")};

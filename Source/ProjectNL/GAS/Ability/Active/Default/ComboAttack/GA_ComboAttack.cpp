@@ -5,6 +5,8 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Active/Default/ComboAttack/AnimNotify/ComboAttackNotifyState.h"
 #include"Abilities/Tasks/AbilityTask_WaitDelay.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 
 
@@ -139,10 +141,10 @@ void UGA_ComboAttack::InputReleased(const FGameplayAbilitySpecHandle Handle, con
 {
 	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
 	const FTimespan HoldDuration = FDateTime::Now() - InputPressedTime;
-	UAbilitySystemComponent* AbilitySystem = GetAbilitySystemComponentFromActorInfo();
-	check(AbilitySystem);
+	APlayerCharacter* Player = Cast<APlayerCharacter>(GetAvatarActorFromActorInfo());
+	check(Player);
 	// 태그에 따라 조건 분기
-	if (AbilitySystem->HasMatchingGameplayTag(NlGameplayTags::Status_Movement_Falling))
+	if (Player->GetMovementComponent()->IsFalling())
 	{
 		ExecuteJumpAttack();
 	}

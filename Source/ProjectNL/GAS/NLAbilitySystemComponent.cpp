@@ -2,6 +2,9 @@
 
 #include "NLAbilitySystemInitializationData.h"
 #include "Ability/Utility/BaseInputTriggerAbility.h"
+#include "Attribute/PlayerAttributeSet.h"
+#include "ProjectNL/Character/Player/PlayerCharacter.h"
+#include "ProjectNL/Helper/GameplayTagHelper.h"
 
 
 UNLAbilitySystemComponent::UNLAbilitySystemComponent()
@@ -72,7 +75,28 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 	{
 		AddLooseGameplayTags(InitData.GameplayTags);
 	}
-
-
+	
 	SetIsInitialized(true);
+}
+
+void UNLAbilitySystemComponent::ReceiveDamage(const float Damage) const
+{
+	// 추가적인 동작이 필요할 때 (ex. 특정 이벤트 실행)
+	OnDamage.Broadcast(Damage);
+	// TODO: 추후 플레이어 말고도 다른 엔티티나 액터 등에 대한 예외도 처리해야함.
+	// 현재는 플레이어만 AttributeSet이 장착되어 있기 때문에 이렇게 처리됨.
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(GetAvatarActor()))
+    {
+		UPlayerAttributeSet* PAS = Player->PlayerAttributeSet.Get();
+		check(PAS)
+		
+		if (HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+		{
+			// TODO: 추후 / 10 대신 방어용 로직 넣을 예정
+			PAS->SetHealth(PAS->GetHealth() - Damage / 10);
+			return;
+		}
+
+		PAS->SetHealth(PAS->GetHealth() - Damage);
+    }
 }
