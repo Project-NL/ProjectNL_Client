@@ -37,6 +37,8 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
 	
 	UPROPERTY()
 	UNLAbilitySystemComponent* AbilitySystemComponent;
@@ -55,6 +57,8 @@ protected:
 	void MovementSpeedChanged(const FOnAttributeChangeData& Data);
 	
 	void Initialize();
+
+	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))
