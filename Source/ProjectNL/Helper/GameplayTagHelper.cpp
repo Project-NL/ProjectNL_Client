@@ -12,4 +12,6 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_PutWeapon, "State.PutWeapon", "특정 액터가 현재 무기를 집어넣는 상태일 때를 나타내는 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status, "Status", "특정 액터의 현재 상황에 대해 나타내는 태그로 여러개가 들어갈 수 있음");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Combat, "Status.Combat", "특정 액터가 현재 전투를 준비한 상황에 대한 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Movement_Grounded, "Status.Movement.Grounded", "특정 액터가 현재 땅에 붙어있는 상태일 때를 나타내는 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Movement_Falling, "Status.Movement.Falling", "특정 액터가 현재 떠 있는 상태일 때를 나타내는 태그");
 }

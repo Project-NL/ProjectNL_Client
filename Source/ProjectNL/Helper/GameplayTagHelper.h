@@ -24,4 +24,6 @@ namespace NlGameplayTags
 	// 특정 액터의 현재 상황에 대해 나타내는 태그로 여러개가 들어갈 수 있음.
 	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status)
 	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Combat)
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Movement_Grounded)
+	PROJECTNL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Movement_Falling)
 }

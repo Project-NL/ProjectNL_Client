@@ -1,5 +1,4 @@
 ﻿#include "BaseInputTriggerAbility.h"
-
 #include "ProjectNL/Helper/EnumHelper.h"
 #include "AbilitySystemComponent.h"
 
@@ -10,7 +9,8 @@ UBaseInputTriggerAbility::UBaseInputTriggerAbility(
 {
 	InputID = EInputIDType::None;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	//NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 }
 
 void UBaseInputTriggerAbility::OnAvatarSet(
@@ -127,5 +127,7 @@ void UBaseInputTriggerAbility::OnAbilityInputReleased(
 	{
 		Owner->GetAbilitySystemComponent()->AbilityLocalInputReleased(
 			static_cast<uint32>(InputID));
+		FGameplayAbilitySpec* Spec = Owner->GetAbilitySystemComponent()->FindAbilitySpecFromInputID(static_cast<uint8>(InputID));
+		Owner->GetAbilitySystemComponent()->ServerSetInputReleased(Spec->Handle);
 	}
 }

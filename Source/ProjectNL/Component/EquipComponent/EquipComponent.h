@@ -23,12 +23,16 @@ public:
 	
 	// ABP에서 주로 사용함.
 	GETTER(TArray<TObjectPtr<UAnimMontage>>, ComboAttackAnim)
-
+	GETTER(TObjectPtr<UAnimMontage>, HeavyAttackAnim);
+	GETTER(TObjectPtr<UAnimMontage>, JumpAttackAnim);
+	
 	GETTER(TObjectPtr<UAnimMontage>, EquipAnim)
 	GETTER(TObjectPtr<UAnimMontage>, UnEquipAnim)
 
 	GETTER(TObjectPtr<ABaseWeapon>, MainWeapon)
 	GETTER(TObjectPtr<ABaseWeapon>, SubWeapon)
+
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -70,4 +74,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
 		, meta = (AllowPrivateAccess = true))
 	TArray<TObjectPtr<UAnimMontage>> ComboAttackAnim;
+	//강공격
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
+		, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> HeavyAttackAnim;
+	//점프공격
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
+		, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> JumpAttackAnim;
 };
