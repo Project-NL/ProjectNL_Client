@@ -177,29 +177,11 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
                         ABaseCharacter* Character=Cast<ABaseCharacter>(HitActor);
                         // 적에게 충돌 시 효과 적용
                         UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Character);
-                        if(ASC)
+                        if (ASC)
                         {
-                            float PlayRate = 1.0f;
-                            // ISLInteractionInterface* HitIslInteractionInterface = Cast<ISLInteractionInterface>(
-                            //     HitActor);
-                            // HitIslInteractionInterface->NotifyHitInteraction(Hit.ImpactPoint);
-                        }
-                        if (ASC && AttackDamageEffect)
-                        {
-                            
-                            FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
-                            EffectContext.AddSourceObject(Owner);
-
-                            FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AttackDamageEffect, 1.0f, EffectContext);
-                            if (SpecHandle.IsValid())
-                            {
-                                ASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), ASC);
-                            }
-                            // 충돌 지점 시각화
+                            BaseCharacter->NotifyHitInteraction(Hit);
                             DrawDebugSphere(Owner->GetWorld(), Hit.ImpactPoint, 10, 12, FColor::Yellow, false, 1.0f);
                         }
-
-                       
                     }
                 }
             }

@@ -6,13 +6,14 @@
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 #include "ProjectNL/GAS/NLAbilitySystemInitializationData.h"
 #include "ProjectNL/Helper/UtilHelper.h"
+#include "ProjectNL/Interface/InteractionInterface.h"
 #include "BaseCharacter.generated.h"
 
 class UEquipComponent;
 enum class EEntityCategory : uint8;
 
 UCLASS()
-class PROJECTNL_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface
+class PROJECTNL_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface,public IInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -28,13 +29,17 @@ public:
 	void Server_ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Effect, const uint32 Level = 1);
 
 	UFUNCTION(Server, Reliable)
+	void Server_ApplyGameplayEffectToTarget(TSubclassOf<UGameplayEffect> Effect,const ABaseCharacter* TargetActor,const uint32 Level = 1);
+	
+	UFUNCTION(Server, Reliable)
 	void Server_RemoveActiveGameplayEffectBySourceEffect(
 		TSubclassOf<UGameplayEffect> Effect);
 	
 	GETTER(UEquipComponent*, EquipComponent)
 	GETTER(FVector2D, MovementVector)
 	GETTER_SETTER(EEntityCategory, EntityType)
-	
+
+	virtual void NotifyHitInteraction(const FHitResult& Hit) override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -59,6 +64,8 @@ protected:
 	void Initialize();
 
 	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode) override;
+
+	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))

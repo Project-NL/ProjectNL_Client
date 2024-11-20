@@ -7,6 +7,7 @@
 #include "EquipComponent.generated.h"
 
 class ABaseWeapon;
+class UGameplayEffect;
 enum class EPlayerCombatWeaponState : uint8;
 
 // TODO: 해당 컴포넌트의 이름에 대한 고민이 더 필요하다.
@@ -36,6 +37,8 @@ public:
 	GETTER(TObjectPtr<ABaseWeapon>, MainWeapon)
 	GETTER(TObjectPtr<ABaseWeapon>, SubWeapon)
 
+	
+	GETTER(TSubclassOf<UGameplayEffect>, AttackDamageEffect)
 
 protected:
 	virtual void BeginPlay() override;
@@ -89,7 +92,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
 		, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> JumpAttackAnim;
-
+	
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TSubclassOf<UGameplayEffect> AttackDamageEffect;
+	
 	FAnimationByRotation EvadeAnim;
 	
 	FAnimationByRotation StepAnim;
