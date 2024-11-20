@@ -141,10 +141,8 @@ void UGA_ComboAttack::InputReleased(const FGameplayAbilitySpecHandle Handle, con
 {
 	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
 	const FTimespan HoldDuration = FDateTime::Now() - InputPressedTime;
-	APlayerCharacter* Player = Cast<APlayerCharacter>(GetAvatarActorFromActorInfo());
-	check(Player);
 	// 태그에 따라 조건 분기
-	if (Player->GetMovementComponent()->IsFalling())
+	if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(NlGameplayTags::Status_IsFalling))
 	{
 		ExecuteJumpAttack();
 	}

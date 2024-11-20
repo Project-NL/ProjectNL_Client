@@ -85,14 +85,14 @@ private:
 	TObjectPtr<UComboAttackNotifyState> ComboAttackNotifyState;
 	UPROPERTY()
 	TObjectPtr<UComboAttackEndNotify> ComboAttackEndNotify;
-	uint8 ComboAttackPerform;
+	bool ComboAttackPerform;
 	//강공격
 	UPROPERTY()
 	TObjectPtr<UPlayMontageWithEvent> HeavyAttackTask;
 
 	FTimerHandle HeavyAttackTimerHandle;
 
-	uint8 HeavyAttackPerform;
+	uint8 HeavyAttackPerform:1;
 
 	//점프 공격
 	TObjectPtr<UPlayMontageWithEvent> JumpAttackTask;

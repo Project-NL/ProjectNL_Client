@@ -16,4 +16,5 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Block, "Status.Block", "특정 액터가 현재 방어 상태임을 의미하는 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Guard, "Status.Guard", "특정 액터가 현재 방어 준비 상태임을 의미하는 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Targeting, "Status.Targeting", "특정 캐릭터가 현재 외부 적에 대해 시점을 고정한 상태를 의미하는 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_IsFalling, "Status.IsFalling", "특정 캐릭터가 현재 추락중인 상태임을 의미함");
 }
