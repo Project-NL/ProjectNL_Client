@@ -20,6 +20,12 @@ public:
 
 	void UpdateEquipWeaponAnimationData();
 
+	void MoveNextComboCount();
+
+	void ClearCurrentComboCount();
+	
+	GETTER(uint8, AttackComboIndex)
+	
 	GETTER(bool, IsFirstEquipWeapon)
 	
 	// ABP에서 주로 사용함.
@@ -35,7 +41,6 @@ public:
 
 	GETTER(TObjectPtr<ABaseWeapon>, MainWeapon)
 	GETTER(TObjectPtr<ABaseWeapon>, SubWeapon)
-
 
 protected:
 	virtual void BeginPlay() override;
@@ -93,4 +98,8 @@ private:
 	FAnimationByRotation EvadeAnim;
 	
 	FAnimationByRotation StepAnim;
+
+	// TODO: 추후 코드 분리 필요 (EquipComponent와 맞는 취지는 아님)
+	uint8 AttackComboIndex = 0;
+	uint8 MaxAttackCombo = 0;
 };

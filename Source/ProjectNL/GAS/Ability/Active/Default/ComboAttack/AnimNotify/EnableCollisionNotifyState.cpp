@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "EnableCollisionNotifyState.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "ProjectNL/Character/BaseCharacter.h"

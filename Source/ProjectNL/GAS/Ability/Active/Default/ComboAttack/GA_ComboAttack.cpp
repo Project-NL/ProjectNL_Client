@@ -1,11 +1,7 @@
 ﻿#include "GA_ComboAttack.h"
 
-#include "AnimNotify/ComboAttackEndNotify.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
-#include "ProjectNL/GAS/Ability/Active/Default/ComboAttack/AnimNotify/ComboAttackNotifyState.h"
-#include"Abilities/Tasks/AbilityTask_WaitDelay.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 
@@ -39,50 +35,28 @@ void UGA_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
                                       , const FGameplayEventData* TriggerEventData)
 {
 	// 입력이 눌린 시각 기록
-	InputPressedTime = FDateTime::Now();;
-
-	HeavyAttackPerform = false;
-	ComboAttackPerform = false;
+	InputPressedTime = FDateTime::Now();
 
 	UE_LOG(LogTemp, Display, TEXT("Test Combo ComboAttackTask!!"));
-	CurrentCharacter = Cast<ABaseCharacter>(
-			GetAvatarActorFromActorInfo());
 }
-
-void UGA_ComboAttack::HandleComboNotifyStart(const EHandEquipStatus AttackHand)
-{
-	// TODO: 공격 시 line-trace 관련 코드 여기에 추가하면 좋다.
-	UE_LOG(LogTemp, Display, TEXT("Test Combo Notify Start"))
-}
-
-void UGA_ComboAttack::HandleComboNotifyEnd(const EHandEquipStatus AttackHand)
-{
-	UE_LOG(LogTemp, Display, TEXT("Test Combo Notify End"))
-	// TODO: 공격 line-trace 탐색 중단을 선언 하는 코드 추가
-}
-
-void UGA_ComboAttack::HandleComboEndNotify()
-{
-	ClearDelegate();
-	ComboIndex = ComboIndex == MaxCombo - 1 ? 0 : ComboIndex + 1;
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
-	           , false);
-}
-
 
 void UGA_ComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	ClearDelegate();
 	GetWorld()->GetTimerManager().SetTimer(ComboClearTimerHandle, FTimerDelegate::CreateLambda([&]
 	{
-		ComboIndex = 0;
+		ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
+		check(CurrentCharacter);
+		check(CurrentCharacter->GetEquipComponent());
+		CurrentCharacter->GetEquipComponent()->ClearCurrentComboCount();
 	}), ComboClearCooldown, false);
 	UE_LOG(LogTemp, Display, TEXT("Test Combo OnCompleted"));
 }
 
 void UGA_ComboAttack::OnCompletedAbility(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	if (APlayerController* PlayerController = Cast<APlayerController>(CurrentCharacter->GetController()))
+	if (APlayerController* PlayerController
+		// TODO: 해당 코드는 Pawn 대상이 된다면 에러 발생할 수 있으니 추후 고쳐야함
+		= Cast<APlayerController>(Cast<ACharacter>(GetAvatarActorFromActorInfo())->GetController()))
 	{
 		PlayerController->SetIgnoreMoveInput(false);
 		//PlayerController->SetIgnoreLookInput(true);
@@ -94,24 +68,9 @@ void UGA_ComboAttack::OnCompletedAbility(FGameplayTag EventTag, FGameplayEventDa
 
 void UGA_ComboAttack::OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	ClearDelegate();
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true
 	           , true);
 	UE_LOG(LogTemp, Display, TEXT("Test Combo onCanceled"));
-}
-
-void UGA_ComboAttack::ClearDelegate()
-{
-	if (ComboAttackNotifyState)
-	{
-		ComboAttackNotifyState->OnNotifiedBegin.RemoveAll(this);
-		ComboAttackNotifyState->OnNotifiedEnd.RemoveAll(this);
-	}
-
-	if (ComboAttackEndNotify)
-	{
-		ComboAttackEndNotify->OnNotified.RemoveAll(this);
-	}
 }
 
 void UGA_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle Handle
@@ -120,6 +79,8 @@ void UGA_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle Handle
                                  ActivationInfo, bool bReplicateEndAbility
                                  , bool bWasCancelled)
 {
+	ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
+	check(CurrentCharacter);
 	if (APlayerController* PlayerController = Cast<APlayerController>(CurrentCharacter->GetController()))
 	{
 		PlayerController->SetIgnoreMoveInput(false);
@@ -130,9 +91,6 @@ void UGA_ComboAttack::EndAbility(const FGameplayAbilitySpecHandle Handle
 	UE_LOG(LogTemp, Display, TEXT("Test Combo EndAbility"));
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility
 	                  , bWasCancelled);
-	
-	// 캐릭터 입력 비활성화
-
 }
 
 
@@ -162,8 +120,12 @@ void UGA_ComboAttack::InputReleased(const FGameplayAbilitySpecHandle Handle, con
 
 void UGA_ComboAttack::ExecuteHeavyAttack()
 {
-	ComboIndex = 0;
-	ClearDelegate();
+	ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
+
+	check(CurrentCharacter);
+	check(CurrentCharacter->GetEquipComponent());
+	
+	CurrentCharacter->GetEquipComponent()->ClearCurrentComboCount();
 	const TObjectPtr<UAnimMontage> HeavyAttack = CurrentCharacter->
 	                                             GetEquipComponent()->GetHeavyAttackAnim();
 
@@ -185,7 +147,7 @@ void UGA_ComboAttack::ExecuteHeavyAttack()
 
 void UGA_ComboAttack::ExecuteComboAttack()
 {
-	if (CurrentCharacter)
+	if (ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
 	{
 		if (IsValid(ComboAttackTask))
 		{
@@ -193,45 +155,19 @@ void UGA_ComboAttack::ExecuteComboAttack()
 			ComboAttackTask = nullptr;
 		}
 
-		const TArray<TObjectPtr<UAnimMontage>> ComboAttack = CurrentCharacter->
-		                                                     GetEquipComponent()->GetComboAttackAnim();
-		MaxCombo = ComboAttack.Num();
+		UEquipComponent* CharEquipInfo = CurrentCharacter->GetEquipComponent();
+		check(CharEquipInfo);
+		const TArray<TObjectPtr<UAnimMontage>> ComboAttack = CharEquipInfo->GetComboAttackAnim();
 
-		if (!IsValid(ComboAttack[ComboIndex]))
+		if (!IsValid(ComboAttack[CharEquipInfo->GetAttackComboIndex()]))
 		{
 			UE_LOG(LogTemp, Error, TEXT("Fail to Load Combo Animation Try Again"));
-			ComboIndex = 0;
+			CharEquipInfo->ClearCurrentComboCount();
 			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo
 			           , true, true);
 		}
 
-		SetCurrentMontage(ComboAttack[ComboIndex]);
-
-		// TODO: 메인 서브 선택해서 Delegate 실행되게끔 처리
-		// TODO: 매번마다 Delegate를 연결하는 방식이 아닌, 최소한의 연결 방식을 활용하고 싶으나
-		// 당장 나은 방식을 찾지는 못함. 별도의 트리거 변수를 사용한다면 가능할 수는 있으나
-		// 코드가 난잡해지는 문제가 있을 수 있어 정확하게 효과적인지 비교는 해봐야함
-
-		for (FAnimNotifyEvent NotifyEvent : GetCurrentMontage()->Notifies)
-		{
-			if (const TObjectPtr<UComboAttackEndNotify> AttackEndNotify = Cast<UComboAttackEndNotify>(
-				NotifyEvent.Notify))
-			{
-				ComboAttackEndNotify = AttackEndNotify;
-				ComboAttackEndNotify->OnNotified.AddDynamic(this, &ThisClass::HandleComboEndNotify);
-			}
-
-
-			if (const TObjectPtr<UComboAttackNotifyState> AttackNotifyState = Cast<UComboAttackNotifyState>(
-				NotifyEvent.NotifyStateClass))
-			{
-				ComboAttackNotifyState = AttackNotifyState;
-				ComboAttackNotifyState->OnNotifiedBegin.AddDynamic(
-					this, &ThisClass::HandleComboNotifyStart);
-				ComboAttackNotifyState->OnNotifiedEnd.AddDynamic(
-					this, &ThisClass::HandleComboNotifyEnd);
-			}
-		}
+		SetCurrentMontage(ComboAttack[CharEquipInfo->GetAttackComboIndex()]);
 
 		ComboAttackTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 		                                                      , GetCurrentMontage()
@@ -248,6 +184,8 @@ void UGA_ComboAttack::ExecuteComboAttack()
 void UGA_ComboAttack::ExecuteJumpAttack()
 {
     // 캐릭터 유효성 체크
+	
+	ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
     if (!CurrentCharacter)
     {
         UE_LOG(LogTemp, Error, TEXT("ExecuteJumpAttack: CurrentCharacter가 null입니다."));
@@ -315,9 +253,9 @@ void UGA_ComboAttack::ExecuteJumpAttack()
 	}
 
     // 점프 공격 실행
-    ComboIndex = 0;
-    ClearDelegate();
-
+	check(CurrentCharacter->
+		GetEquipComponent());
+	CurrentCharacter->GetEquipComponent()->ClearCurrentComboCount();
     const TObjectPtr<UAnimMontage> JumpAttackAnim = CurrentCharacter->
         GetEquipComponent()->GetJumpAttackAnim();
 

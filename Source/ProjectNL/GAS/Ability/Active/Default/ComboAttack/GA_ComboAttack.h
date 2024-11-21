@@ -44,29 +44,12 @@ protected:
 	void ExecuteJumpAttack();
 	
 private:
-	UPROPERTY()
-	TObjectPtr<ABaseCharacter> CurrentCharacter;
-	uint8 ComboIndex = 0;
-	uint8 MaxCombo = 0;
-
 	UPROPERTY(EditDefaultsOnly ,meta = (AllowPrivateAccess = true))
 	uint8 ComboClearCooldown;
 
 	FTimerHandle ComboClearTimerHandle;
 
 	FDateTime InputPressedTime;
-
-	// 헤비 어택을 위한 임계값 시간 (초 단위)
-	FDateTime InputReleasedTime;
-	
-	UFUNCTION()
-	void HandleComboNotifyStart(const EHandEquipStatus AttackHand);
-
-	UFUNCTION()
-	void HandleComboNotifyEnd(const EHandEquipStatus AttackHand);
-
-	UFUNCTION()
-	void HandleComboEndNotify();
 
 	UFUNCTION()
 	void OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData);
@@ -75,26 +58,13 @@ private:
 	void OnCompletedAbility(FGameplayTag EventTag, FGameplayEventData EventData);
 	UFUNCTION()
 	void OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
-	// UFUNCTION()
-	// void OnCompleteCallback();
-	void ClearDelegate();
-	//콤보 어택
+
+	FTimerHandle HeavyAttackTimerHandle;
+	
 	UPROPERTY()
 	TObjectPtr<UPlayMontageWithEvent> ComboAttackTask;
 	UPROPERTY()
-	TObjectPtr<UComboAttackNotifyState> ComboAttackNotifyState;
-	UPROPERTY()
-	TObjectPtr<UComboAttackEndNotify> ComboAttackEndNotify;
-	bool ComboAttackPerform;
-	//강공격
-	UPROPERTY()
 	TObjectPtr<UPlayMontageWithEvent> HeavyAttackTask;
-
-	FTimerHandle HeavyAttackTimerHandle;
-
-	uint8 HeavyAttackPerform:1;
-
-	//점프 공격
+	UPROPERTY()
 	TObjectPtr<UPlayMontageWithEvent> JumpAttackTask;
-	
 };
