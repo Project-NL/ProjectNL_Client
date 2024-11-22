@@ -44,11 +44,17 @@ protected:
 	void ExecuteJumpAttack();
 	
 private:
+	UPROPERTY()
+	TObjectPtr<UPlayMontageWithEvent> AttackAnimTask;
+	
 	UPROPERTY(EditDefaultsOnly ,meta = (AllowPrivateAccess = true))
-	uint8 ComboClearCooldown;
+	float ComboClearCooldown;
+	
+	UPROPERTY(EditDefaultsOnly ,meta = (AllowPrivateAccess = true))
+	float HoldDurationCooldown;
 
 	FTimerHandle ComboClearTimerHandle;
-
+	
 	FDateTime InputPressedTime;
 
 	UFUNCTION()
@@ -56,15 +62,9 @@ private:
 
 	UFUNCTION()
 	void OnCompletedAbility(FGameplayTag EventTag, FGameplayEventData EventData);
+	
 	UFUNCTION()
 	void OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
 
-	FTimerHandle HeavyAttackTimerHandle;
-	
-	UPROPERTY()
-	TObjectPtr<UPlayMontageWithEvent> ComboAttackTask;
-	UPROPERTY()
-	TObjectPtr<UPlayMontageWithEvent> HeavyAttackTask;
-	UPROPERTY()
-	TObjectPtr<UPlayMontageWithEvent> JumpAttackTask;
+	bool CanAttack() const;
 };
