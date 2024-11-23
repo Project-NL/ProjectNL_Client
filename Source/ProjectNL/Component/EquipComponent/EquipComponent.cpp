@@ -75,6 +75,8 @@ void UEquipComponent::SetAnimationsByWeaponState()
 		->FindRow<FCombatAnimationData>(*RowName, ""))
 	{
 		ComboAttackAnim = AnimData->ComboAttackAnim;
+		MaxAttackCombo = AnimData->ComboAttackAnim.Num();
+		
 		HeavyAttackAnim = AnimData->HeavyAttackAnim;
 		JumpAttackAnim = AnimData->JumpAttackAnim;
 		EquipAnim = AnimData->EquipAnim;

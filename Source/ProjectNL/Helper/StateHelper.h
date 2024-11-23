@@ -118,6 +118,11 @@ public:
 		return Ability->HasMatchingGameplayTag(NlGameplayTags::State_Idle);
 	}
 
+	FORCEINLINE static bool IsCombatMode(const UAbilitySystemComponent* Ability)
+	{
+		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Combat);
+	}
+
 	FORCEINLINE static bool IsPlayerStatusGuard(const UAbilitySystemComponent* Ability)
 	{
 		return Ability->HasMatchingGameplayTag(NlGameplayTags::Status_Guard);
