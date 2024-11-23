@@ -68,74 +68,19 @@ void UEquipComponent::ClearCurrentComboCount()
 // TODO: 추후 별도의 Manager로 옮겨야 할 지 고려할 필요 있음
 void UEquipComponent::SetAnimationsByWeaponState()
 {
-	const FString AttackAnimName = FEnumHelper::GetClassEnumKeyAsString(
-		PlayerCombatWeaponState) + "AttackAnim";
+	const FString RowName = FEnumHelper::GetClassEnumKeyAsString(
+		PlayerCombatWeaponState);
 
-	if (const FCombatAnimationData* Animation = CombatAnimData.DataTable->FindRow<
-		FCombatAnimationData>(*AttackAnimName, ""))
+	if (const FCombatAnimationData* AnimData = CombatAnimData.DataTable
+		->FindRow<FCombatAnimationData>(*RowName, ""))
 	{
-		ComboAttackAnim = Animation->AnimGroup;
-	} else
-	{
-		ComboAttackAnim = TArray<UAnimMontage*>();
-	}
-	// 콤보 수치 초기화
-	// TODO: 추후 코드 분리 필요 (EquipComponent와 맞는 취지는 아님)
-	AttackComboIndex = 0;
-	MaxAttackCombo = ComboAttackAnim.Num();
-
-	const FString EquipAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
-		PlayerCombatWeaponState) + "EquipAnim";
-	if (const FCombatAnimationData* NewEquipAnim = CombatAnimData.DataTable->FindRow<
-		FCombatAnimationData>(*EquipAnimRowName, ""))
-	{
-		EquipAnim = NewEquipAnim->AnimGroup.Top();
-	} else
-	{
-		EquipAnim = nullptr;
-	}
-	
-	const FString UnEquipAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
-		PlayerCombatWeaponState) + "UnEquipAnim";
-	if (const FCombatAnimationData* NewUnEquipAnim = CombatAnimData.DataTable->FindRow<
-		FCombatAnimationData>(*UnEquipAnimRowName, ""))
-	{
-		UnEquipAnim = NewUnEquipAnim->AnimGroup.Top();
-	} else
-	{
-		UnEquipAnim = nullptr;
-	}
-	
-	const FString BlockAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
-		PlayerCombatWeaponState) + "BlockAnim";
-	if (const FCombatAnimationData* NewBlockAnim = CombatAnimData.DataTable->FindRow<
-		FCombatAnimationData>(*BlockAnimRowName, ""))
-	{
-		BlockAnim = NewBlockAnim->AnimGroup.Top();
-	} else
-	{
-		BlockAnim = nullptr;
-	}
-
-	const FString EvadeAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
-		PlayerCombatWeaponState) + "EvadeAnim";
-	if (const FCombatAnimationByRotationData* NewEvadeAnim = CombatAnimByDirectionData.DataTable->FindRow<
-		FCombatAnimationByRotationData>(*EvadeAnimRowName, ""))
-	{
-		EvadeAnim = NewEvadeAnim->AnimGroup;
-	} else
-	{
-		EvadeAnim = {};
-	}
-
-	const FString StepAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
-		PlayerCombatWeaponState) + "StepAnim";
-	if (const FCombatAnimationByRotationData* NewStepAnim = CombatAnimByDirectionData.DataTable->FindRow<
-		FCombatAnimationByRotationData>(*StepAnimRowName, ""))
-	{
-		StepAnim = NewStepAnim->AnimGroup;
-	} else
-	{
-		StepAnim = {};
+		ComboAttackAnim = AnimData->ComboAttackAnim;
+		HeavyAttackAnim = AnimData->HeavyAttackAnim;
+		JumpAttackAnim = AnimData->JumpAttackAnim;
+		EquipAnim = AnimData->EquipAnim;
+		UnEquipAnim = AnimData->UnEquipAnim;
+		BlockAnim = AnimData->BlockAnim;
+		EvadeAnim = AnimData->EvadeAnim;
+		StepAnim = AnimData->StepAnim;
 	}
 }
