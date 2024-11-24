@@ -37,14 +37,6 @@ private:
 	UFUNCTION()
 	void EndToggleWeapon(FGameplayTag EventTag, FGameplayEventData EventData);
 	
-	UFUNCTION()
-	void GrabWeapon();
-	
-	UFUNCTION()
-	void PutWeapon();
-
-	void ClearDelegate();
-	
 	TObjectPtr<UPlayMontageWithEvent> AnimationTask;
 
 	UPROPERTY()
