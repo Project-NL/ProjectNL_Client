@@ -22,7 +22,6 @@ bool UGA_Guard::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	return FStateHelper::IsCombatMode(GetAbilitySystemComponentFromActorInfo());
 }
 
-
 void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
@@ -51,8 +50,26 @@ void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 
 void UGA_Guard::StartBlock(float Damage)
 {
-	GetAbilitySystemComponentFromActorInfo()->SetLooseGameplayTagCount(NlGameplayTags::Status_Block, 1);
-	AnimationTask->ReadyForActivation();
+	if (APlayerCharacter* Player = Cast<APlayerCharacter>(GetAvatarActorFromActorInfo()))
+	{
+		// 플레이어의 경우 스테미나가 30 이상 있어야만 Block 스킬이 발동.
+		if (Player->PlayerAttributeSet->GetStamina() > 30)
+		{
+			
+			if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
+			{
+				FStateHelper::ChangePlayerState(
+					GetAbilitySystemComponentFromActorInfo(),
+					NlGameplayTags::Status_Guard,
+					NlGameplayTags::Status_Block);
+				Player->PlayerAttributeSet->SetStamina(Player->PlayerAttributeSet->GetStamina() - 30);
+				AnimationTask->ReadyForActivation();
+			}
+		} else
+		{
+			EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+		}
+	}
 }
 
 void UGA_Guard::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)

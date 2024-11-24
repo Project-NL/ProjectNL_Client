@@ -83,20 +83,12 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 void UNLAbilitySystemComponent::ReceiveDamage(const float Damage) const
 {
 	OnDamageStartedNotified.Broadcast(Damage);
-	
-	if (HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
-	{
-		FStateHelper::ChangePlayerState(
-			const_cast<UNLAbilitySystemComponent*>(this),
-			NlGameplayTags::Status_Guard,
-			NlGameplayTags::Status_Block);
-		return;
-	}
 
 	if (HasMatchingGameplayTag(NlGameplayTags::Status_Block))
 	{
 		const_cast<UNLAbilitySystemComponent*>(this)->
 			RemoveLooseGameplayTag(NlGameplayTags::Status_Block);
+		return;
 	}
 	
 	if (APlayerCharacter* Player = Cast<APlayerCharacter>(GetAvatarActor()))
