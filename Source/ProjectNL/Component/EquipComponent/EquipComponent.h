@@ -70,7 +70,7 @@ private:
 	// 아무 DB나 다 들어가게 되어있지만 실제 사용 DB는 CombatAnimationData.h 기준으로 들어감
 	// TODO: 타입 제한이 가능한지 다시 check할 필요가 있음
 	UPROPERTY(Category="Property|Weapon", EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-	FDataTableRowHandle CombatAnimData;
+	TObjectPtr<UDataTable> CombatAnimData;
 
 	// 애니메이션 관련 정보
 	UPROPERTY()

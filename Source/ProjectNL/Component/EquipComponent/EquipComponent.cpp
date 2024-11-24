@@ -71,7 +71,7 @@ void UEquipComponent::SetAnimationsByWeaponState()
 	const FString RowName = FEnumHelper::GetClassEnumKeyAsString(
 		PlayerCombatWeaponState);
 
-	if (const FCombatAnimationData* AnimData = CombatAnimData.DataTable
+	if (const FCombatAnimationData* AnimData = CombatAnimData
 		->FindRow<FCombatAnimationData>(*RowName, ""))
 	{
 		ComboAttackAnim = AnimData->ComboAttackAnim;
