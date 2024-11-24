@@ -4,6 +4,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/Character/Player/PlayerCharacter.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
+#include "ProjectNL/Helper/StateHelper.h"
 
 
 UGA_ComboAttack::UGA_ComboAttack(const FObjectInitializer& ObjectInitializer)
@@ -16,6 +17,11 @@ UGA_ComboAttack::UGA_ComboAttack(const FObjectInitializer& ObjectInitializer)
 
 bool UGA_ComboAttack::CanAttack() const
 {
+	if (!FStateHelper::IsCombatMode(GetAbilitySystemComponentFromActorInfo()))
+	{
+		return false;
+	}
+	
 	// TODO: 상위 태그를 기반으로 한 쿼리로 리팩토링 필요함
 	FGameplayTagContainer TagContainer;
 	TagContainer.AddTag(NlGameplayTags::State_Attack_Combo);

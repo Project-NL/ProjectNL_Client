@@ -57,14 +57,26 @@ struct PROJECTNL_API FCombatAnimationData : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<UAnimMontage*> AnimGroup;
-};
-
-USTRUCT(BlueprintType)
-struct PROJECTNL_API FCombatAnimationByRotationData : public FTableRowBase
-{
-	GENERATED_BODY()
-
+	TArray<TObjectPtr<UAnimMontage>> ComboAttackAnim;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FAnimationByRotation AnimGroup;
+	TObjectPtr<UAnimMontage> HeavyAttackAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> JumpAttackAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> EquipAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> UnEquipAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UAnimMontage> BlockAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FAnimationByRotation EvadeAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FAnimationByRotation StepAnim;
 };

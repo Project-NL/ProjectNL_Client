@@ -55,6 +55,7 @@ private:
 	bool IsFirstEquipWeapon = false;
 
 	// 무기 관련 정보
+	// TODO: class 관련은 테스트용이기에 추후 없애야한다.
 	UPROPERTY(Category="Property|Weapon", EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	TSubclassOf<ABaseWeapon> MainWeaponClass;
 
@@ -70,9 +71,6 @@ private:
 	// TODO: 타입 제한이 가능한지 다시 check할 필요가 있음
 	UPROPERTY(Category="Property|Weapon", EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	FDataTableRowHandle CombatAnimData;
-	
-	UPROPERTY(Category="Property|Weapon", EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-	FDataTableRowHandle CombatAnimByDirectionData;
 
 	// 애니메이션 관련 정보
 	UPROPERTY()
@@ -87,12 +85,11 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<UAnimMontage>> ComboAttackAnim;
 	//강공격
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
-		, meta = (AllowPrivateAccess = true))
+	UPROPERTY()
 	TObjectPtr<UAnimMontage> HeavyAttackAnim;
+	
 	//점프공격
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation
-		, meta = (AllowPrivateAccess = true))
+	UPROPERTY()
 	TObjectPtr<UAnimMontage> JumpAttackAnim;
 
 	FAnimationByRotation EvadeAnim;
