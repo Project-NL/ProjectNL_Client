@@ -1,10 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "EnableCollisionNotifyState.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "ProjectNL/Character/BaseCharacter.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
+#include "ProjectNL/Helper/StateHelper.h"
 #include "ProjectNL/Weapon/BaseWeapon.h"
 
 void UEnableCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
@@ -26,12 +24,30 @@ void UEnableCollisionNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, U
 
 void UEnableCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-    if (AActor* Owner = MeshComp->GetOwner())
+    ABaseCharacter* Owner = Cast<ABaseCharacter>(MeshComp->GetOwner());
+    check(Owner);
+    HitActors.Reset();
+    UAbilitySystemComponent* ASC = Owner->GetAbilitySystemComponent();
+    check(ASC);
+    
+    FStateHelper::ChangePlayerState(
+        Owner->GetAbilitySystemComponent(),NlGameplayTags::State_Attack,
+    NlGameplayTags::State_Idle);
+    
+    if (ASC->HasMatchingGameplayTag(NlGameplayTags::State_Attack_Combo))
     {
-      {
-            HitActors.Reset();
-        }
+        FStateHelper::ChangePlayerState(ASC, NlGameplayTags::State_Attack_Combo,
+            NlGameplayTags::State_Idle);
+    } else if (ASC->HasMatchingGameplayTag(NlGameplayTags::State_Attack_Heavy))
+    {
+        FStateHelper::ChangePlayerState(ASC, NlGameplayTags::State_Attack_Heavy,
+            NlGameplayTags::State_Idle);
+    } else if (ASC->HasMatchingGameplayTag(NlGameplayTags::State_Attack_Jump))
+    {
+        FStateHelper::ChangePlayerState(ASC, NlGameplayTags::State_Attack_Jump,
+            NlGameplayTags::State_Idle);
     }
+    
     UE_LOG(LogTemp, Log, TEXT("Notify End"));
 }
 

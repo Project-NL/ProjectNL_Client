@@ -8,7 +8,7 @@
 struct FInitGameplayAbilitySystem;
 struct FNLAbilitySystemInitializationData;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageToAbilitySystem, float, Damage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, float, Damage);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECTNL_API UNLAbilitySystemComponent : public UAbilitySystemComponent
@@ -20,12 +20,12 @@ public:
 
 	void InitializeAbilitySystem(
 		const FNLAbilitySystemInitializationData& InitData);
-
-	FOnDamageToAbilitySystem OnDamage;
 	
 	void ReceiveDamage(const float Damage) const;
 
 	GETTER_SETTER(bool, IsInitialized)
+
+	FOnDamageStartedNotifiedSignature OnDamageStartedNotified;
 private:
 	bool IsInitialized = false;
 };

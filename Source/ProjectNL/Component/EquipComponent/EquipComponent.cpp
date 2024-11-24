@@ -52,6 +52,19 @@ void UEquipComponent::UpdateEquipWeaponAnimationData()
 	SetAnimationsByWeaponState();
 }
 
+// TODO: 추후 코드 분리 필요 (EquipComponent와 맞는 취지는 아님)
+void UEquipComponent::MoveNextComboCount()
+{
+	AttackComboIndex = AttackComboIndex == MaxAttackCombo - 1 ? 0 : AttackComboIndex + 1;
+}
+
+void UEquipComponent::ClearCurrentComboCount()
+{
+	AttackComboIndex = 0;
+}
+
+
+
 // TODO: 추후 별도의 Manager로 옮겨야 할 지 고려할 필요 있음
 void UEquipComponent::SetAnimationsByWeaponState()
 {
@@ -66,6 +79,10 @@ void UEquipComponent::SetAnimationsByWeaponState()
 	{
 		ComboAttackAnim = TArray<UAnimMontage*>();
 	}
+	// 콤보 수치 초기화
+	// TODO: 추후 코드 분리 필요 (EquipComponent와 맞는 취지는 아님)
+	AttackComboIndex = 0;
+	MaxAttackCombo = ComboAttackAnim.Num();
 
 	const FString EquipAnimRowName = FEnumHelper::GetClassEnumKeyAsString(
 		PlayerCombatWeaponState) + "EquipAnim";

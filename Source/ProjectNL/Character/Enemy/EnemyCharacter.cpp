@@ -1,11 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ProjectNL/Character/Enemy/EnemyCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
-#include "ProjectNL/Player/BasePlayerState.h"
 
 
 AEnemyCharacter::AEnemyCharacter()

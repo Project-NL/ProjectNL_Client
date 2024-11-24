@@ -51,32 +51,6 @@ void UGA_ToggleWeapon::ActivateAbility(
 			OwnerCharacter->GetEquipComponent()->GetEquipAnim() :
 			OwnerCharacter->GetEquipComponent()->GetUnEquipAnim());
 
-		for (FAnimNotifyEvent NotifyEvent : GetCurrentMontage()->Notifies)
-		{
-			if (IsCombat)
-			{
-				if (UGrabWeaponNotify* GrabWeaponNotify = Cast<UGrabWeaponNotify>(NotifyEvent.Notify))
-				{
-					GrabWeaponNotify->OnNotified.AddDynamic(this, &ThisClass::GrabWeapon);
-					ToggleWeaponNotify = GrabWeaponNotify;
-				}
-			} else
-			{
-				if (UPutWeaponNotify* PutWeaponNotify = Cast<UPutWeaponNotify>(NotifyEvent.Notify))
-				{
-					PutWeaponNotify->OnNotified.AddDynamic(this, &ThisClass::PutWeapon);
-					ToggleWeaponNotify = PutWeaponNotify;
-				}
-			}
-
-			// TODO: Get Main Weapon으로 가져와서 두 손 무기 인지 확인하고 처리하는 것이 더 편할 수 있다.
-			// if (const TObjectPtr<USwapTwoHandWeaponNotify> SwapTwoHandNotify
-			// 	= Cast<USwapTwoHandWeaponNotify>(NotifyEvent.Notify))
-			// {
-			// 	
-			// }
-		}
-
 		AnimationTask = UPlayMontageWithEvent::InitialEvent(this,
 			NAME_None, GetCurrentMontage(), FGameplayTagContainer());
 		AnimationTask->OnCompleted.AddDynamic(this, &ThisClass::EndToggleWeapon);
@@ -99,41 +73,8 @@ bool UGA_ToggleWeapon::ToggleCombatState()
 	return !IsCombat;
 }
 
-void UGA_ToggleWeapon::GrabWeapon()
-{
-	if (ABaseCharacter* OwnerCharacter = Cast<ABaseCharacter>(
-		CurrentActorInfo->AvatarActor.Get()))
-	{
-		if (ABaseWeapon* MainWeapon = OwnerCharacter->GetEquipComponent()->GetMainWeapon())
-		{
-			MainWeapon->EquipCharacterWeapon(OwnerCharacter, true);
-		}
-		if (ABaseWeapon* SubWeapon = OwnerCharacter->GetEquipComponent()->GetSubWeapon())
-		{
-			SubWeapon->EquipCharacterWeapon(OwnerCharacter, false);
-		}
-	}
-}
-
-void UGA_ToggleWeapon::PutWeapon()
-{
-	if (ABaseCharacter* OwnerCharacter = Cast<ABaseCharacter>(
-		CurrentActorInfo->AvatarActor.Get()))
-	{
-		if (ABaseWeapon* MainWeapon = OwnerCharacter->GetEquipComponent()->GetMainWeapon())
-		{
-			MainWeapon->UnEquipCharacterWeapon(OwnerCharacter, true);
-		}
-		if (ABaseWeapon* SubWeapon = OwnerCharacter->GetEquipComponent()->GetSubWeapon())
-		{
-			SubWeapon->UnEquipCharacterWeapon(OwnerCharacter, false);
-		}
-	}
-}
-
 void UGA_ToggleWeapon::EndToggleWeapon(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	ClearDelegate();
 	const bool IsCombat = GetAbilitySystemComponentFromActorInfo()
 							->HasMatchingGameplayTag(NlGameplayTags::Status_Combat);
 	if (IsCombat)
@@ -152,18 +93,5 @@ void UGA_ToggleWeapon::EndToggleWeapon(FGameplayTag EventTag, FGameplayEventData
 	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
-
-void UGA_ToggleWeapon::ClearDelegate()
-{
-	if (const TObjectPtr<UPutWeaponNotify> PutWeaponNotify = Cast<UPutWeaponNotify>(ToggleWeaponNotify))
-	{
-		PutWeaponNotify->OnNotified.RemoveAll(this);
-	}
-	if (const TObjectPtr<UGrabWeaponNotify> GrabWeaponNotify = Cast<UGrabWeaponNotify>(ToggleWeaponNotify))
-	{
-		GrabWeaponNotify->OnNotified.RemoveAll(this);
-	}
-}
-
 
 
