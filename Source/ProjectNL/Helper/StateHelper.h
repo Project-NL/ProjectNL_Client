@@ -130,9 +130,15 @@ public:
 
 	FORCEINLINE static void ChangePlayerState(UAbilitySystemComponent* Ability
 																						, const FGameplayTag PreviousTag
-																						, const FGameplayTag NewTag)
+																						, const FGameplayTag NewTag
+																						, const bool bIsReplicated = false)
 	{
 		Ability->SetLooseGameplayTagCount(PreviousTag, 0);
 		Ability->SetLooseGameplayTagCount(NewTag, 1);
+		if (bIsReplicated)
+		{
+			Ability->SetReplicatedLooseGameplayTagCount(PreviousTag, 0);
+			Ability->SetReplicatedLooseGameplayTagCount(NewTag, 1);
+		}
 	}
 };

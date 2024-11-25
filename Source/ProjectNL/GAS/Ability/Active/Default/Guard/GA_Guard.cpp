@@ -4,6 +4,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Ability/Utility/PlayMontageWithEvent.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
+#include "ProjectNL/Helper/AbilityHelper.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Helper/StateHelper.h"
 
@@ -25,7 +26,7 @@ bool UGA_Guard::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	GetAbilitySystemComponentFromActorInfo()->SetLooseGameplayTagCount(NlGameplayTags::Status_Guard, 1);
+	NlGameplayTags::SetGameplayTag(GetAbilitySystemComponentFromActorInfo(),NlGameplayTags::Status_Guard, 1, true);
 	
 	if (ABaseCharacter* CharacterInfo = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
 	{
@@ -50,10 +51,10 @@ void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 
 void UGA_Guard::StartBlock(float Damage)
 {
-	if (APlayerCharacter* Player = Cast<APlayerCharacter>(GetAvatarActorFromActorInfo()))
+	if (UBaseAttributeSet* AttributeSet = Cast<UBaseAttributeSet>(AbilityHelper::GetAttribute(GetAvatarActorFromActorInfo())))
 	{
 		// 플레이어의 경우 스테미나가 30 이상 있어야만 Block 스킬이 발동.
-		if (Player->PlayerAttributeSet->GetStamina() > 30)
+		if (AttributeSet->GetStamina() > 30)
 		{
 			
 			if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
@@ -61,8 +62,8 @@ void UGA_Guard::StartBlock(float Damage)
 				FStateHelper::ChangePlayerState(
 					GetAbilitySystemComponentFromActorInfo(),
 					NlGameplayTags::Status_Guard,
-					NlGameplayTags::Status_Block);
-				Player->PlayerAttributeSet->SetStamina(Player->PlayerAttributeSet->GetStamina() - 30);
+					NlGameplayTags::Status_Block, true);
+				AttributeSet->SetStamina(AttributeSet->GetStamina() - 30);
 				AnimationTask->ReadyForActivation();
 			}
 		} else
@@ -87,8 +88,8 @@ void UGA_Guard::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGamep
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	if (UNLAbilitySystemComponent* ASC = Cast<UNLAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo()))
 	{
-		ASC->SetLooseGameplayTagCount(NlGameplayTags::Status_Block, 0);
-		ASC->SetLooseGameplayTagCount(NlGameplayTags::Status_Guard, 0);
+		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_Guard, 0, true);
+		NlGameplayTags::SetGameplayTag(ASC, NlGameplayTags::Status_Block, 0, true);
 		ASC->OnDamageStartedNotified.RemoveDynamic(this, &ThisClass::StartBlock);
 	}
 }
