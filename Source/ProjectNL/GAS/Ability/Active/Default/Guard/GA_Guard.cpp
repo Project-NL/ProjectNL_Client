@@ -20,6 +20,10 @@ bool UGA_Guard::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		return false;
 	}
 
+	if (UBaseAttributeSet* AttributeSet = Cast<UBaseAttributeSet>(AbilityHelper::GetAttribute(GetAvatarActorFromActorInfo())))
+	{
+		if (AttributeSet->GetStamina() < 30) return false;
+	}
 	return FStateHelper::IsCombatMode(GetAbilitySystemComponentFromActorInfo());
 }
 
