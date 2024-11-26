@@ -67,7 +67,7 @@ bool UGA_ToggleWeapon::ToggleCombatState()
 																	, NlGameplayTags::State_Idle
 																	, IsCombat
 																			? NlGameplayTags::State_PutWeapon
-																			: NlGameplayTags::State_GrabWeapon);
+																			: NlGameplayTags::State_GrabWeapon, true);
 
 	// 기존 상태에서 변화가 있었기 때문에 IsCombat 변수의 부정 값을 반환
 	return !IsCombat;
@@ -80,15 +80,17 @@ void UGA_ToggleWeapon::EndToggleWeapon(FGameplayTag EventTag, FGameplayEventData
 	if (IsCombat)
 	{
 		GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(NlGameplayTags::Status_Combat);
+		GetAbilitySystemComponentFromActorInfo()->RemoveReplicatedLooseGameplayTag(NlGameplayTags::Status_Combat);
 		FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo()
 																	, NlGameplayTags::State_PutWeapon
-																	,  NlGameplayTags::State_Idle);
+																	,  NlGameplayTags::State_Idle, true);
 	} else
 	{
 		GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(NlGameplayTags::Status_Combat);
+		GetAbilitySystemComponentFromActorInfo()->AddReplicatedLooseGameplayTag(NlGameplayTags::Status_Combat);
 		FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo()
 																	, NlGameplayTags::State_GrabWeapon
-																	, NlGameplayTags::State_Idle);
+																	, NlGameplayTags::State_Idle, true);
 	}
 	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);

@@ -18,10 +18,6 @@ class PROJECTNL_API UBaseAttributeSet : public UAttributeSet
 	GENERATED_BODY()
 
 public:
-	// TODO: 복제에 도움이 되는 함수지만 정확한 기능은 추후
-	virtual void GetLifetimeReplicatedProps(
-		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	virtual void InitBaseAttribute();
 
 	UPROPERTY(BlueprintReadOnly, Category="Attributes"
@@ -116,20 +112,34 @@ public:
 	FGameplayAttributeData Level;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Level)
 
+protected:
+	// TODO: 복제에 도움이 되는 함수지만 정확한 기능은 추후
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	
 	UFUNCTION()
 	virtual void OnRepHealth(const FGameplayAttributeData& OldHealth);
+	
 	UFUNCTION()
 	virtual void OnRepMaxHealth(const FGameplayAttributeData& OldMaxHealth);
+	
 	UFUNCTION()
 	virtual void OnRepMana(const FGameplayAttributeData& OldMana);
+	
 	UFUNCTION()
 	virtual void OnRepMaxMana(const FGameplayAttributeData& OldMaxMana);
+	
 	UFUNCTION()
 	virtual void OnRepStamina(const FGameplayAttributeData& OldStamina);
+	
 	UFUNCTION()
 	virtual void OnRepMaxStamina(const FGameplayAttributeData& OldMaxStamina);
+	
 	UFUNCTION()
 	virtual void OnRepLevel(const FGameplayAttributeData& OldLevel);
+	
 	UFUNCTION()
 	virtual void OnRepMovementSpeed(
 		const FGameplayAttributeData& OldMovementSpeed);

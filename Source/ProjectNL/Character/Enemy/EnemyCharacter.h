@@ -7,7 +7,7 @@
 
 #include "EnemyCharacter.generated.h"
 
-class UPlayerAttributeSet;
+class UBaseAttributeSet;
 
 /**
  * 
@@ -17,7 +17,8 @@ class PROJECTNL_API AEnemyCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 public:
-	AEnemyCharacter();
+	AEnemyCharacter();UPROPERTY()
+	TObjectPtr<UBaseAttributeSet> EnemyAttributeSet;
 
 protected:
 	virtual void PossessedBy(AController* NewController) override;
@@ -27,7 +28,4 @@ protected:
 	virtual void BeginPlay() override;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY()
-	TObjectPtr<UPlayerAttributeSet> PlayerAttributeSet;
 };

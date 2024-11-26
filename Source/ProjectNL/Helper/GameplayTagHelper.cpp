@@ -1,8 +1,38 @@
 ﻿#include "GameplayTagHelper.h"
+
+#include "AbilitySystemComponent.h"
 #include "NativeGameplayTags.h"
 
 namespace NlGameplayTags
 {
+	void AddGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated)
+	{
+		if (bIsReplicated)
+		{
+			ASC->SetReplicatedLooseGameplayTagCount(Tag, Count);
+		}
+		ASC->SetLooseGameplayTagCount(Tag, Count);
+	}
+
+	void RemoveGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated)
+	{
+		if (bIsReplicated)
+		{
+			ASC->SetReplicatedLooseGameplayTagCount(Tag, Count);
+		}
+		ASC->SetLooseGameplayTagCount(Tag, Count);
+	}
+
+	void SetGameplayTag(UAbilitySystemComponent* ASC, const FGameplayTag Tag, const int32 Count, const bool bIsReplicated)
+	{
+		if (bIsReplicated)
+		{
+			ASC->SetReplicatedLooseGameplayTagCount(Tag, Count);
+		}
+		ASC->SetLooseGameplayTagCount(Tag, Count);
+	}
+
+	
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability, "Ability", "Ability 관련 최상위 트리 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Guard, "Ability.Guard", "Ability - 기본스킬 - 방어");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Category, "Category", "특정 Actor의 카테고리 관련 최상위 트리 태그");

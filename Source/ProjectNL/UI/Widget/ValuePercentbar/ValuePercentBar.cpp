@@ -1,6 +1,12 @@
 ﻿#include "ValuePercentBar.h"
 #include "Components/ProgressBar.h"
 
+void UValuePercentBar::OnWidgetRebuilt()
+{
+	ViewPercentBar->SetFillColorAndOpacity(MainColor);
+	DelayViewPercentBar->SetFillColorAndOpacity(SubColor);
+}
+
 void UValuePercentBar::InitializePercent(const float CurrentValue, const float MaxValue)
 {
 	PercentNum.Key = CurrentValue;

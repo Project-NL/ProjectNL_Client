@@ -1,6 +1,6 @@
 #include "ProjectNL/Character/Enemy/EnemyCharacter.h"
 #include "AbilitySystemComponent.h"
-#include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
+#include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "ProjectNL/GAS/NLAbilitySystemComponent.h"
 
 
@@ -8,7 +8,7 @@ AEnemyCharacter::AEnemyCharacter()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UNLAbilitySystemComponent>(
 	"Ability System Component");
-	PlayerAttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("AttributeSet"));
+	EnemyAttributeSet = CreateDefaultSubobject<UBaseAttributeSet>(TEXT("AttributeSet"));
 }
 
 void AEnemyCharacter::PossessedBy(AController* NewController)
@@ -19,12 +19,12 @@ void AEnemyCharacter::PossessedBy(AController* NewController)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	
-		PlayerAttributeSet->InitBaseAttribute();
+		EnemyAttributeSet->InitBaseAttribute();
 
 		//AbilitySystemComponent->InitializeAbilitySystem(InitializeData);
 		
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
+			EnemyAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
 		
 		Initialize();

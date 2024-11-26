@@ -93,3 +93,9 @@ void UBaseAttributeSet::InitBaseAttribute()
 	InitCriticalPercent(10 + GetConcentration() * 0.01);
 	InitCriticalPower(10 + GetSharpness() * 0.005);
 }
+
+void UBaseAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	if (NewValue < 0) NewValue = 0;
+}
+
