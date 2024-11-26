@@ -17,10 +17,8 @@ UGA_ComboAttack::UGA_ComboAttack(const FObjectInitializer& ObjectInitializer)
 
 bool UGA_ComboAttack::CanAttack() const
 {
-	if (!FStateHelper::IsCombatMode(GetAbilitySystemComponentFromActorInfo()))
-	{
-		return false;
-	}
+	if (!FStateHelper::IsCombatMode(GetAbilitySystemComponentFromActorInfo())) return false;
+	if (!FStateHelper::IsPlayerIdle(GetAbilitySystemComponentFromActorInfo())) return false;
 	
 	// TODO: 상위 태그를 기반으로 한 쿼리로 리팩토링 필요함
 	FGameplayTagContainer TagContainer;
@@ -196,8 +194,7 @@ void UGA_ComboAttack::ExecuteComboAttack()
 		}
 
 		SetCurrentMontage(ComboAttack[CharEquipInfo->GetAttackComboIndex()]);
-		GetAbilitySystemComponentFromActorInfo()
-			->SetLooseGameplayTagCount(NlGameplayTags::State_Attack_Combo, 1);
+		FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo(), NlGameplayTags::State_Idle, NlGameplayTags::State_Attack_Combo, true);
 		
 		AttackAnimTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 		                                                      , GetCurrentMontage()
