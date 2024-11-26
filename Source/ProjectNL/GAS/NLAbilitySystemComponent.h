@@ -21,7 +21,7 @@ public:
 	void InitializeAbilitySystem(
 		const FNLAbilitySystemInitializationData& InitData);
 	
-	void ReceiveDamage(const float Damage) const;
+	void ReceiveDamage(const float Damage, AActor* TargetActor) const;
 
 	GETTER_SETTER(bool, IsInitialized)
 

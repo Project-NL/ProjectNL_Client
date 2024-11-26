@@ -2,8 +2,7 @@
 
 #include "NLAbilitySystemInitializationData.h"
 #include "Ability/Utility/BaseInputTriggerAbility.h"
-#include "Attribute/PlayerAttributeSet.h"
-#include "ProjectNL/Character/Player/PlayerCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Helper/StateHelper.h"
 
@@ -80,7 +79,7 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 	SetIsInitialized(true);
 }
 
-void UNLAbilitySystemComponent::ReceiveDamage(const float Damage) const
+void UNLAbilitySystemComponent::ReceiveDamage(const float Damage, AActor* TargetActor) const
 {
 	OnDamageStartedNotified.Broadcast(Damage);
 
@@ -91,11 +90,6 @@ void UNLAbilitySystemComponent::ReceiveDamage(const float Damage) const
 		return;
 	}
 	
-	if (APlayerCharacter* Player = Cast<APlayerCharacter>(GetAvatarActor()))
-    {
-		UPlayerAttributeSet* PAS = Player->PlayerAttributeSet.Get();
-		check(PAS)
-
-		PAS->SetHealth(PAS->GetHealth() - Damage);
-    }
+	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
+	UGameplayStatics::ApplyDamage(GetAvatarActor(), Damage, NULL, TargetActor, NULL);
 }
