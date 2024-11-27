@@ -107,15 +107,19 @@ FVector BezierCurve(const FVector& P0, const FVector& P1, const FVector& P2, flo
 void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
 {
     
-    ABaseCharacter* BaseCharacter= Cast<ABaseCharacter>(Owner);
+    ABaseCharacter* SourceCharacter = Cast<ABaseCharacter>(Owner);
+    UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(SourceCharacter);
+    
     UEquipComponent* EquipComponent{};
-    if(BaseCharacter)
+    if (SourceCharacter)
     {
-        EquipComponent= BaseCharacter->GetEquipComponent();
+        EquipComponent= SourceCharacter->GetEquipComponent();
     }
+    
     ABaseWeapon* MainWeapon{};
-    if(EquipComponent)
-        MainWeapon=EquipComponent->GetMainWeapon();
+    if (EquipComponent)
+        MainWeapon= EquipComponent->GetMainWeapon();
+    
     if (MainWeapon)
     {
         TSet<AActor*> &HitActors=MainWeapon->GetHitActorsReference();
@@ -257,8 +261,6 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
                             // 충돌 지점 시각화
                             DrawDebugSphere(Owner->GetWorld(), Hit.ImpactPoint, 10, 12, FColor::Yellow, false, 1.0f);
                         }
-
-                       
                     }
                 }
             }
