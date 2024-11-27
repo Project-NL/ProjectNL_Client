@@ -12,6 +12,7 @@
  */
 class UBlackboardData;
 class UBehaviorTree;
+class UAISenseConfig_Sight;
 UCLASS()
 class PROJECTNL_API AEnemyAIController : public AAIController
 {
@@ -38,10 +39,10 @@ protected:
 	void UpdateClosestEnemy();
 private:
 	UPROPERTY(VisibleAnywhere, Category = "AI")
-	class UAIPerceptionComponent* AIPerceptionComponent;
+	UAIPerceptionComponent* AIPerceptionComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
-	class UAISenseConfig_Sight* SightConfig;
+	UAISenseConfig_Sight* SightConfig;
 
 	
 	
