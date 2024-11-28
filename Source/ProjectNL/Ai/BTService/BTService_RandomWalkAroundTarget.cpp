@@ -7,8 +7,13 @@
 #include "NavigationSystem.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectNL/Helper/AbilityHelper.h"
+
 #include "Navigation/PathFollowingComponent.h"
 #include "ProjectNL/Ai/AiKey.h"
+#include "ProjectNL/Character/BaseCharacter.h"
+#include "ProjectNL/Character/Enemy/EnemyCharacter.h"
+#include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 
 UBTService_RandomWalkAroundTarget::UBTService_RandomWalkAroundTarget()
 {
@@ -93,6 +98,9 @@ void UBTService_RandomWalkAroundTarget::OnCeaseRelevant(UBehaviorTreeComponent& 
 		return;
 	}
 	ControlledPawn->bUseControllerRotationYaw = true;
+	
+	float BaseSpeed=Cast<UBaseAttributeSet>(AbilityHelper::GetAttribute(Cast<AEnemyCharacter>(ControlledPawn)))->GetMovementSpeed();
+	Cast<ACharacter>(ControlledPawn)->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
 	Super::OnCeaseRelevant(OwnerComp, NodeMemory);
 	
 	
