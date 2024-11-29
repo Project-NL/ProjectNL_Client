@@ -8,27 +8,67 @@
 void UEnableCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
     UE_LOG(LogTemp, Log, TEXT("Notify Begin"));
+    ABaseCharacter* Owner = Cast<ABaseCharacter>(MeshComp->GetOwner());
 
-    // 애니메이션 시작 시 이전 프레임의 소켓 위치 초기화
-    PrevStartLocation = FVector::ZeroVector;
-    PrevEndLocation = FVector::ZeroVector;
+    UEquipComponent* EquipComponent{};
+    if(Owner)
+    {
+        EquipComponent= Owner->GetEquipComponent();
+    }
+    ABaseWeapon* MainWeapon{};
+    if (EquipComponent)
+    {
+      
+        MainWeapon=EquipComponent->GetMainWeapon();
+    }
+    if (MainWeapon)
+    {
+        MainWeapon->SetPrevStartLocation(FVector::ZeroVector); 
+        MainWeapon->SetPrevEndLocation(FVector::ZeroVector);;
+    }
 }
 
 void UEnableCollisionNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
+    Super::NotifyTick(MeshComp, Animation, FrameDeltaTime);
     if (AActor* Owner = MeshComp->GetOwner())
     {
-        MakeTriangleTrace(Owner);
+
+            MakeTriangleTrace(Owner);
+        
     }
 }
 
 void UEnableCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
     ABaseCharacter* Owner = Cast<ABaseCharacter>(MeshComp->GetOwner());
-    check(Owner);
-    HitActors.Reset();
+    if (!Owner)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Owner is null in NotifyEnd"));
+        return;
+    }
+    UEquipComponent* EquipComponent{};
+    if(Owner)
+    {
+        EquipComponent= Owner->GetEquipComponent();
+    }
+    ABaseWeapon* MainWeapon{};
+    if (EquipComponent)
+    {
+      
+        MainWeapon=EquipComponent->GetMainWeapon();
+    }
+    if (MainWeapon)
+    {
+        TSet<AActor*> &HitActors=MainWeapon->GetHitActorsReference();
+        HitActors.Reset();
+    }
     UAbilitySystemComponent* ASC = Owner->GetAbilitySystemComponent();
-    check(ASC);
+    if (!ASC)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("OwnerASC is null in NotifyEnd"));
+        return;
+    }
     
     FStateHelper::ChangePlayerState(
         Owner->GetAbilitySystemComponent(),NlGameplayTags::State_Attack,
@@ -78,8 +118,11 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
         MainWeapon=EquipComponent->GetMainWeapon();
     if (MainWeapon)
     {
+        TSet<AActor*> &HitActors=MainWeapon->GetHitActorsReference();
+        FVector PrevStartLocation =   MainWeapon->GetPrevStartLocation();
+        FVector PrevEndLocation = MainWeapon->GetPrevEndLocation();
+        
         USkeletalMeshComponent* SwordMesh = MainWeapon->GetWeaponSkeleton();
-
         if (SwordMesh && SwordMesh->DoesSocketExist(FName("SwordBoneStart")) && SwordMesh->DoesSocketExist(FName("SwordBoneEnd")))
         {
             FVector CurrentStartLocation = SwordMesh->GetSocketLocation(FName("SwordBoneStart"));
@@ -87,8 +130,8 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
 
             if (PrevStartLocation == FVector::ZeroVector && PrevEndLocation == FVector::ZeroVector)
             {
-                PrevStartLocation = CurrentStartLocation;
-                PrevEndLocation = CurrentEndLocation;
+                MainWeapon->SetPrevStartLocation(CurrentStartLocation); 
+                MainWeapon->SetPrevEndLocation(CurrentEndLocation);;
                 return;
             }
 
@@ -190,9 +233,9 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
                     if (!HitActors.Contains(HitActor))
                     {
                         HitActors.Add(HitActor);
-                        ABaseCharacter* Character=Cast<ABaseCharacter>(HitActor);
+                        ABaseCharacter* HitCharacter=Cast<ABaseCharacter>(HitActor);
                         // 적에게 충돌 시 효과 적용
-                        UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Character);
+                        UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitCharacter);
                         if(ASC)
                         {
                             float PlayRate = 1.0f;
@@ -200,17 +243,17 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
                             //     HitActor);
                             // HitIslInteractionInterface->NotifyHitInteraction(Hit.ImpactPoint);
                         }
-                        if (ASC && AttackDamageEffect)
+                        if (ASC )
                         {
                             
                             FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
                             EffectContext.AddSourceObject(Owner);
 
-                            FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AttackDamageEffect, 1.0f, EffectContext);
-                            if (SpecHandle.IsValid())
-                            {
-                                ASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), ASC);
-                            }
+                            // FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(AttackDamageEffect, 1.0f, EffectContext);
+                            // if (SpecHandle.IsValid())
+                            // {
+                            //     ASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), ASC);
+                            // }
                             // 충돌 지점 시각화
                             DrawDebugSphere(Owner->GetWorld(), Hit.ImpactPoint, 10, 12, FColor::Yellow, false, 1.0f);
                         }
@@ -236,8 +279,9 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
              DrawDebugSphere(Owner->GetWorld(), CurrentStartLocation, 2.3f, 12, FColor::Red, false, 2.0f); // 현재 프레임 시작지점
              DrawDebugSphere(Owner->GetWorld(), CurrentEndLocation, 2.3f, 12, FColor::Red, false, 2.0f); // 현재 프레임 끝지점
             // 현재 프레임 위치를 이전 프레임 위치로 업데이트
-            PrevStartLocation = CurrentStartLocation;
-            PrevEndLocation = CurrentEndLocation;
+            MainWeapon->SetPrevStartLocation(CurrentStartLocation); 
+            MainWeapon->SetPrevEndLocation(CurrentEndLocation);;
+       
          
         }
     }

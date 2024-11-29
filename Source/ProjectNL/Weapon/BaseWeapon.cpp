@@ -68,3 +68,8 @@ void ABaseWeapon::SwapTwoHandWeapon()
 											, "weapon_twoHand");
 	}
 }
+
+TSet<AActor*>& ABaseWeapon::GetHitActorsReference()
+{
+	return HitActors;
+}
