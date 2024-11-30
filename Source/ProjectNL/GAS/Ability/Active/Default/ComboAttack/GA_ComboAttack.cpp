@@ -25,6 +25,7 @@ bool UGA_ComboAttack::CanAttack() const
 	TagContainer.AddTag(NlGameplayTags::State_Attack_Combo);
 	TagContainer.AddTag(NlGameplayTags::State_Attack_Heavy);
 	TagContainer.AddTag(NlGameplayTags::State_Attack_Jump);
+	
 	return !GetAbilitySystemComponentFromActorInfo()->HasAnyMatchingGameplayTags(TagContainer);
 }
 
@@ -56,20 +57,6 @@ void UGA_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 }
 
 void UGA_ComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
-{
-	GetWorld()->GetTimerManager().SetTimer(ComboClearTimerHandle, FTimerDelegate::CreateLambda([&]
-	{
-		ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
-		check(CurrentCharacter);
-		check(CurrentCharacter->GetEquipComponent());
-		CurrentCharacter->GetEquipComponent()->ClearCurrentComboCount();
-	}), ComboClearCooldown, false);
-	UE_LOG(LogTemp, Warning, TEXT("Test End"));
-	
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-}
-
-void UGA_ComboAttack::OnCompletedAbility(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	if (APlayerController* PlayerController
 		// TODO: 해당 코드는 Pawn 대상이 된다면 에러 발생할 수 있으니 추후 고쳐야함
@@ -165,9 +152,9 @@ void UGA_ComboAttack::ExecuteHeavyAttack()
 	                                                      , HeavyAttack
 	                                                      , FGameplayTagContainer());
 	AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
-	AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-	AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-	AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
+	AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+	AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+	AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 	AttackAnimTask->ReadyForActivation();
 }
 
@@ -200,9 +187,9 @@ void UGA_ComboAttack::ExecuteComboAttack()
 		                                                      , GetCurrentMontage()
 		                                                      , FGameplayTagContainer());
 		AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
-		AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-		AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-		AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
+		AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+		AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+		AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 
 		AttackAnimTask->ReadyForActivation();
 	}
@@ -300,8 +287,8 @@ void UGA_ComboAttack::ExecuteJumpAttack()
                                                          JumpAttackAnim,
                                                          FGameplayTagContainer());
     AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
-    AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-    AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-    AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
+    AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+    AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+    AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
     AttackAnimTask->ReadyForActivation();
 }
