@@ -17,6 +17,18 @@ EMovementDirection FLocateHelper::GetDirectionByVector(const FVector2D Vector)
 	return EMovementDirection::F;
 }
 
+EMovementDirection FLocateHelper::GetDirectionByAngle(const float Angle)
+{
+	if (Angle <= 22.5 && Angle >= -22.5) return EMovementDirection::F;
+	if (Angle <= 22.5 && Angle >= 67.5) return EMovementDirection::FR;
+	if (Angle <= 67.5 && Angle >= 112.5) return EMovementDirection::R;
+	if (Angle <= 112.5 && Angle >= 157.5) return EMovementDirection::BR;
+	if (Angle <= -22.5 && Angle >= -67.5) return EMovementDirection::FL;
+	if (Angle <= -67.5 && Angle >= -112.5) return EMovementDirection::L;
+	if (Angle <= -112.5 && Angle >= -157.5) return EMovementDirection::BL;
+	return EMovementDirection::B;
+}
+
 // 액터간의 서로 방향에 대한 값을 반환한다.
 FRotator FLocateHelper::GetTargetingRotate(const AActor* OwnerActor, const AActor* TargetActor)
 {
@@ -25,4 +37,13 @@ FRotator FLocateHelper::GetTargetingRotate(const AActor* OwnerActor, const AActo
 
 	return UKismetMathLibrary::FindLookAtRotation(
 		StartVector, TargetVector);
+}
+
+ETargetHeight FLocateHelper::GetTargetHeightTypeByPoint(const float ActorHeight, const FVector Point, const FVector TargetLocation)
+{
+	const float TargetHeight = TargetLocation.Z - Point.Z;
+
+	if (TargetHeight <= ActorHeight / 3) return ETargetHeight::High;
+	if (TargetHeight <= ActorHeight / 3 * 2) return ETargetHeight::Middle;
+	return ETargetHeight::Low;
 }
