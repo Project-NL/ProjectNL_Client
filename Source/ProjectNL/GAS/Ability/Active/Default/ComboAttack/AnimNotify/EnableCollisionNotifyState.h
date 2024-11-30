@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "EnableCollisionNotifyState.generated.h"
+class UCharacterAnimInstance;
 class UGameplayEffect;
 /**
  * 
@@ -24,18 +25,12 @@ public:
 protected:
 	void PerformTriangleTrace(AActor* Owner, FVector Point1, FVector Point2, FVector Point3, TArray<FHitResult>& OutHitResults);
 
-	void MakeTriangleTrace(AActor* Character);
-private:
+	void MakeTriangleTrace(AActor* owner);
+
 	
 
-	UPROPERTY()
-	TSet<AActor*> HitActors;
 
-	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<UGameplayEffect> AttackDamageEffect;
-	// 이전 프레임의 소켓 위치를 저장하는 벡터
-	FVector PrevStartLocation;
-	FVector PrevEndLocation;
+	
 
 	
 };

@@ -22,10 +22,16 @@ public:
 	void UnEquipCharacterWeapon(ACharacter* Character, const bool IsMain);
 	void SwapTwoHandWeapon();
 
+	TSet<AActor*>& GetHitActorsReference();
 	GETTER(EUEquippedHandType, EquippedHandType)
 	GETTER(EWeaponAttachPosition, AttachPosition)
 	GETTER(EUWeaponType, WeaponType)
 	GETTER(USkeletalMeshComponent*, WeaponSkeleton)
+
+	GETTER_SETTER(FVector, PrevStartLocation)
+	GETTER_SETTER(FVector, PrevEndLocation)
+	GETTER_SETTER(TSet<AActor*>, HitActors)
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -44,4 +50,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Assets
 		, meta = (AllowPrivateAccess = "true"))
 	EWeaponAttachPosition AttachPosition;
+
+	UPROPERTY()
+	TSet<AActor*> HitActors;
+
+	// 캐릭터별로 관리할 변수 선언
+	FVector PrevStartLocation;
+	FVector PrevEndLocation;
 };
