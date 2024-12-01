@@ -41,10 +41,10 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Idle, "State.Idle", "특정 액터의 행동 상태가 어떠한 동작하지 않는 대기 상태인 경우 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_GrabWeapon, "State.GrabWeapon", "특정 액터가 현재 무기를 뽑는 상태일 때를 나타내는 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_PutWeapon, "State.PutWeapon", "특정 액터가 현재 무기를 집어넣는 상태일 때를 나타내는 태그");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Attack, "State.Attack", "특정 액터가 현재 무기를 집어넣는 상태일 때를 나타내는 태그");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Attack_Combo, "State.Attack.Combo", "특정 액터가 현재 무기를 집어넣는 상태일 때를 나타내는 태그");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Attack_Heavy, "State.Attack.Heavy", "특정 액터가 현재 무기를 집어넣는 상태일 때를 나타내는 태그");
-	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Attack_Jump, "State.Attack.Jump", "특정 액터가 현재 무기를 집어넣는 상태일 때를 나타내는 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Attack, "State.Attack", "특정 액터가 공격 중인 상태임을 나타내는 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Attack_Combo, "State.Attack.Combo", "특정 액터가 콤보 공격 중인 상태임을 나타내는 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Attack_Heavy, "State.Attack.Heavy", "특정 액터가 강공격 중인 상태임을 나타내는 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Attack_Jump, "State.Attack.Jump", "특정 액터가 점프 공격 중인 상태임을 나타내는 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status, "Status", "특정 액터의 현재 상황에 대해 나타내는 태그로 여러개가 들어갈 수 있음");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Combat, "Status.Combat", "특정 액터가 현재 전투를 준비한 상황에 대한 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Status_Block, "Status.Block", "특정 액터가 현재 방어 상태임을 의미하는 태그");

@@ -52,8 +52,6 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly ,meta = (AllowPrivateAccess = true))
 	float HoldDurationCooldown;
-
-	FTimerHandle ComboClearTimerHandle;
 	
 	FDateTime InputPressedTime;
 

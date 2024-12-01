@@ -28,14 +28,12 @@ void UEnableCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, 
     }
 }
 
-void UEnableCollisionNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
+void UEnableCollisionNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
-    Super::NotifyTick(MeshComp, Animation, FrameDeltaTime);
+    Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
     if (AActor* Owner = MeshComp->GetOwner())
     {
-
-            MakeTriangleTrace(Owner);
-        
+        MakeTriangleTrace(Owner);
     }
 }
 
@@ -68,24 +66,6 @@ void UEnableCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UA
     {
         UE_LOG(LogTemp, Warning, TEXT("OwnerASC is null in NotifyEnd"));
         return;
-    }
-    
-    FStateHelper::ChangePlayerState(
-        Owner->GetAbilitySystemComponent(),NlGameplayTags::State_Attack,
-    NlGameplayTags::State_Idle);
-    
-    if (ASC->HasMatchingGameplayTag(NlGameplayTags::State_Attack_Combo))
-    {
-        FStateHelper::ChangePlayerState(ASC, NlGameplayTags::State_Attack_Combo,
-            NlGameplayTags::State_Idle);
-    } else if (ASC->HasMatchingGameplayTag(NlGameplayTags::State_Attack_Heavy))
-    {
-        FStateHelper::ChangePlayerState(ASC, NlGameplayTags::State_Attack_Heavy,
-            NlGameplayTags::State_Idle);
-    } else if (ASC->HasMatchingGameplayTag(NlGameplayTags::State_Attack_Jump))
-    {
-        FStateHelper::ChangePlayerState(ASC, NlGameplayTags::State_Attack_Jump,
-            NlGameplayTags::State_Idle);
     }
     
     UE_LOG(LogTemp, Log, TEXT("Notify End"));
