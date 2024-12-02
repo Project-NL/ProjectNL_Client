@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "ProjectNL/Helper/LocateHelper.h"
 
 UBTTask_DirectTo::UBTTask_DirectTo()
 {
@@ -44,13 +45,9 @@ EBTNodeResult::Type UBTTask_DirectTo::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	}
 
 	// Calculate the direction to the target
-	FVector TargetLocation = TargetActor->GetActorLocation();
-	FVector PawnLocation = ControlledPawn->GetActorLocation();
-
-	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(PawnLocation, TargetLocation);
+	FLocateHelper::GetTargetingRotate(TargetActor, ControlledPawn);
 
 	// Set the actor's rotation to face the target
-	ControlledPawn->SetActorRotation(LookAtRotation);
 
 	return EBTNodeResult::Succeeded;
 }

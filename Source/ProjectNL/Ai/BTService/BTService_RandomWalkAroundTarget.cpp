@@ -99,8 +99,7 @@ void UBTService_RandomWalkAroundTarget::OnCeaseRelevant(UBehaviorTreeComponent& 
 	}
 	ControlledPawn->bUseControllerRotationYaw = true;
 	
-	float BaseSpeed=Cast<UBaseAttributeSet>(AbilityHelper::GetAttribute(Cast<AEnemyCharacter>(ControlledPawn)))->GetMovementSpeed();
-	Cast<ACharacter>(ControlledPawn)->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
+
 	Super::OnCeaseRelevant(OwnerComp, NodeMemory);
 	
 	
