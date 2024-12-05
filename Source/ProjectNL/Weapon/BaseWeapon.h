@@ -31,6 +31,7 @@ public:
 	GETTER_SETTER(FVector, PrevStartLocation)
 	GETTER_SETTER(FVector, PrevEndLocation)
 	GETTER_SETTER(TSet<AActor*>, HitActors)
+	GETTER_SETTER(FVector, LastAttackDirection)
 
 protected:
 	virtual void BeginPlay() override;
@@ -57,4 +58,5 @@ protected:
 	// 캐릭터별로 관리할 변수 선언
 	FVector PrevStartLocation;
 	FVector PrevEndLocation;
+	FVector LastAttackDirection;
 };

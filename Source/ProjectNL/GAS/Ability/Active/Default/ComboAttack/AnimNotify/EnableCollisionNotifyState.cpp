@@ -112,10 +112,13 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
             FVector CurrentStartLocation = SwordMesh->GetSocketLocation(FName("SwordBoneStart"));
             FVector CurrentEndLocation = SwordMesh->GetSocketLocation(FName("SwordBoneEnd"));
 
+            MainWeapon->SetLastAttackDirection((CurrentStartLocation - PrevStartLocation).GetSafeNormal());
+            UE_LOG(LogTemp, Display, TEXT("Test Direction: %f, %f, %f"), MainWeapon->GetLastAttackDirection().X, MainWeapon->GetLastAttackDirection().Y,MainWeapon->GetLastAttackDirection().Z)
+            
             if (PrevStartLocation == FVector::ZeroVector && PrevEndLocation == FVector::ZeroVector)
             {
                 MainWeapon->SetPrevStartLocation(CurrentStartLocation); 
-                MainWeapon->SetPrevEndLocation(CurrentEndLocation);;
+                MainWeapon->SetPrevEndLocation(CurrentEndLocation);
                 return;
             }
 
@@ -138,7 +141,7 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
 
             // 라디안 값을 도 단위로 변환
             float AngleDegrees = FMath::RadiansToDegrees(AngleRadians);
-            float AngleRatio =  (AngleDegrees)/45;
+            float AngleRatio = AngleDegrees / 45;
   
             // 보간할 간격(거리가 일정 이상일 경우 보간 수행)
             float InterpolationStep = 5.0f; // 간격을 설정 
