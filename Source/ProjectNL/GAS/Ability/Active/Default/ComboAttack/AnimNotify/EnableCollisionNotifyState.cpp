@@ -112,8 +112,8 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner)
             FVector CurrentStartLocation = SwordMesh->GetSocketLocation(FName("SwordBoneStart"));
             FVector CurrentEndLocation = SwordMesh->GetSocketLocation(FName("SwordBoneEnd"));
 
-            MainWeapon->SetLastAttackDirection((CurrentStartLocation - PrevStartLocation).GetSafeNormal());
-            UE_LOG(LogTemp, Display, TEXT("Test Direction: %f, %f, %f"), MainWeapon->GetLastAttackDirection().X, MainWeapon->GetLastAttackDirection().Y,MainWeapon->GetLastAttackDirection().Z)
+            // TODO: 현재 사용하지는 않는 변수지만 계속 사용할 예정
+            FVector WeaponAttackDirection = (CurrentStartLocation - PrevStartLocation).GetSafeNormal();
             
             if (PrevStartLocation == FVector::ZeroVector && PrevEndLocation == FVector::ZeroVector)
             {
