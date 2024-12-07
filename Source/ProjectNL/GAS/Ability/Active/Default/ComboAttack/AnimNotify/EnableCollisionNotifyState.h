@@ -28,5 +28,5 @@ private:
 
 	void MakeTriangleTrace(AActor* Owner, ABaseWeapon* Weapon);
 
-	void ReactToHitActor(AActor* Owner, ABaseWeapon* Weapon, TArray<FHitResult>& HitResults);
+	void ReactToHitActor(AActor* Owner, ABaseWeapon* Weapon, FVector& WeaponMoveDirection, TArray<FHitResult>& HitResults);
 };

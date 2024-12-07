@@ -2,6 +2,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "ProjectNL/Character/BaseCharacter.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
+#include "ProjectNL/Helper/LocateHelper.h"
 #include "ProjectNL/Helper/StateHelper.h"
 #include "ProjectNL/Weapon/BaseWeapon.h"
 
@@ -132,7 +133,7 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner, ABaseWeapon* 
         FVector CurrentEndLocation = SwordMesh->GetSocketLocation(FName("SwordBoneEnd"));
 
         // TODO: 현재 사용하지는 않는 변수지만 계속 사용할 예정
-        FVector WeaponAttackDirection = (CurrentStartLocation - PrevStartLocation).GetSafeNormal();
+        FVector WeaponAttackDirection = (PrevStartLocation - CurrentStartLocation).GetSafeNormal2D();
 
         // 현재 Vector가 Zero 상태인 것은 즉 계산을 시도하지 않았다는 의미기에 별도의 처리 없이 끝낸다.
         // 즉 NotifyEnd때 초기화 해주면 불필요한 계산을 1회 줄일 수 있다.
@@ -223,6 +224,8 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner, ABaseWeapon* 
                 InterPrevStartLocation=InterpolatedEnd;
            
         }
+
+        ReactToHitActor(Owner, Weapon, WeaponAttackDirection, HitResults);
         
         // 첫 번째 삼각형: PrevStart -> CurrentStart -> PrevMiddle
         PerformTriangleTrace(Owner, PrevStartLocation, CurrentStartLocation, PrevMiddleLocation, HitResults);
@@ -235,9 +238,6 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner, ABaseWeapon* 
 
         // 추가 삼각형 2: CurrentStartLocation -> PrevEnd -> CurrentEnd
         PerformTriangleTrace(Owner, CurrentMiddleLocation, PrevEndLocation, CurrentEndLocation, HitResults);
-
-
-        
 
         // 디버그 라인 그리기
          DrawDebugLine(Owner->GetWorld(), PrevStartLocation, CurrentStartLocation, FColor::Blue, false, 2.0f);
@@ -257,7 +257,7 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner, ABaseWeapon* 
     }
 }
 
-void UEnableCollisionNotifyState::ReactToHitActor(AActor* Owner, ABaseWeapon* Weapon, TArray<FHitResult>& HitResults)
+void UEnableCollisionNotifyState::ReactToHitActor(AActor* Owner, ABaseWeapon* Weapon, FVector& WeaponAttackDirection, TArray<FHitResult>& HitResults)
 {
     ABaseCharacter* SourceCharacter = Cast<ABaseCharacter>(Owner);
     if (!SourceCharacter) return;
@@ -282,7 +282,12 @@ void UEnableCollisionNotifyState::ReactToHitActor(AActor* Owner, ABaseWeapon* We
                     EffectContext.AddSourceObject(Owner);
 
                     FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(Weapon->GetAttackEffect(), 1.0f, EffectContext);
-                    // TODO: SetByCaller로 GESpec에 피격 방향을 저장해 전달해준다.
+                    const FVector2d WeaponAttackDirection2D(WeaponAttackDirection);
+                    UE_LOG(LogTemp, Display, TEXT("테스트 위치: %f, %f"), WeaponAttackDirection2D.X, WeaponAttackDirection2D.Y);
+                    // TODO: 현재 테스트를 위해 잠시 공격자 기준으로 전달하지만 피격 대상과의 방향도 계산해서 같이 방향을 계산할 필요가 있다.
+                    // 현재 WeaponAttackDirection2D는 그저 공격 방향만 전달하고 있다.
+                    EMovementDirection Direction = FLocateHelper::GetDirectionByVector(WeaponAttackDirection2D);
+                    SpecHandle.Data.Get()->SetByCallerNameMagnitudes.Add(NlGameplayTags::Data_AttackDirection.GetModuleName(), static_cast<uint8>(Direction));
                     
                     if (SpecHandle.IsValid())
                     {

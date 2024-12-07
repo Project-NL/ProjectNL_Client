@@ -53,7 +53,7 @@ private:
 		, meta = (AllowPrivateAccess = "true"))
 	EWeaponAttachPosition AttachPosition;
 
-	UPROPERTY(EditInstanceOnly, Category = Ability, meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly, Category = Ability, meta = (AllowPrivateAccess = true))
 	TSubclassOf<UGameplayEffect> AttackEffect;
 	
 	UPROPERTY()

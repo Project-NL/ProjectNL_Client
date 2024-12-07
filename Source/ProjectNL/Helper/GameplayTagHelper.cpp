@@ -37,6 +37,8 @@ namespace NlGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Ability_Guard, "Ability.Guard", "Ability - 기본스킬 - 방어");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Category, "Category", "특정 Actor의 카테고리 관련 최상위 트리 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Category_Entity, "Category.Entity", "특정 Actor의 카테고리가 엔티티(살아있는 생물체)인 경우");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Data, "Data", "SetByCaller를 위해 전달하는 데이터 전용 태그");
+	UE_DEFINE_GAMEPLAY_TAG_COMMENT(Data_AttackDirection, "Data.AttackDirection", "공격 시 공격한 방향 값을 전달하는 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State, "State", "특정 액터의 행동 상태에 대한 최상위 트리 태그로 하나만 들어갈 수 있음");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_Idle, "State.Idle", "특정 액터의 행동 상태가 어떠한 동작하지 않는 대기 상태인 경우 태그");
 	UE_DEFINE_GAMEPLAY_TAG_COMMENT(State_GrabWeapon, "State.GrabWeapon", "특정 액터가 현재 무기를 뽑는 상태일 때를 나타내는 태그");
