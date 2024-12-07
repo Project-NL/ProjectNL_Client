@@ -1,15 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "ProjectNL/Weapon/BaseWeapon.h"
 #include "EnableCollisionNotifyState.generated.h"
+
+class ABaseWeapon;
 class UCharacterAnimInstance;
 class UGameplayEffect;
-/**
- * 
- */
+
 UCLASS()
 class PROJECTNL_API UEnableCollisionNotifyState : public UAnimNotifyState
 {
@@ -22,15 +21,12 @@ public:
 
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 	
-protected:
+private:
+	void StartTraceTriangle(AActor* Owner);
+	
 	void PerformTriangleTrace(AActor* Owner, FVector Point1, FVector Point2, FVector Point3, TArray<FHitResult>& OutHitResults);
 
-	void MakeTriangleTrace(AActor* owner);
+	void MakeTriangleTrace(AActor* Owner, ABaseWeapon* Weapon);
 
-	
-
-
-	
-
-	
+	void ReactToHitActor(AActor* Owner, ABaseWeapon* Weapon, TArray<FHitResult>& HitResults);
 };

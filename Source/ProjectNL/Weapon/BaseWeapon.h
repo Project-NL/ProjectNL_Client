@@ -5,6 +5,7 @@
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "BaseWeapon.generated.h"
 
+class UGameplayEffect;
 enum class EUWeaponType : uint8;
 enum class EUEquippedHandType : uint8;
 enum class EWeaponAttachPosition : uint8;
@@ -27,14 +28,15 @@ public:
 	GETTER(EWeaponAttachPosition, AttachPosition)
 	GETTER(EUWeaponType, WeaponType)
 	GETTER(USkeletalMeshComponent*, WeaponSkeleton)
+	GETTER(TSubclassOf<UGameplayEffect>, AttackEffect)
 
 	GETTER_SETTER(FVector, PrevStartLocation)
 	GETTER_SETTER(FVector, PrevEndLocation)
-	GETTER_SETTER(TSet<AActor*>, HitActors)
 
 protected:
 	virtual void BeginPlay() override;
-	
+
+private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Assets
 	, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* WeaponSkeleton;
@@ -51,6 +53,9 @@ protected:
 		, meta = (AllowPrivateAccess = "true"))
 	EWeaponAttachPosition AttachPosition;
 
+	UPROPERTY(EditInstanceOnly, Category = Ability, meta = (AllowPrivateAccess = true))
+	TSubclassOf<UGameplayEffect> AttackEffect;
+	
 	UPROPERTY()
 	TSet<AActor*> HitActors;
 
