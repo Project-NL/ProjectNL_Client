@@ -8,6 +8,8 @@ enum class ETargetHeight: uint8;
 class PROJECTNL_API FLocateHelper
 {
 public:
+	static EMovementDirection GetDirectionByMovementData(const FVector2D Vector);
+	
 	static EMovementDirection GetDirectionByVector(const FVector2D Vector);
 	
 	static EMovementDirection GetDirectionByAngle(const float Angle);

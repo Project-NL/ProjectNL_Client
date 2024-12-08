@@ -5,9 +5,20 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ProjectNL/Helper/EnumHelper.h"
 
-// TODO: 해당 함수는 잘못된 이름을 가진 함수다.
 // 단순히 Character Input Movement의 값에 따라 움직이는 것 이기 때문이다.
 // 보완하기 위해서는 단순히 같다가 아닌 범위를 줘야한다.
+EMovementDirection FLocateHelper::GetDirectionByMovementData(const FVector2D Vector)
+{
+	if (Vector.X == -1 && Vector.Y == 1) return EMovementDirection::FL;
+	if (Vector.X == 1 && Vector.Y == 1) return EMovementDirection::FR;
+	if (Vector.X == -1 && Vector.Y == 0) return EMovementDirection::L;
+	if (Vector.X == 1 && Vector.Y == 0) return EMovementDirection::R;
+	if (Vector.X == -1 && Vector.Y == -1) return EMovementDirection::BL;
+	if (Vector.X == 1 && Vector.Y == -1) return EMovementDirection::BR;
+	if (Vector.X == 0 && Vector.Y == -1) return EMovementDirection::B;
+	return EMovementDirection::F;
+}
+
 EMovementDirection FLocateHelper::GetDirectionByVector(const FVector2D Vector)
 {
 	if (Vector.X == -1 && Vector.Y == 1) return EMovementDirection::FL;

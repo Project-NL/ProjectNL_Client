@@ -69,7 +69,7 @@ void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FG
 		{
 			const EMovementDirection CurrentDirection =
 				FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
-					? FLocateHelper::GetDirectionByVector(OwnerCharacter->GetMovementVector()) : EMovementDirection::F;
+					? FLocateHelper::GetDirectionByMovementData(OwnerCharacter->GetMovementVector()) : EMovementDirection::F;
 			
 			if (UAnimMontage* EvadeAnim = OwnerCharacter->GetEquipComponent()
 				->GetEvadeAnim().GetAnimationByDirection(CurrentDirection))
