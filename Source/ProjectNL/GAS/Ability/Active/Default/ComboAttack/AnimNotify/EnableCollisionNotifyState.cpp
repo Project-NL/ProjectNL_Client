@@ -225,17 +225,17 @@ void UEnableCollisionNotifyState::MakeTriangleTrace(AActor* Owner, ABaseWeapon* 
 
         ReactToHitActor(Owner, Weapon, HitResults);
         
-        // 첫 번째 삼각형: PrevStart -> CurrentStart -> PrevMiddle
-        PerformTriangleTrace(Owner, PrevStartLocation, CurrentStartLocation, PrevMiddleLocation, HitResults);
-
-        // 두 번째 삼각형: CurrentStart -> CurrentMiddle -> PrevMiddle
-        PerformTriangleTrace(Owner, CurrentStartLocation, CurrentMiddleLocation, PrevMiddleLocation, HitResults);
-
-        // 추가 삼각형 1: PrevMiddle -> CurrentMiddle -> PrevEnd
-        PerformTriangleTrace(Owner, PrevMiddleLocation, CurrentMiddleLocation, PrevEndLocation, HitResults);
-
         // 추가 삼각형 2: CurrentStartLocation -> PrevEnd -> CurrentEnd
         PerformTriangleTrace(Owner, CurrentMiddleLocation, PrevEndLocation, CurrentEndLocation, HitResults);
+        
+        // 추가 삼각형 1: PrevMiddle -> CurrentMiddle -> PrevEnd
+        PerformTriangleTrace(Owner, PrevMiddleLocation, CurrentMiddleLocation, PrevEndLocation, HitResults);
+        
+        // 두 번째 삼각형: CurrentStart -> CurrentMiddle -> PrevMiddle
+        PerformTriangleTrace(Owner, CurrentStartLocation, CurrentMiddleLocation, PrevMiddleLocation, HitResults);
+        
+        // 첫 번째 삼각형: PrevStart -> CurrentStart -> PrevMiddle
+        PerformTriangleTrace(Owner, PrevStartLocation, CurrentStartLocation, PrevMiddleLocation, HitResults);
 
         // 디버그 라인 그리기
          DrawDebugLine(Owner->GetWorld(), PrevStartLocation, CurrentStartLocation, FColor::Blue, false, 2.0f);
@@ -305,7 +305,7 @@ void UEnableCollisionNotifyState::PerformTriangleTrace(AActor* Owner, FVector Po
     CollisionParams.AddIgnoredActor(Owner);
 
     // 각 변을 라인 트레이스로 검사
-    Owner->GetWorld()->LineTraceMultiByChannel(OutHitResults, Point1, Point2, ECC_WorldDynamic, CollisionParams);
     Owner->GetWorld()->LineTraceMultiByChannel(OutHitResults, Point2, Point3, ECC_WorldDynamic, CollisionParams);
     Owner->GetWorld()->LineTraceMultiByChannel(OutHitResults, Point3, Point1, ECC_WorldDynamic, CollisionParams);
+    Owner->GetWorld()->LineTraceMultiByChannel(OutHitResults, Point1, Point2, ECC_WorldDynamic, CollisionParams);
 }
