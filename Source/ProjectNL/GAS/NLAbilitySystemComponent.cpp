@@ -79,7 +79,7 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 	SetIsInitialized(true);
 }
 
-void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse DamagedResponse) const
+void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedResponse) const
 {
 	OnDamageStartedNotified.Broadcast(DamagedResponse);
 

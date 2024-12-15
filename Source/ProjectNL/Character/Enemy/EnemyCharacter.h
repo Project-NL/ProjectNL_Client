@@ -25,5 +25,5 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnDamaged(FDamagedResponse DamagedResponse);
+	void OnDamaged(const FDamagedResponse& DamagedResponse);
 };

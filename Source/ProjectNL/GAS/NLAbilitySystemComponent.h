@@ -21,8 +21,8 @@ struct FDamagedResponse
 	ETargetHeight DamagedHeight;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, FDamagedResponse, DamageResponse);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReactNotifiedSignature, FDamagedResponse, DamageResponse);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, const FDamagedResponse&, DamageResponse);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReactNotifiedSignature, const FDamagedResponse&, DamageResponse);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECTNL_API UNLAbilitySystemComponent : public UAbilitySystemComponent
@@ -35,7 +35,7 @@ public:
 	void InitializeAbilitySystem(
 		const FNLAbilitySystemInitializationData& InitData);
 	
-	void ReceiveDamage(const FDamagedResponse DamagedResponse) const;
+	void ReceiveDamage(const FDamagedResponse& DamagedResponse) const;
 
 	GETTER_SETTER(bool, IsInitialized)
 

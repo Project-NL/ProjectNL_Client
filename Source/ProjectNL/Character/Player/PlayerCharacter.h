@@ -35,7 +35,7 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnDamaged(FDamagedResponse DamagedResponse);
+	void OnDamaged(const FDamagedResponse& DamagedResponse);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
 		, meta = (AllowPrivateAccess = "true"))

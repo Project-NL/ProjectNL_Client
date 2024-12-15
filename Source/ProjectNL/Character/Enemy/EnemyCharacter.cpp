@@ -25,7 +25,7 @@ void AEnemyCharacter::BeginPlay()
 	.AddDynamic(this, &ThisClass::OnDamaged);
 }
 
-void AEnemyCharacter::OnDamaged(FDamagedResponse DamagedResponse)
+void AEnemyCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 {
 	if (EnemyAttributeSet)
 	{

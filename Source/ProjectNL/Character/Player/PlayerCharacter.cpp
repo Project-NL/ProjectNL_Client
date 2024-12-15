@@ -168,7 +168,7 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void APlayerCharacter::OnDamaged(FDamagedResponse DamagedResponse)
+void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 {
 	if (PlayerAttributeSet)
 	{

@@ -31,7 +31,7 @@ private:
 	TObjectPtr<UBlockStartNotify> BlockStartNotify;
 
 	UFUNCTION()
-	void StartBlock(FDamagedResponse Response);
+	void StartBlock(const FDamagedResponse& DamagedResponse);
 
 	UFUNCTION()
 	void EndBlock(FGameplayTag EventTag, FGameplayEventData EventData);
