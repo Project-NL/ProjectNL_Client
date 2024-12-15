@@ -34,6 +34,9 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 private:
+	UFUNCTION()
+	void OnDamaged(FDamagedResponse DamagedResponse);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
 		, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;

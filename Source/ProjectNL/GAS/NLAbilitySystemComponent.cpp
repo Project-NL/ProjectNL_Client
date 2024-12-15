@@ -79,9 +79,9 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 	SetIsInitialized(true);
 }
 
-void UNLAbilitySystemComponent::ReceiveDamage(const float Damage, AActor* TargetActor) const
+void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse DamagedResponse) const
 {
-	OnDamageStartedNotified.Broadcast(Damage);
+	OnDamageStartedNotified.Broadcast(DamagedResponse);
 
 	if (HasMatchingGameplayTag(NlGameplayTags::Status_Block))
 	{
@@ -89,7 +89,6 @@ void UNLAbilitySystemComponent::ReceiveDamage(const float Damage, AActor* Target
 			RemoveLooseGameplayTag(NlGameplayTags::Status_Block);
 		return;
 	}
-	
 	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
-	UGameplayStatics::ApplyDamage(GetAvatarActor(), Damage, NULL, TargetActor, NULL);
+	OnDamageReactNotified.Broadcast(DamagedResponse);
 }

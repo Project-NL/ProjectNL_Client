@@ -38,6 +38,7 @@ public:
 	GETTER(TObjectPtr<UAnimMontage>, BlockAnim)
 	GETTER(FAnimationByRotation, EvadeAnim)
 	GETTER(FAnimationByRotation, StepAnim)
+	GETTER(FAnimationBy4RotationWithHeight, DamagedAnim)
 
 	GETTER(TObjectPtr<ABaseWeapon>, MainWeapon)
 	GETTER(TObjectPtr<ABaseWeapon>, SubWeapon)
@@ -95,6 +96,8 @@ private:
 	FAnimationByRotation EvadeAnim;
 	
 	FAnimationByRotation StepAnim;
+
+	FAnimationBy4RotationWithHeight DamagedAnim;
 
 	// TODO: 추후 코드 분리 필요 (EquipComponent와 맞는 취지는 아님)
 	uint8 AttackComboIndex = 0;

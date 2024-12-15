@@ -86,16 +86,6 @@ ABaseCharacter::Server_RemoveActiveGameplayEffectBySourceEffect_Implementation(
 		Effect, AbilitySystemComponent);
 }
 
-float ABaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	if (UBaseAttributeSet* Attribute = Cast<UBaseAttributeSet>(AbilityHelper::GetAttribute(this)))
-	{
-		Attribute->SetHealth(Attribute->GetHealth() - DamageAmount);
-	}
-	return 0.f;
-}
-
 
 void ABaseCharacter::MovementSpeedChanged(const FOnAttributeChangeData& Data)
 {

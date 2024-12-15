@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
+#include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 #include "ProjectNL/Helper/EnumHelper.h"
@@ -63,7 +64,9 @@ void APlayerCharacter::OnRep_PlayerState()
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
-
+		
+		AbilitySystemComponent->OnDamageReactNotified
+		.AddDynamic(this, &ThisClass::OnDamaged);
 		Initialize();
 	}
 }
@@ -87,6 +90,9 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
+		
+		AbilitySystemComponent->OnDamageReactNotified
+		.AddDynamic(this, &ThisClass::APlayerCharacter::OnDamaged);
 		
 		Initialize();
 	}
@@ -160,4 +166,16 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(NewYaw);
 		AddControllerPitchInput(NewPitch);
 	}
+}
+
+void APlayerCharacter::OnDamaged(FDamagedResponse DamagedResponse)
+{
+	if (PlayerAttributeSet)
+	{
+		PlayerAttributeSet->SetHealth(PlayerAttributeSet->GetHealth() - DamagedResponse.Damage);
+	}
+	// TODO: 이거 별도의 Ability로 빼는 것도 고려할 필요 있음.
+	// 근데 고려만 할 것
+	PlayAnimMontage(EquipComponent->GetDamagedAnim()
+	.GetAnimationByDirection(DamagedResponse.DamagedDirection, DamagedResponse.DamagedHeight));
 }

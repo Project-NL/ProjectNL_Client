@@ -43,6 +43,14 @@ EMovementDirection FLocateHelper::GetDirectionByAngle(const float Angle)
 	return EMovementDirection::B;
 }
 
+EMovementDirection FLocateHelper::CastToSimpleDirection(EMovementDirection Direction)
+{
+	if (Direction == EMovementDirection::BL || Direction == EMovementDirection::FL) return EMovementDirection::L;
+	if (Direction == EMovementDirection::BR || Direction == EMovementDirection::FR) return EMovementDirection::R;
+	return Direction;
+}
+
+
 // 액터간의 서로 방향에 대한 값을 반환한다.
 FRotator FLocateHelper::GetTargetingRotate(const AActor* OwnerActor, const AActor* TargetActor)
 {

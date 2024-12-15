@@ -14,6 +14,8 @@ public:
 	
 	static EMovementDirection GetDirectionByAngle(const float Angle);
 
+	static EMovementDirection CastToSimpleDirection(EMovementDirection Direction);
+
 	static FRotator GetTargetingRotate(const AActor* OwnerActor, const AActor* TargetActor);
 
 	static ETargetHeight GetTargetHeightTypeByPoint(const float ActorHeight, const FVector Point, const FVector TargetLocation);

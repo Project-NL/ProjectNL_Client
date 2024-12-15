@@ -21,11 +21,9 @@ public:
 	TObjectPtr<UBaseAttributeSet> EnemyAttributeSet;
 
 protected:
-	virtual void PossessedBy(AController* NewController) override;
-	virtual void OnRep_PlayerState() override;
-
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+
+private:
+	UFUNCTION()
+	void OnDamaged(FDamagedResponse DamagedResponse);
 };
