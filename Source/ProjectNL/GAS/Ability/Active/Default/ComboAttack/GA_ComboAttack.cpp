@@ -17,17 +17,9 @@ UGA_ComboAttack::UGA_ComboAttack(const FObjectInitializer& ObjectInitializer)
 
 bool UGA_ComboAttack::CanAttack() const
 {
-	if (!FStateHelper::IsCombatMode(GetAbilitySystemComponentFromActorInfo()))
-	{
-		return false;
-	}
-	
-	// TODO: 상위 태그를 기반으로 한 쿼리로 리팩토링 필요함
-	FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(NlGameplayTags::State_Attack_Combo);
-	TagContainer.AddTag(NlGameplayTags::State_Attack_Heavy);
-	TagContainer.AddTag(NlGameplayTags::State_Attack_Jump);
-	return !GetAbilitySystemComponentFromActorInfo()->HasAnyMatchingGameplayTags(TagContainer);
+	if (!FStateHelper::IsCombatMode(GetAbilitySystemComponentFromActorInfo())) return false;
+	if (!FStateHelper::IsPlayerIdle(GetAbilitySystemComponentFromActorInfo())) return false;
+	return true;
 }
 
 bool UGA_ComboAttack::CanActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -58,20 +50,6 @@ void UGA_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 }
 
 void UGA_ComboAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
-{
-	GetWorld()->GetTimerManager().SetTimer(ComboClearTimerHandle, FTimerDelegate::CreateLambda([&]
-	{
-		ABaseCharacter* CurrentCharacter = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo());
-		check(CurrentCharacter);
-		check(CurrentCharacter->GetEquipComponent());
-		CurrentCharacter->GetEquipComponent()->ClearCurrentComboCount();
-	}), ComboClearCooldown, false);
-	UE_LOG(LogTemp, Warning, TEXT("Test End"));
-	
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-}
-
-void UGA_ComboAttack::OnCompletedAbility(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	if (APlayerController* PlayerController
 		// TODO: 해당 코드는 Pawn 대상이 된다면 에러 발생할 수 있으니 추후 고쳐야함
@@ -118,12 +96,15 @@ void UGA_ComboAttack::InputReleased(const FGameplayAbilitySpecHandle Handle, con
                                     const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
+
 	if (!CanAttack())
 	{
 		return;
 	}
 	
 	const FTimespan HoldDuration = FDateTime::Now() - InputPressedTime;
+	// 지속 시간 초기화를 통해 이후 InputRelease에 이전 시간이 반영되지 않게 처리
+	InputPressedTime = FDateTime::Now();
 	// 태그에 따라 조건 분기
 	if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(NlGameplayTags::Status_IsFalling))
 	{
@@ -160,16 +141,15 @@ void UGA_ComboAttack::ExecuteHeavyAttack()
 		AttackAnimTask = nullptr;
 	}
 	
-	GetAbilitySystemComponentFromActorInfo()
-		->SetLooseGameplayTagCount(NlGameplayTags::State_Attack_Heavy, 1);
+	FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo(), NlGameplayTags::State_Idle, NlGameplayTags::State_Attack_Heavy, true);
 
 	AttackAnimTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 	                                                      , HeavyAttack
 	                                                      , FGameplayTagContainer());
 	AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
-	AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-	AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-	AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
+	AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+	AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+	AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 	AttackAnimTask->ReadyForActivation();
 }
 
@@ -196,16 +176,15 @@ void UGA_ComboAttack::ExecuteComboAttack()
 		}
 
 		SetCurrentMontage(ComboAttack[CharEquipInfo->GetAttackComboIndex()]);
-		GetAbilitySystemComponentFromActorInfo()
-			->SetLooseGameplayTagCount(NlGameplayTags::State_Attack_Combo, 1);
+		FStateHelper::ChangePlayerState(GetAbilitySystemComponentFromActorInfo(), NlGameplayTags::State_Idle, NlGameplayTags::State_Attack_Combo, true);
 		
 		AttackAnimTask = UPlayMontageWithEvent::InitialEvent(this, NAME_None
 		                                                      , GetCurrentMontage()
 		                                                      , FGameplayTagContainer());
 		AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
-		AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-		AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-		AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
+		AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+		AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+		AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
 
 		AttackAnimTask->ReadyForActivation();
 	}
@@ -303,8 +282,8 @@ void UGA_ComboAttack::ExecuteJumpAttack()
                                                          JumpAttackAnim,
                                                          FGameplayTagContainer());
     AttackAnimTask->OnCancelled.AddDynamic(this, &UGA_ComboAttack::OnCancelled);
-    AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-    AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
-    AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompletedAbility);
+    AttackAnimTask->OnBlendOut.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+    AttackAnimTask->OnCompleted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
+    AttackAnimTask->OnInterrupted.AddDynamic(this, &UGA_ComboAttack::OnCompleted);
     AttackAnimTask->ReadyForActivation();
 }

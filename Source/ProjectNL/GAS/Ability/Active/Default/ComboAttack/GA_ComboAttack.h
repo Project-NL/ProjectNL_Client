@@ -52,16 +52,11 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly ,meta = (AllowPrivateAccess = true))
 	float HoldDurationCooldown;
-
-	FTimerHandle ComboClearTimerHandle;
 	
 	FDateTime InputPressedTime;
 
 	UFUNCTION()
 	void OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData);
-
-	UFUNCTION()
-	void OnCompletedAbility(FGameplayTag EventTag, FGameplayEventData EventData);
 	
 	UFUNCTION()
 	void OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData);

@@ -8,7 +8,21 @@
 struct FInitGameplayAbilitySystem;
 struct FNLAbilitySystemInitializationData;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, float, Damage);
+enum class EMovementDirection: uint8;
+enum class ETargetHeight: uint8;
+
+USTRUCT()
+struct FDamagedResponse
+{
+	GENERATED_BODY()
+
+	float Damage;
+	EMovementDirection DamagedDirection;
+	ETargetHeight DamagedHeight;
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, const FDamagedResponse&, DamageResponse);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageReactNotifiedSignature, const FDamagedResponse&, DamageResponse);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECTNL_API UNLAbilitySystemComponent : public UAbilitySystemComponent
@@ -21,11 +35,12 @@ public:
 	void InitializeAbilitySystem(
 		const FNLAbilitySystemInitializationData& InitData);
 	
-	void ReceiveDamage(const float Damage) const;
+	void ReceiveDamage(const FDamagedResponse& DamagedResponse) const;
 
 	GETTER_SETTER(bool, IsInitialized)
 
 	FOnDamageStartedNotifiedSignature OnDamageStartedNotified;
+	FOnDamageReactNotifiedSignature OnDamageReactNotified;
 private:
 	bool IsInitialized = false;
 };

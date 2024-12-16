@@ -84,5 +84,6 @@ void UEquipComponent::SetAnimationsByWeaponState()
 		BlockAnim = AnimData->BlockAnim;
 		EvadeAnim = AnimData->EvadeAnim;
 		StepAnim = AnimData->StepAnim;
+		DamagedAnim = AnimData->DamagedAnim;
 	}
 }

@@ -19,7 +19,7 @@ void UGA_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	{
 		const EMovementDirection CurrentDirection =
 			FStateHelper::GetIsCharacterTargetMode(GetAbilitySystemComponentFromActorInfo())
-				? FLocateHelper::GetDirectionByVector(OwnerCharacter->GetMovementVector()) : EMovementDirection::F;
+				? FLocateHelper::GetDirectionByMovementData(OwnerCharacter->GetMovementVector()) : EMovementDirection::F;
 			
 		if (UAnimMontage* StepAnim = OwnerCharacter->GetEquipComponent()
 			->GetStepAnim().GetAnimationByDirection(CurrentDirection))

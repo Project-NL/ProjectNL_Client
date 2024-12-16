@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
+#include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 #include "ProjectNL/Helper/EnumHelper.h"
@@ -63,7 +64,9 @@ void APlayerCharacter::OnRep_PlayerState()
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
-
+		
+		AbilitySystemComponent->OnDamageReactNotified
+		.AddDynamic(this, &ThisClass::OnDamaged);
 		Initialize();
 	}
 }
@@ -87,6 +90,9 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			PlayerAttributeSet->GetMovementSpeedAttribute()).AddUObject(
 			this, &ThisClass::MovementSpeedChanged);
+		
+		AbilitySystemComponent->OnDamageReactNotified
+		.AddDynamic(this, &ThisClass::APlayerCharacter::OnDamaged);
 		
 		Initialize();
 	}
@@ -140,6 +146,8 @@ void APlayerCharacter::MoveTo(const FInputActionValue& Value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
+		// TODO: 둘다 동시에 누를 경우 1,1이 되기 때문에 대각선으로 더 멀리갈 수도 있다. (확인 필요)
+		// 그렇기에 값을 조정해줘야할 필요가 있을 수도 있다.
 		this->AddMovementInput(ForwardDirection, static_cast<float>(MovementVector.Y));
 		this->AddMovementInput(RightDirection, static_cast<float>(MovementVector.X));
 	}
@@ -158,4 +166,16 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(NewYaw);
 		AddControllerPitchInput(NewPitch);
 	}
+}
+
+void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
+{
+	if (PlayerAttributeSet)
+	{
+		PlayerAttributeSet->SetHealth(PlayerAttributeSet->GetHealth() - DamagedResponse.Damage);
+	}
+	// TODO: 이거 별도의 Ability로 빼는 것도 고려할 필요 있음.
+	// 근데 고려만 할 것
+	PlayAnimMontage(EquipComponent->GetDamagedAnim()
+	.GetAnimationByDirection(DamagedResponse.DamagedDirection, DamagedResponse.DamagedHeight));
 }

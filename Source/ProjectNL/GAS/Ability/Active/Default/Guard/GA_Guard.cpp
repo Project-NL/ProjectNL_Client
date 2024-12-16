@@ -53,7 +53,7 @@ void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	}
 }
 
-void UGA_Guard::StartBlock(float Damage)
+void UGA_Guard::StartBlock(const FDamagedResponse& DamagedResponse)
 {
 	if (UBaseAttributeSet* AttributeSet = Cast<UBaseAttributeSet>(AbilityHelper::GetAttribute(GetAvatarActorFromActorInfo())))
 	{
