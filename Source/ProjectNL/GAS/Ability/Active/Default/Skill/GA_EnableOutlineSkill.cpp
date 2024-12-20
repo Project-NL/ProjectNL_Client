@@ -42,10 +42,12 @@ void UGA_EnableOutlineSkill::EndAbility(const FGameplayAbilitySpecHandle Handle,
 
 void UGA_EnableOutlineSkill::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
 {
+	
 }
 
 void UGA_EnableOutlineSkill::OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
 {
+	
 }
 
 void UGA_EnableOutlineSkill::PlayActionAnimation()

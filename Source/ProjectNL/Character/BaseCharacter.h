@@ -9,6 +9,7 @@
 #include "BaseCharacter.generated.h"
 
 class UEquipComponent;
+class UTimeRecallComponent;
 enum class EEntityCategory : uint8;
 
 UCLASS()
@@ -34,15 +35,18 @@ public:
 	GETTER(UEquipComponent*, EquipComponent)
 	GETTER(FVector2D, MovementVector)
 	GETTER_SETTER(EEntityCategory, EntityType)
-	
+	GETTER(UTimeRecallComponent*, TimeRecallComponent)
 protected:
 	virtual void BeginPlay() override;
 	
 	UPROPERTY()
-	UNLAbilitySystemComponent* AbilitySystemComponent;
+	TObjectPtr<UNLAbilitySystemComponent> AbilitySystemComponent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UEquipComponent* EquipComponent;
+	TObjectPtr<UEquipComponent> EquipComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UTimeRecallComponent> TimeRecallComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AbilitySystem"
 		, meta = (AllowPrivateAccess = "true"))
@@ -61,4 +65,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity|Category"
 		, meta = (AllowPrivateAccess = "true"))
 	EEntityCategory EntityType;
+
+	
 };
