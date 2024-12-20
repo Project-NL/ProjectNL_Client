@@ -107,6 +107,4 @@ void UBTTask_ActiveGA::OnAbilityEndCallback(UGameplayAbility* GameplayAbility)
 void UBTTask_ActiveGA::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	
-	UE_LOG(LogTemp, Log, TEXT("UBTTask_ActiveGA TickTask"));
 }

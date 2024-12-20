@@ -2,7 +2,6 @@
 
 
 #include "ProjectNL/Ai/Controller/EnemyAIController.h"
-
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Engine/OverlapResult.h"
@@ -23,7 +22,7 @@ AEnemyAIController::AEnemyAIController()
 	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 	SightConfig->SightRadius = 300.0f;
 	SightConfig->LoseSightRadius = 400.0f;
-	SightConfig->PeripheralVisionAngleDegrees = 90.0f;
+	SightConfig->PeripheralVisionAngleDegrees = 60.0f;
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
@@ -31,6 +30,7 @@ AEnemyAIController::AEnemyAIController()
 	AIPerceptionComponent->ConfigureSense(*SightConfig);
 	AIPerceptionComponent->SetDominantSense(*SightConfig->GetSenseImplementation());
 	AIPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyAIController::OnPerceptionUpdated);
+	
 }
 
 void AEnemyAIController::Tick(float DeltaSeconds)
@@ -158,10 +158,10 @@ void AEnemyAIController::UpdateClosestEnemy()
 
 	if (NearestEnemy)
 	{
-		GetBlackboardComponent()->SetValueAsObject("NearestEnemy", NearestEnemy);
+		GetBlackboardComponent()->SetValueAsObject(BBKEY_NEAREST_ENEMY, NearestEnemy);
 	}
 	else
 	{
-		GetBlackboardComponent()->ClearValue("NearestEnemy");
+		GetBlackboardComponent()->ClearValue(BBKEY_NEAREST_ENEMY);
 	}
 }

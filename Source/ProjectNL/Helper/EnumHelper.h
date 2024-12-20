@@ -100,3 +100,10 @@ enum class EMovementDirection: uint8
 	, B UMETA(DisplayName = "Backward")
 	, BL UMETA(DisplayName = "BackwardLeft")
 	, BR UMETA(DisplayName = "BackwardRight")};
+
+UENUM(BlueprintType)
+enum class ETargetHeight: uint8
+{
+	Low UMETA(DisplayName = "Low")
+	, Middle UMETA(DisplayName = "Middle")
+	, High UMETA(DisplayName = "High")};

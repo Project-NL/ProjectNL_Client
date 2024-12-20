@@ -4,6 +4,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectNL/Helper/AbilityHelper.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 
 
@@ -16,18 +17,6 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void ABaseCharacter::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	// 태그 컨테이너 선언
-	// if(!GetCharacterMovement())
-	// {
-	// 	return;
-	// }
-	// // Check if the character is falling
-	
 }
 
 void ABaseCharacter::Initialize()
@@ -44,6 +33,18 @@ void ABaseCharacter::Initialize()
 void ABaseCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+	if (AbilitySystemComponent)
+	{
+		if (GetCharacterMovement()->IsFalling())
+		{
+			AbilitySystemComponent->
+				SetLooseGameplayTagCount(NlGameplayTags::Status_IsFalling, 1);
+		} else
+		{
+			AbilitySystemComponent->
+				SetLooseGameplayTagCount(NlGameplayTags::Status_IsFalling, 0);
+		}
+	}
 }
 
 
@@ -84,6 +85,7 @@ ABaseCharacter::Server_RemoveActiveGameplayEffectBySourceEffect_Implementation(
 	AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(
 		Effect, AbilitySystemComponent);
 }
+
 
 void ABaseCharacter::MovementSpeedChanged(const FOnAttributeChangeData& Data)
 {

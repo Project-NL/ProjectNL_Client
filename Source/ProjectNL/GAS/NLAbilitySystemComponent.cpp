@@ -2,9 +2,9 @@
 
 #include "NLAbilitySystemInitializationData.h"
 #include "Ability/Utility/BaseInputTriggerAbility.h"
-#include "Attribute/PlayerAttributeSet.h"
-#include "ProjectNL/Character/Player/PlayerCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
+#include "ProjectNL/Helper/StateHelper.h"
 
 
 UNLAbilitySystemComponent::UNLAbilitySystemComponent()
@@ -79,24 +79,16 @@ void UNLAbilitySystemComponent::InitializeAbilitySystem(
 	SetIsInitialized(true);
 }
 
-void UNLAbilitySystemComponent::ReceiveDamage(const float Damage) const
+void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedResponse) const
 {
-	// 추가적인 동작이 필요할 때 (ex. 특정 이벤트 실행)
-	OnDamage.Broadcast(Damage);
-	// TODO: 추후 플레이어 말고도 다른 엔티티나 액터 등에 대한 예외도 처리해야함.
-	// 현재는 플레이어만 AttributeSet이 장착되어 있기 때문에 이렇게 처리됨.
-	if (APlayerCharacter* Player = Cast<APlayerCharacter>(GetAvatarActor()))
-    {
-		UPlayerAttributeSet* PAS = Player->PlayerAttributeSet.Get();
-		check(PAS)
-		
-		if (HasMatchingGameplayTag(NlGameplayTags::Status_Guard))
-		{
-			// TODO: 추후 / 10 대신 방어용 로직 넣을 예정
-			PAS->SetHealth(PAS->GetHealth() - Damage / 10);
-			return;
-		}
+	OnDamageStartedNotified.Broadcast(DamagedResponse);
 
-		PAS->SetHealth(PAS->GetHealth() - Damage);
-    }
+	if (HasMatchingGameplayTag(NlGameplayTags::Status_Block))
+	{
+		const_cast<UNLAbilitySystemComponent*>(this)->
+			RemoveLooseGameplayTag(NlGameplayTags::Status_Block);
+		return;
+	}
+	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
+	OnDamageReactNotified.Broadcast(DamagedResponse);
 }

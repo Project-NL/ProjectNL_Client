@@ -5,7 +5,7 @@
 
 ABasePlayerState::ABasePlayerState()
 {
-	NetUpdateFrequency = 100.0f;
+	SetNetUpdateFrequency(100.f);
 
 	AbilitySystemComponent = CreateDefaultSubobject<UNLAbilitySystemComponent>(
 		"Ability System Component");

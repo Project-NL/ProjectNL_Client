@@ -27,6 +27,8 @@ public:
 	void SetMaxValue(const float NewValue);
 	
 protected:
+	virtual void OnWidgetRebuilt() override;
+	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> ViewPercentBar;
 	
@@ -37,6 +39,11 @@ protected:
 	TObjectPtr<UOverlay> PercentBarOverlay;
 	
 private:
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	FLinearColor MainColor;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	FLinearColor SubColor;
+	
 	// N초 뒤 실행할 변수 값
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	float DelayedTime = 1.2;

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
@@ -11,13 +11,8 @@ UCLASS()
 class PROJECTNL_API UBlockStartNotify : public UAnimNotify
 {
 	GENERATED_BODY()
-
 public:
 	FOnBlockNotifiedSignature OnNotified;
 
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override
-	{
-		OnNotified.Broadcast();
-		Super::Notify(MeshComp, Animation, EventReference);
-	}
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 };
