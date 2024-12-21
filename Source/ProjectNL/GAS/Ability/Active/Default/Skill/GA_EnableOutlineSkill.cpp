@@ -22,21 +22,13 @@ void UGA_EnableOutlineSkill::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 
 	
-	/*스킬 애니메이션 추가
 	
-	 *
-	*/
-	//if (K2_HasAuthority())
-	//{
+	if (APlayerController* PC = Cast<APlayerController>(ActorInfo->PlayerController.Get()))
+	{
+		PC->SetIgnoreMoveInput(true);  // 이동 입력 무시
+	}
 		PlayActionAnimation();
-	//}
-	//EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-	// GetWorld()->GetTimerManager().SetTimer(
-	// OutlineDisableTimerHandle,   // FTimerHandle
-	// this,                        // 대상(멤버함수 호출용)
-	// &UGA_EnableOutlineSkill::DisableOutline, // 5초 후 호출할 함수
-	// 5.0f,                        // 지연 시간(5초)
-	// false );
+
 }
 
 void UGA_EnableOutlineSkill::EndAbility(const FGameplayAbilitySpecHandle Handle,
@@ -44,6 +36,10 @@ void UGA_EnableOutlineSkill::EndAbility(const FGameplayAbilitySpecHandle Handle,
 	bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	if (APlayerController* PC = Cast<APlayerController>(ActorInfo->PlayerController.Get()))
+	{
+		PC->SetIgnoreMoveInput(false);
+	}
 }
 
 void UGA_EnableOutlineSkill::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
