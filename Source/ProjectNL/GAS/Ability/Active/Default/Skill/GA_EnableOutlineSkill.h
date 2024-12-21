@@ -38,22 +38,26 @@ protected:
 
 	UFUNCTION()
 	void PlayActionAnimation();
+	void DisableOutline();
+
 public:
 	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS")
 	TObjectPtr<UAnimMontage> SkillAnimMontage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = Material)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Material")
 	UMaterialInstance* OutlineMaterialInstance;
 private:
 	UPROPERTY()
 	TObjectPtr<class UPlayMontageWithEvent> PlayMontageTask;
-
-	UPROPERTY()
-	UMaterialInstanceDynamic* OutlineMaterialInstanceDynamic;
-
+	
 	UPROPERTY()
 	int32 bEnableLine{};
 	
+	UPROPERTY()
+	UMaterialInstanceDynamic* OutlineMaterialInstanceDynamic;
+
+	/** 타이머 핸들 */
+	FTimerHandle OutlineDisableTimerHandle;
 };
