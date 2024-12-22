@@ -63,8 +63,8 @@ private:
 	UFUNCTION()
 	void OnRep_BIsRecalling();
 	float RecallTimeRemaining;
-
-
+	
+	float RecordTime;
 	
 
 

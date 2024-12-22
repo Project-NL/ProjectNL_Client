@@ -12,11 +12,12 @@ UTimeRecallComponent::UTimeRecallComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicated(true);
-	RecordInterval = 0.05f;    // 예: 0.05초마다 기록
-	MaxRecordTime = 5.0f;      // 예: 최대 5초간 기록
+	RecordInterval = 0.05f; // 예: 0.05초마다 기록
+	MaxRecordTime = 5.0f; // 예: 최대 5초간 기록
 	TimeAccumulator = 0.0f;
 	bIsRecalling = false;
 	RecallTimeRemaining = 5.0f;
+	RecordTime=0.2f;
 }
 
 void UTimeRecallComponent::BeginPlay()
@@ -27,12 +28,12 @@ void UTimeRecallComponent::BeginPlay()
 	MaxTransformsCount = FMath::FloorToInt(MaxRecordTime / RecordInterval);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = GetOwner();
-	GhostTrailPoolManager = GetWorld()->SpawnActor<AGhostTrailPoolManager>(AGhostTrailPoolManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+	GhostTrailPoolManager = GetWorld()->SpawnActor<AGhostTrailPoolManager>(
+		AGhostTrailPoolManager::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
 	if (GhostTrailPoolManager)
 	{
 		GhostTrailPoolManager->InitializePool(GetWorld(), GhostTrailActor, 50); // 초기 풀 사이즈 10개
 	}
-	
 }
 
 void UTimeRecallComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -43,7 +44,8 @@ void UTimeRecallComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(UTimeRecallComponent, bIsRecalling);
 }
 
-void UTimeRecallComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UTimeRecallComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                         FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -60,7 +62,7 @@ void UTimeRecallComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		if (AActor* Owner = GetOwner())
 		{
 			FTransform CurrentTransform = Owner->GetActorTransform();
-			
+
 			StoredTransforms.Add(CurrentTransform);
 
 			// 최대 기록 개수를 초과하면 가장 오래된 자료 제거
@@ -85,12 +87,14 @@ void UTimeRecallComponent::StartRecall(float RecallDuration)
 
 void UTimeRecallComponent::PerformRecall(float DeltaTime)
 {
+	
 	if (RecallTimeRemaining <= 0.0f || StoredTransforms.Num() == 0)
 	{
 		// 역행 종료 조건
 		bIsRecalling = false;
 		return;
 	}
+	
 	// 마지막 Transform 가져와 적용
 	FTransform LastTransform = StoredTransforms.Last();
 	if (AActor* Owner = GetOwner())
@@ -102,14 +106,29 @@ void UTimeRecallComponent::PerformRecall(float DeltaTime)
 			FRotator NewRotation = LastTransform.GetRotation().Rotator();
 			Pawn->GetController()->SetControlRotation(NewRotation);
 		}
-
-		if (GhostTrailPoolManager)
+		RecordTime+=DeltaTime;//잔상을 몇 초마다 남길지
+		if (GhostTrailPoolManager&&RecordTime>0.2)
 		{
+			RecordTime=0;
 			FTransform OwnerTransform = GetOwner()->GetActorTransform();
 			AGhostTrail* SpawnedGhostTrail = GhostTrailPoolManager->GetPooledGhostTrail();
 			if (SpawnedGhostTrail)
 			{
-				SpawnedGhostTrail->SetActorTransform(OwnerTransform);
+				// 현재 Owner의 Transform을 가져옴
+				FTransform GhostTransform = OwnerTransform;
+
+				// 1. 위치(트랜슬레이션) 아래로 -85
+				GhostTransform.AddToTranslation(FVector(0.f, 0.f, -85.f));
+
+				// 2. 좌우로 -90도 회전
+				//    보통 “좌우로”라는 의미는 Yaw(수평 회전)를 가정합니다.
+				FRotator Rotator = GhostTransform.GetRotation().Rotator();
+				Rotator.Yaw += -90.f;
+				GhostTransform.SetRotation(Rotator.Quaternion());
+
+				// 수정한 Transform 적용
+				SpawnedGhostTrail->SetActorTransform(GhostTransform);
+
 				ACharacter* CharacterOwner = Cast<ACharacter>(Owner);
 				if (CharacterOwner)
 				{
@@ -136,11 +155,10 @@ void UTimeRecallComponent::OnRep_BIsRecalling()
 {
 	if (bIsRecalling)
 	{
-		RecallTimeRemaining=5.0f;
+		RecallTimeRemaining = 5.0f;
 	}
 	else if (!bIsRecalling)
 	{
-		RecallTimeRemaining=0.0f;
+		RecallTimeRemaining = 0.0f;
 	}
 }
-
