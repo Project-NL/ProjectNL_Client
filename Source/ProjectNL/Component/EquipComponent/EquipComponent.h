@@ -53,7 +53,7 @@ private:
 	EPlayerCombatWeaponState PlayerCombatWeaponState;
 	
 	UPROPERTY(Category="Property", EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	bool IsFirstEquipWeapon = false;
+	bool IsFirstEquipWeapon = true;
 
 	// 무기 관련 정보
 	// TODO: class 관련은 테스트용이기에 추후 없애야한다.
