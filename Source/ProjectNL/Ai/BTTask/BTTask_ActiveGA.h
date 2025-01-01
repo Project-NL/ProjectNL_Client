@@ -32,6 +32,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
 	TSubclassOf<UGameplayAbility> AbilityToActivate;
 
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+	// EBossSkillName SkillName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	FName SkillName;
+
 private:
 	UBehaviorTreeComponent* CachedOwnerComp;
 

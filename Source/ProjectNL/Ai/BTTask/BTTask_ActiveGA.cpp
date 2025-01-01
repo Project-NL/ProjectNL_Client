@@ -9,6 +9,7 @@
 #include "AIController.h"
 #include "Logging/LogMacros.h"
 #include "ProjectNL/Character/BaseCharacter.h"
+#include "ProjectNL/GAS/Ability/Active/Default/Action/GA_Action.h"
 
 
 // 로그 카테고리 정의
@@ -69,12 +70,18 @@ EBTNodeResult::Type UBTTask_ActiveGA::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	UGameplayAbility* ActivatedAbility = TargetASC->FindAbilitySpecFromHandle(AbilityHandle)->GetPrimaryInstance();
 	if (ActivatedAbility)
 	{
+		
 		// 어빌리티 종료 시 호출될 델리게이트 바인딩
 		ActivatedAbility->OnGameplayAbilityEnded.AddUObject(this, &UBTTask_ActiveGA::OnAbilityEndCallback);
 		ActivatedAbility->OnGameplayAbilityCancelled.AddUObject(this, &UBTTask_ActiveGA::OnAbilityCancelCallback);
-
 		UE_LOG(LogPRBTTaskPlayAbility, Log, TEXT("Successfully activated ability: %s"), *AbilityToActivate->GetName());
 	}
+	UGA_Action* ActionAbility = Cast<UGA_Action>(ActivatedAbility);
+	if (ActionAbility)
+	{
+		ActionAbility->SetSkillName(SkillName);
+	}
+	
 	bool bActivated = TargetASC->TryActivateAbility(AbilityHandle);
 	if (!bActivated)
 	{
