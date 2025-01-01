@@ -22,7 +22,7 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 	
 private:
-	UPROPERTY(EditDefaultsOnly, Category="Options", meta=(AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, Category="Options", meta=(AllowPrivateAccess = true))
 	uint8 IsHitStop:1 = false;
 	
 	void StartTraceTriangle(AActor* Owner);

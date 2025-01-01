@@ -16,6 +16,7 @@ struct FDamagedResponse
 {
 	GENERATED_BODY()
 
+	AActor* SourceActor;
 	float Damage;
 	EMovementDirection DamagedDirection;
 	ETargetHeight DamagedHeight;
@@ -43,5 +44,8 @@ public:
 	FOnDamageStartedNotifiedSignature OnDamageStartedNotified;
 	FOnDamageReactNotifiedSignature OnDamageReactNotified;
 private:
+	UPROPERTY(EditDefaultsOnly, Category="Options", meta = (AllowPrivateAccess = true))
+	uint16 LevelByDamaged = 10;
+	
 	bool IsInitialized = false;
 };
