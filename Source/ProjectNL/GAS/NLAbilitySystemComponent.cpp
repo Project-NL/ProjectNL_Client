@@ -1,5 +1,6 @@
 ﻿#include "NLAbilitySystemComponent.h"
 
+#include "AbilitySystemGlobals.h"
 #include "NLAbilitySystemInitializationData.h"
 #include "Ability/Utility/BaseInputTriggerAbility.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
@@ -88,10 +89,11 @@ void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedRes
 			RemoveLooseGameplayTag(NlGameplayTags::Status_Block);
 		return;
 	}
-
+	
 	if (DamagedResponse.IsHitStop)
 	{
-		// AddGameplayCue(NlGameplayTags::GameplayCue_Utility_HitStop);
+		FGameplayCueParameters CueParams;
+		ExecuteGameplayCue(NlGameplayTags::GameplayCue_Utility_HitStop, CueParams);
 	}
 	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
 	OnDamageReactNotified.Broadcast(DamagedResponse);
