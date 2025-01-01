@@ -10,6 +10,7 @@
 void UEnableCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
     UE_LOG(LogTemp, Log, TEXT("Notify Begin"));
+
     ABaseCharacter* Owner = Cast<ABaseCharacter>(MeshComp->GetOwner());
 
     UEquipComponent* EquipComponent{};
@@ -37,10 +38,16 @@ void UEnableCollisionNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, 
         SubWeapon->SetPrevStartLocation(FVector::ZeroVector); 
         SubWeapon->SetPrevEndLocation(FVector::ZeroVector);
     }
+    
+    if (Owner->HasAuthority())
+    {
+        return;
+    }
 }
 
 void UEnableCollisionNotifyState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
+    
     Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
     if (AActor* Owner = MeshComp->GetOwner())
     {
