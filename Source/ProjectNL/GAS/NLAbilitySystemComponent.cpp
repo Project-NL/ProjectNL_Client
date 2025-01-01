@@ -2,7 +2,6 @@
 
 #include "NLAbilitySystemInitializationData.h"
 #include "Ability/Utility/BaseInputTriggerAbility.h"
-#include "Kismet/GameplayStatics.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 #include "ProjectNL/Helper/StateHelper.h"
 
@@ -88,6 +87,11 @@ void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedRes
 		const_cast<UNLAbilitySystemComponent*>(this)->
 			RemoveLooseGameplayTag(NlGameplayTags::Status_Block);
 		return;
+	}
+
+	if (DamagedResponse.IsHitStop)
+	{
+		// AddGameplayCue(NlGameplayTags::GameplayCue_Utility_HitStop);
 	}
 	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
 	OnDamageReactNotified.Broadcast(DamagedResponse);

@@ -19,6 +19,7 @@ struct FDamagedResponse
 	float Damage;
 	EMovementDirection DamagedDirection;
 	ETargetHeight DamagedHeight;
+	bool IsHitStop;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, const FDamagedResponse&, DamageResponse);
