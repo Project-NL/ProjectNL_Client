@@ -10,6 +10,6 @@ public class ProjectNLEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
-		ExtraModuleNames.Add("ProjectNL");
-	}
+		ExtraModuleNames.AddRange( new string[] { "ProjectNL", "IGCEditorExtensionsEditor" } );
+    }
 }
