@@ -1,45 +1,68 @@
 
 #pragma once
 
-#include "EngineMinimal.h"
+#include "CoreMinimal.h"
+#include "SEditorViewport.h"
 #include "SlateFwd.h"
 #include "UObject/GCObject.h"
-#include "SEditorViewport.h"
+#include "Engine/SkeletalMesh.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Animation/AnimSequenceBase.h"
+#include "EditorViewportClient.h"
+#include "Framework/Commands/UICommandList.h"
 #include "SCommonEditorViewportToolbarBase.h"
-
+// â–¼ ê°€ëŠ¥í•˜ë‹¤ë©´ Persona Commands, AnimViewportCommands ë“±ì„ í¬í•¨ â–¼
+// #include "AnimViewportMenuCommands.h"
+// #include "AnimViewportShowCommands.h"
+// #include "AnimViewportLODCommands.h"
+// #include "AnimViewportPlaybackCommands.h"
+class FAdvancedPreviewScene;
 class FIGCEditor;
 class UIGC;
 
 class SIGCViewport : public SEditorViewport, public FGCObject
 {
 public:
-	SLATE_BEGIN_ARGS(SIGCViewport) {}//
-		SLATE_ARGUMENT(TWeakPtr<FIGCEditor>, ParentIGCEditor)
-		SLATE_ARGUMENT(UIGC*, ObjectToEdit)
-	SLATE_END_ARGS()////ÀÌ·¯ÇÑ ±ÔÄ¢À¸·Î ¼±¾ğ¿¡ Æ¯¼öÇÑ ¸ÅÅ©·Î¸¦ Ãß°¡ÇÏ¸é ½½·¹ÀÌÆ® Å¬·¡½ºÀÇ ÀÎÀÚ °ªÀÌ Ãß°¡µË´Ï´Ù. ¾Æ·¡´Â À§ÀÇ À§Á¬À» »ı¼ºÇÏ¸é¼­ ½½·¹ÀÌÆ® ÀÎÀÚ °ªÀ» Ãß°¡ÇÏ´Â ÄÚµåÀÔ´Ï´Ù.
-	//->ºäÆ÷Æ® ,¿¡µğÅÍ , ui °¨½Î´Â Çü½ÄÀ¸·Î µÇ¾î ÀÖÀ½ 
-	void Construct(const FArguments& InArgs);
-	SIGCViewport();
-	~SIGCViewport();
+	SLATE_BEGIN_ARGS(SIGCViewport){}
+	// íƒ€ì„ë¼ì¸ ì‹œê°„ ë“±ì„ ë°›ì•„ì˜¬ ìˆ˜ë„ ìˆìŒ
+	SLATE_ATTRIBUTE(float, CurrentTime)
+	SLATE_ARGUMENT(TWeakObjectPtr<class UIGCSkillData>, SkillData)
+SLATE_END_ARGS()
 
-	
-	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
-	TSharedRef<class FAdvancedPreviewScene> GetPreviewScene();
+void Construct(const FArguments& InArgs);
 
-	virtual FString GetReferencerName()const override;
-protected:
+	/** ì†Œë©¸ì */
+	virtual ~SIGCViewport();
+
+	// ë·°í¬íŠ¸ ê°±ì‹ (ì—ë””í„° í‹±ë§ˆë‹¤ í˜¸ì¶œ)
+	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
+
+	// í”„ë¦¬ë·°ì”¬ ê°€ì ¸ì˜¤ê¸°(íˆ´ë°”ìš© ë“±)
 	virtual TSharedRef<FEditorViewportClient> MakeEditorViewportClient() override;
+	virtual EVisibility GetTransformToolbarVisibility() const { return EVisibility::Visible; }
+	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
+	virtual FString GetReferencerName() const override ;
+	TSharedRef<class FAdvancedPreviewScene> GetPreviewScene();
+	
+	// ë·°í¬íŠ¸ì—ì„œ ì‚¬ìš©í•  PreviewScene
+	TSharedPtr<FAdvancedPreviewScene> PreviewScenePtr;
 
 private:
+	// ì—ë””í„° ë·°í¬íŠ¸ í´ë¼ì´ì–¸íŠ¸
+	TSharedPtr<class FIGCViewportClient> ViewportClient;
 
-	TWeakPtr<FIGCEditor> IGCEditorPtr;//Åø¹Ù /¸Ş´º µîÀÇ »ç¿ëÀÚ ÀÎÅÍÆäÀÌ½º 
-	TSharedPtr<class FAdvancedPreviewScene> PreviewScene; //µ¶¸³µÈ ¿ùµå °ø°£ÀÇ ·£´õ¸µÀ» ½ÇÇà 
-	TSharedPtr<class FIGCViewportClient> IGCViewportClient;//°¢Á¾ ·£´õ¸µ ¼³Á¤°ú ºäÆ÷µå °ü·Ã µ¥ÀÌÅÍ¸¦ °ü¸® 
-	UIGC* IGCObject;//iGC object
-
-
-	TSharedPtr<SVerticalBox> OverlayTextVerticalBox;
+	// ìš°ë¦¬ê°€ ì‹¤ì œ í‘œì‹œí•  ìŠ¤ì¼ˆë ˆíƒˆ ë©”ì‹œ ì»´í¬ë„ŒíŠ¸
+	USkeletalMeshComponent* PreviewSkeletalMeshComp = nullptr;
 
 
-	class UStaticMeshComponent* PreviewMeshComponent;//È­¸é¿¡ º¸ÀÌ´Â ¸Å½¬ ÄÄÆ÷³ÍÆ® 
+	class UStaticMeshComponent* PreviewMeshComponent=nullptr;
+	// ì¬ìƒ ì‹œê°„ (Timelineì—ì„œ ë°›ì•„ì˜´)
+	TAttribute<float> CurrentTime;
+
+	// ìŠ¤í‚¬ë°ì´í„° (Steps ë“±)
+	TWeakObjectPtr<class UIGCSkillData> SkillData;
+
+	// ë‚´ë¶€ì—ì„œ ì‚¬ìš©í•  ì´ˆê¸°í™” í•¨ìˆ˜
+	void InitPreviewScene();
+	
 };

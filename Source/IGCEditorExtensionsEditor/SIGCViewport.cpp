@@ -3,85 +3,163 @@
 #include "IGCViewportClient.h"
 #include "AdvancedPreviewScene.h"
 #include "EditorStyleSet.h"
+#include "IGCSkillData.h"
+#include "Framework/Commands/Contexts/UIContentContext.h"
 
 #define LOCTEXT_NAMESPACE "IGCViewport"
 
-SIGCViewport::SIGCViewport()
-	: PreviewScene(MakeShareable(new FAdvancedPreviewScene(FPreviewScene::ConstructionValues())))
+void SIGCViewport::Construct(const FArguments& InArgs)
 {
+    CurrentTime = InArgs._CurrentTime;
+    SkillData = InArgs._SkillData;
 
+    // 미리보기 씬 생성
+    PreviewScenePtr = MakeShareable(new FAdvancedPreviewScene(FPreviewScene::ConstructionValues()));
+
+    // 에디터 뷰포트 SEditorViewport 초기화
+    SEditorViewport::Construct(SEditorViewport::FArguments());
+
+    // SkeletalMeshComponent 생성 & Scene에 등록
+    InitPreviewScene();
 }
 
 SIGCViewport::~SIGCViewport()
 {
-	if (IGCViewportClient.IsValid())
-	{
-		IGCViewportClient->Viewport = NULL;
-	}
+    // 뷰포트 종료시 정리
+    if(PreviewSkeletalMeshComp)
+    {
+        PreviewSkeletalMeshComp->DestroyComponent();
+        PreviewSkeletalMeshComp = nullptr;
+    }
+    PreviewScenePtr.Reset();
 }
 
-void SIGCViewport::AddReferencedObjects(FReferenceCollector & Collector)//�����ʹ� ���۷��� �÷��Ϳ� �־ ������ �������ش�.
+void SIGCViewport::InitPreviewScene()
 {
-	Collector.AddReferencedObject(IGCObject);
-	Collector.AddReferencedObject(PreviewMeshComponent);
+    if(!PreviewScenePtr.IsValid())
+    {
+        return;
+    }
+
+    // 스켈레탈 메시 컴포넌트 생성
+    PreviewSkeletalMeshComp = NewObject<USkeletalMeshComponent>(GetTransientPackage(), USkeletalMeshComponent::StaticClass());
+    // 메시 설정 (필요하다면 SkillData에서 SkeletalMesh나 AnimBP를 참조해서 로드)
+    // PreviewSkeletalMeshComp->SetSkeletalMesh(SomeSkeletalMesh);
+    // 스켈레탈 메시 로드
+    USkeletalMesh* SkeletalMesh = LoadObject<USkeletalMesh>(nullptr, TEXT("/Game/Sword_Animations/Demo/Mannequins/Character/Meshes/SKM_Manny.SKM_Manny"));
+    if (SkeletalMesh)
+    {
+        PreviewSkeletalMeshComp->SetSkeletalMesh(SkeletalMesh);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("스켈레탈 메시를 로드하지 못했습니다."));
+        return;
+    }
+    PreviewSkeletalMeshComp->SetActive(true);
+    PreviewSkeletalMeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+    UAnimSequence* AnimationAsset = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Assets/Character/Animation/001_OnlyOneHandWeapon/Block/AS_OnlyOneHandWeapon_Guard.AS_OnlyOneHandWeapon_Guard"));
+    if (AnimationAsset)
+    {
+        PreviewSkeletalMeshComp->SetAnimation(AnimationAsset);
+        PreviewSkeletalMeshComp->PlayAnimation(AnimationAsset, true);
+        // if ()
+        // {
+        //     UE_LOG(LogTemp, Log, TEXT("애니메이션 재생 시작"));
+        // }
+        // else
+        // {
+        //     UE_LOG(LogTemp, Warning, TEXT("애니메이션 재생에 실패했습니다."));
+        // }
+    }
+   
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("애니메이션 애셋을 로드하지 못했습니다."));
+        // 애니메이션 로드에 실패해도 계속 진행할 수 있습니다.
+    }
+    // 애니메이션 단일 재생 모드
+  
+
+    UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(NULL, TEXT("/Engine/EngineMeshes/SM_MatPreviewMesh_01.SM_MatPreviewMesh_01"), NULL, LOAD_None, NULL);
+    UMaterialInterface* BaseMaterial = LoadObject<UMaterialInterface>(NULL, TEXT("/Engine/EditorMeshes/ColorCalibrator/M_ChromeBall.M_ChromeBall"), NULL, LOAD_None, NULL);
+
+    PreviewMeshComponent = NewObject<UStaticMeshComponent>(GetTransientPackage(), NAME_None, RF_Transient);
+    PreviewMeshComponent->SetStaticMesh(StaticMesh);
+    PreviewMeshComponent->SetMaterial(0, BaseMaterial);
+    // 프리뷰씬에 컴포넌트 등록
+    PreviewScenePtr->AddComponent(PreviewSkeletalMeshComp, FTransform::Identity);
 }
 
-TSharedRef<class FAdvancedPreviewScene> SIGCViewport::GetPreviewScene()
+void SIGCViewport::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
 {
-	return PreviewScene.ToSharedRef();
-}
+    SEditorViewport::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
 
-FString SIGCViewport::GetReferencerName() const
-{
-	
-	return "SIGCViewport";
+    // 현재 타임라인 시간 구하기
+    float TimeNow = CurrentTime.Get(0.f);
+
+    // 예: 첫 번째 Step의 AnimSequence를 재생한다거나...
+    if(SkillData.IsValid() && PreviewSkeletalMeshComp)
+    {
+        const UIGCSkillData* Data = SkillData.Get();
+        if(Data->Steps.Num() > 0)
+        {
+            const FSkillStepData& Step0 = Data->Steps[0];
+            if(Step0.AnimationAsset.IsValid())
+            {
+                UAnimSequenceBase* AnimSeq = Cast<UAnimSequenceBase>(Step0.AnimationAsset.LoadSynchronous());
+                if(AnimSeq)
+                {
+                    // 이 애니메이션을 “TimeNow” 위치로
+                    PreviewSkeletalMeshComp->SetAnimation(AnimSeq);
+                    PreviewSkeletalMeshComp->SetPosition(TimeNow, false); // 루프=false
+                }
+            }
+        }
+    }
 }
 
 TSharedRef<FEditorViewportClient> SIGCViewport::MakeEditorViewportClient()
 {
-	IGCViewportClient = MakeShareable(new FIGCViewportClient(IGCEditorPtr, PreviewScene.ToSharedRef(), SharedThis(this), IGCObject));//
+    ViewportClient = MakeShareable(new FIGCViewportClient( *PreviewScenePtr.Get(), SharedThis(this)));//
 
-	return IGCViewportClient.ToSharedRef();
+    return ViewportClient.ToSharedRef();
+    // ViewportClient = MakeShareable(new FIGCViewportClient(*PreviewScenePtr.Get(), SharedThis(this)));
+    // return ViewportClient.ToSharedRef();
 }
 
-
-void SIGCViewport::Construct(const FArguments& InArgs)
+void SIGCViewport::AddReferencedObjects(FReferenceCollector& Collector)
 {
-	IGCEditorPtr = InArgs._ParentIGCEditor;
-	IGCObject = InArgs._ObjectToEdit;
 
-	SEditorViewport::Construct(SEditorViewport::FArguments());
-
-	ViewportOverlay->AddSlot()
-		.VAlign(VAlign_Top)
-		.HAlign(HAlign_Left)
-		.Padding(FMargin(10.0f, 10.0f, 10.0f, 10.0f))
-		[
-			SAssignNew(OverlayTextVerticalBox, SVerticalBox)
-		];
-
-	OverlayTextVerticalBox->ClearChildren();
-	OverlayTextVerticalBox->AddSlot()
-		[
-			SNew(STextBlock)
-			.Text(LOCTEXT("IGCWelcomeText", "Welcome To IGC 2018"))
-			.TextStyle(FEditorStyle::Get(), TEXT("TextBlock.ShadowedText"))
-			.ColorAndOpacity(FLinearColor::Red)
-		];
-
-
-	UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(NULL, TEXT("/Engine/EngineMeshes/SM_MatPreviewMesh_01.SM_MatPreviewMesh_01"), NULL, LOAD_None, NULL);
-	UMaterialInterface* BaseMaterial = LoadObject<UMaterialInterface>(NULL, TEXT("/Engine/EditorMeshes/ColorCalibrator/M_ChromeBall.M_ChromeBall"), NULL, LOAD_None, NULL);
-
-	PreviewMeshComponent = NewObject<UStaticMeshComponent>(GetTransientPackage(), NAME_None, RF_Transient);
-	PreviewMeshComponent->SetStaticMesh(StaticMesh);
-	PreviewMeshComponent->SetMaterial(0, BaseMaterial);
-
-	FTransform Transform = FTransform::Identity;
-	PreviewScene->AddComponent(PreviewMeshComponent, Transform);
-
-	PreviewMeshComponent->SetSimulatePhysics(true);
+    Collector.AddReferencedObject(PreviewMeshComponent);
 }
+
+
+
+FString SIGCViewport::GetReferencerName() const
+{
+    return "SIGCViewport";
+}
+
+TSharedRef<class FAdvancedPreviewScene> SIGCViewport::GetPreviewScene()
+{
+    return PreviewScenePtr.ToSharedRef();
+}
+// TSharedPtr<SWidget> SIGCViewport::MakeViewportToolbar()
+// {
+//     return SAssignNew(ViewportToolbar, SAnimViewportToolBar, TabBodyPtr.Pin(), SharedThis(this))
+//         .Visibility(EVisibility::SelfHitTestInvisible)
+//         .Cursor(EMouseCursor::Default)
+//         .Extenders(Extenders)
+//         .ContextName(FUIContentContext::ContextName)
+//         .PreviewProfileController(MakeShared<FPreviewProfileController>())
+//         .ShowShowMenu(bShowShowMenu)
+//         .ShowLODMenu(bShowLODMenu)
+//         .ShowPlaySpeedMenu(bShowPlaySpeedMenu)
+//         .ShowFloorOptions(bShowFloorOptions)
+//         .ShowTurnTable(bShowTurnTable)
+//         .ShowPhysicsMenu(bShowPhysicsMenu);
+// }
 
 #undef LOCTEXT_NAMESPACE
 

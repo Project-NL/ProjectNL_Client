@@ -5,52 +5,64 @@
 #include "Toolkits/AssetEditorToolkit.h"
 #include "Toolkits/IToolkitHost.h"
 
+class UIGCSkillData;
+class SSkillTimelineWidget;
+
 class FIGCEditor : public FAssetEditorToolkit
 {
 public:
-	// 소멸자. 
+	static const FName IGCEditorAppIdentifier;
+	static const FName ViewportTabId;
+	static const FName DetailTabId;
+	static const FName TimelineTabId; // 새로 추가할 탭
+	static const FName PreviewSceneSettingsTabId;
+
+public:
+	void InitIGCEditor(const EToolkitMode::Type Mode, const TSharedPtr<class IToolkitHost>& InitToolkitHost, UIGCSkillData* InIGC);
 	virtual ~FIGCEditor();
 
-	// 초기화 함수. 
-	void InitIGCEditor(const EToolkitMode::Type Mode, const TSharedPtr< class IToolkitHost >& InitToolkitHost, class UIGC* InIGC);
-
-	// IToolkit에서 상속받아 구현해야 할 가상함수들.
-	virtual void RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
-	virtual void UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager) override;
+	// FAssetEditorToolkit 인터페이스 구현
 	virtual FName GetToolkitFName() const override;
 	virtual FText GetBaseToolkitName() const override;
 	virtual FString GetWorldCentricTabPrefix() const override;
 	virtual FLinearColor GetWorldCentricTabColorScale() const override;
-	virtual FString GetDocumentationLink() const override
-	{
-		return TEXT("NotAvailable");
-	}
+
+protected:
+	// 탭 등록 / 언등록
+	virtual void RegisterTabSpawners(const TSharedRef<FTabManager>& TabManager) override;
+	virtual void UnregisterTabSpawners(const TSharedRef<FTabManager>& TabManager) override;
 
 private:
+	// 탭을 생성하는 함수들
 	TSharedRef<SDockTab> SpawnTab_Viewport(const FSpawnTabArgs& Args);
 	TSharedRef<SDockTab> SpawnTab_Detail(const FSpawnTabArgs& Args);
+	TSharedRef<SDockTab> SpawnTab_Timeline(const FSpawnTabArgs& Args);
 	TSharedRef<SDockTab> SpawnTab_PreviewSceneSettings(const FSpawnTabArgs& Args);
 
 private:
-	// IGC 에디터가 사용할 고유한 앱의 명칭.
-	static const FName IGCEditorAppIdentifier;
-
-	// 각 Tab이 사용할 고유 명칭.
-	static const FName ViewportTabId;
-	static const FName DetailTabId;
-	static const FName PreviewSceneSettingsTabId;
-
-	// 디테일 뷰.
+	// 실제 편집할 UObject
+	UIGCSkillData* SkillDataObject;
+	
+	
+	// 디테일 뷰
 	TSharedPtr<class IDetailsView> DetailsView;
 
-	// 프리뷰 위젯
-	TSharedPtr<class SIGCViewport> Viewport;
+	// 뷰포트 (프리뷰) 위젯
+	TSharedPtr<class SIGCViewport> ViewportWidget;
 
-	// 편집할 IGC 오브젝트
-	class UIGC* IGCObject;
+	// 타임라인 위젯
+	//TSharedPtr<SSkillTimelineWidget> TimelineWidget;
 
+	// 타임라인 위젯
+	TSharedPtr<SSkillTimelineWidget> TimelineWidget;
+	
 	// 프리뷰 씬 세팅 위젯.
 	TSharedPtr<SWidget> AdvancedPreviewSettingsWidget;
+	
+	/** (예시) 재생 시간 - Timeline과 Viewport에서 공유할 수 있음 */
+	float PlaybackTime = 0.0f;
 
+	/** (예시) 실행 중인지 (에디터 상에서 Play 버튼 눌렀다고 가정) */
+	bool bIsPlaying = false;
 };
 

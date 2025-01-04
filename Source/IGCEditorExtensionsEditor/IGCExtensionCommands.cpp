@@ -2,6 +2,7 @@
 
 #include "IGCExtensionCommands.h"
 #include "IGCEditor.h"
+#include "IGCSkillData.h"
 #include "ProjectNL/IGC.h"
 
 #define LOCTEXT_NAMESPACE "IGCCommand"
@@ -27,7 +28,7 @@ void FIGCExtensionActions::Action2()
 void FIGCExtensionActions::Action3()
 {
 	TSharedRef< FIGCEditor > NewIGCEditor(new FIGCEditor());
-	NewIGCEditor->InitIGCEditor(EToolkitMode::Standalone, TSharedPtr<IToolkitHost>(), NewObject<UIGC>());
+	NewIGCEditor->InitIGCEditor(EToolkitMode::Standalone, TSharedPtr<IToolkitHost>(), NewObject<UIGCSkillData>());
 }
 
 #undef LOCTEXT_NAMESPACE

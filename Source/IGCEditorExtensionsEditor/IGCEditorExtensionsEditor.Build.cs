@@ -20,10 +20,16 @@ public class IGCEditorExtensionsEditor : ModuleRules
                 "ProjectNL",
                 "Engine",
                 "AdvancedPreviewScene",
-                "EditorStyle"
+                "EditorStyle",
+                "InputCore", 
+                "Persona"
             }
 		);
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(new string[] 
+		{   
+		
+			
+		});
 	}
 }
