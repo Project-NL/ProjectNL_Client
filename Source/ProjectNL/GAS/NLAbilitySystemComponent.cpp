@@ -89,7 +89,8 @@ void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedRes
 			RemoveLooseGameplayTag(NlGameplayTags::Status_Block);
 		return;
 	}
-	
+	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
+	OnDamageReactNotified.Broadcast(DamagedResponse);
 	if (DamagedResponse.IsHitStop)
 	{
 		FGameplayCueParameters Param;
@@ -97,6 +98,4 @@ void UNLAbilitySystemComponent::ReceiveDamage(const FDamagedResponse& DamagedRes
 		Param.EffectCauser = DamagedResponse.SourceActor;
 		const_cast<UNLAbilitySystemComponent*>(this)->ExecuteGameplayCue(NlGameplayTags::GameplayCue_Utility_HitStop, Param);
 	}
-	// TODO: 추후 데미지 제공한 Causer도 같이 전송해도 무방할 듯
-	OnDamageReactNotified.Broadcast(DamagedResponse);
 }

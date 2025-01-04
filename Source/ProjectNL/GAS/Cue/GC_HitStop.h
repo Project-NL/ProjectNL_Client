@@ -1,13 +1,9 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameplayCueNotify_Actor.h"
 #include "Components/TimelineComponent.h"
 #include "GC_HitStop.generated.h"
-
-class UTimelineComponent;
 
 UCLASS()
 class PROJECTNL_API AGC_HitStop : public AGameplayCueNotify_Actor
@@ -19,13 +15,17 @@ public:
 
 protected:
 	virtual bool OnExecute_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters) override;
+	virtual void BeginPlay() override;
 	
 private:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UTimelineComponent> HitStopTimeline;
 	
 	UPROPERTY(EditAnywhere, Category="Options", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UCurveFloat> HitStopTimingCurve;
+	
+	UPROPERTY(EditAnywhere, Category="Options", meta = (AllowPrivateAccess = true))
+	float HitStopRadius = 1000.f;
 	
 	UPROPERTY()
 	TObjectPtr<AActor> TargetActor;
@@ -36,6 +36,12 @@ private:
 	TArray<FOverlapResult> OverlapResults;
 	
 	FOnTimelineFloat HitStopCallback;
+	
+	FOnTimelineEvent HitStopFinish;
 
-	void HitStopPlayCallback(float Output);
+	UFUNCTION()
+	void OnHitStopPlayCallback(float Output);
+	
+	UFUNCTION()
+	void OnHitStopFinish();
 };

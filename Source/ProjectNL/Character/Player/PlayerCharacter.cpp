@@ -143,13 +143,14 @@ void APlayerCharacter::MoveTo(const FInputActionValue& Value)
 		 * ex. 상의 경우 Y,X,Z 순서대로 제공함으로써 EAxis::X = Y가 매핑되는 방식이다
 		 * ex. 좌의 경우 X,Z,Y 순서대로 매핑되어서 EAxis:X = X가 매핑된다
 		 */
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * MovementVector.Y;
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * MovementVector.X;
 
 		// TODO: 둘다 동시에 누를 경우 1,1이 되기 때문에 대각선으로 더 멀리갈 수도 있다. (확인 필요)
 		// 그렇기에 값을 조정해줘야할 필요가 있을 수도 있다.
-		this->AddMovementInput(ForwardDirection, static_cast<float>(MovementVector.Y));
-		this->AddMovementInput(RightDirection, static_cast<float>(MovementVector.X));
+		const FVector MoveToVector = (ForwardDirection + RightDirection).GetSafeNormal(1);
+		
+		this->AddMovementInput(MoveToVector);
 	}
 }
 
