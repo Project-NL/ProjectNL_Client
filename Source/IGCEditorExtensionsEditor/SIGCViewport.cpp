@@ -4,7 +4,10 @@
 #include "AdvancedPreviewScene.h"
 #include "EditorStyleSet.h"
 #include "IGCSkillData.h"
+#include "Animation/DebugSkelMeshComponent.h"
+#include "Editor/AnimGraph/Public/AnimPreviewInstance.h"
 #include "Framework/Commands/Contexts/UIContentContext.h"
+#include "Misc/MapErrors.h"
 
 #define LOCTEXT_NAMESPACE "IGCViewport"
 
@@ -33,6 +36,15 @@ SIGCViewport::~SIGCViewport()
     }
     PreviewScenePtr.Reset();
 }
+void SIGCViewport::SetPreviewAnimationAsset(UAnimationAsset* AnimAsset, bool bEnablePreview /*= true*/)
+{
+    if (PreviewSkeletalMeshComp)
+    {
+
+        PreviewSkeletalMeshComp->EnablePreview(bEnablePreview, AnimAsset);
+    }
+    
+}
 
 void SIGCViewport::InitPreviewScene()
 {
@@ -42,7 +54,7 @@ void SIGCViewport::InitPreviewScene()
     }
 
     // 스켈레탈 메시 컴포넌트 생성
-    PreviewSkeletalMeshComp = NewObject<USkeletalMeshComponent>(GetTransientPackage(), USkeletalMeshComponent::StaticClass());
+    PreviewSkeletalMeshComp = NewObject<UDebugSkelMeshComponent>(GetTransientPackage(), UDebugSkelMeshComponent::StaticClass());
     // 메시 설정 (필요하다면 SkillData에서 SkeletalMesh나 AnimBP를 참조해서 로드)
     // PreviewSkeletalMeshComp->SetSkeletalMesh(SomeSkeletalMesh);
     // 스켈레탈 메시 로드
@@ -57,20 +69,14 @@ void SIGCViewport::InitPreviewScene()
         return;
     }
     PreviewSkeletalMeshComp->SetActive(true);
-    PreviewSkeletalMeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-    UAnimSequence* AnimationAsset = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Assets/Character/Animation/001_OnlyOneHandWeapon/Block/AS_OnlyOneHandWeapon_Guard.AS_OnlyOneHandWeapon_Guard"));
+  //  PreviewSkeletalMeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+    UAnimationAsset* AnimationAsset = LoadObject<UAnimSequence>(nullptr, TEXT("/Game/Assets/Character/Animation/001_OnlyOneHandWeapon/Block/AS_OnlyOneHandWeapon_Guard.AS_OnlyOneHandWeapon_Guard"));
     if (AnimationAsset)
     {
-        PreviewSkeletalMeshComp->SetAnimation(AnimationAsset);
-        PreviewSkeletalMeshComp->PlayAnimation(AnimationAsset, true);
-        // if ()
-        // {
-        //     UE_LOG(LogTemp, Log, TEXT("애니메이션 재생 시작"));
-        // }
-        // else
-        // {
-        //     UE_LOG(LogTemp, Warning, TEXT("애니메이션 재생에 실패했습니다."));
-        // }
+        PreviewSkeletalMeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+        SetPreviewAnimationAsset(AnimationAsset,true);
+        //PreviewSkeletalMeshComp->PreviewInstance->SetPosition(PlayPosition);
+        PreviewSkeletalMeshComp->PreviewInstance->SetPlaying(true);
     }
    
     else
@@ -130,7 +136,6 @@ TSharedRef<FEditorViewportClient> SIGCViewport::MakeEditorViewportClient()
 
 void SIGCViewport::AddReferencedObjects(FReferenceCollector& Collector)
 {
-
     Collector.AddReferencedObject(PreviewMeshComponent);
 }
 

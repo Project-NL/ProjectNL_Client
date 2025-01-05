@@ -33,6 +33,7 @@ void Construct(const FArguments& InArgs);
 
 	/** 소멸자 */
 	virtual ~SIGCViewport();
+	void SetPreviewAnimationAsset(UAnimationAsset* AnimAsset, bool bEnablePreview);
 
 	// 뷰포트 갱신(에디터 틱마다 호출)
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
@@ -52,8 +53,7 @@ private:
 	TSharedPtr<class FIGCViewportClient> ViewportClient;
 
 	// 우리가 실제 표시할 스켈레탈 메시 컴포넌트
-	USkeletalMeshComponent* PreviewSkeletalMeshComp = nullptr;
-
+	UDebugSkelMeshComponent* PreviewSkeletalMeshComp = nullptr;
 
 	class UStaticMeshComponent* PreviewMeshComponent=nullptr;
 	// 재생 시간 (Timeline에서 받아옴)
