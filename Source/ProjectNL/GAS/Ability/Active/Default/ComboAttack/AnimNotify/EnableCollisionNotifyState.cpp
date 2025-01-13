@@ -283,15 +283,14 @@ void UEnableCollisionNotifyState::ReactToHitActor(AActor* Owner, ABaseWeapon* We
                 // 적에게 충돌 시 효과 적용
                 if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetCharacter))
                 {
-                    FGameplayEffectContextHandle EffectContext = TargetASC->MakeEffectContext();
-                    EffectContext.AddSourceObject(Owner);
+                    const FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
 
                     FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(Weapon->GetAttackEffect(), 1.0f, EffectContext);
                     
                     const FRotator RotateValue = UKismetMathLibrary::FindLookAtRotation(TargetCharacter->GetActorLocation(), Hit.ImpactPoint);
-                    UE_LOG(LogTemp, Display, TEXT("테스트 용 테스트1: %f, %f, %f"), RotateValue.Pitch, RotateValue.Yaw, RotateValue.Roll);
-                    UE_LOG(LogTemp, Display, TEXT("테스트 용 테스트2: %s, %s"), *SourceASC->GetOwnerActor()->GetName(), *TargetASC->GetOwnerActor()->GetName());
+                    
                     SpecHandle.Data.Get()->SetByCallerNameMagnitudes.Add(NlGameplayTags::Data_AttackDirection.GetModuleName(), static_cast<uint8>(FLocateHelper::GetDirectionByAngle(RotateValue.Yaw)));
+                    SpecHandle.Data.Get()->SetByCallerNameMagnitudes.Add(NlGameplayTags::Data_IsHitStop.GetModuleName(), IsHitStop);
                     
                     if (SpecHandle.IsValid())
                     {
