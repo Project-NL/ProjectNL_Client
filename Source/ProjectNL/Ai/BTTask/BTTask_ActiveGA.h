@@ -27,6 +27,7 @@ public:
 
 	void OnAbilityEndCallback(UGameplayAbility* GameplayAbility);
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+	EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
 
 	/** 어빌리티 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
@@ -42,5 +43,9 @@ private:
 	UBehaviorTreeComponent* CachedOwnerComp;
 
 	FGameplayAbilitySpec AbilitySpec;
-	
+
+	UPROPERTY()
+	TObjectPtr<UGameplayAbility> ActivatedAbilityInstance = nullptr;
+
+
 };

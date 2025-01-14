@@ -17,6 +17,9 @@ class PROJECTNL_API UGA_Action : public UBaseInputTriggerAbility
 public:
 	UGA_Action(const FObjectInitializer& ObjectInitializer);
 
+	GETTER(FActionAbilityData*,ActionAnimData);
+
+	FActionSequenceData* GetActionSequenceData();
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle
 															, const FGameplayAbilityActorInfo* ActorInfo
@@ -66,6 +69,7 @@ protected:
 	UFUNCTION()
 	void SetActionDataByDataTable();
 
+	
 
 
 private:
@@ -82,7 +86,6 @@ private:
 	UPROPERTY()
 	TArray<FActionAbilityData> InActionSequence;
 
-	
 	FActionAbilityData* ActionAnimData;
 
 	FName SkillName;

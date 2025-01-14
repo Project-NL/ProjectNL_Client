@@ -16,6 +16,11 @@ UGA_Action::UGA_Action(const FObjectInitializer& ObjectInitializer): Super(Objec
 {
 }
 
+FActionSequenceData* UGA_Action::GetActionSequenceData()
+{
+	return &ActionAnimData->ArrActionSequenceDatas[CurrentActionIndex];
+}
+
 void UGA_Action::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
                                  const FGameplayAbilityActivationInfo ActivationInfo,
                                  const FGameplayEventData* TriggerEventData)
