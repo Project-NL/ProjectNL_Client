@@ -133,7 +133,7 @@ void UAiEnableCollisionNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, 
 }
 
 
-void UAiEnableCollisionNotifyState::StartTrace(AActor* Owner)
+void UAiEnableCollisionNotifyState::StartTrace( AActor* Owner)
 {
 	ABaseCharacter* SourceCharacter = Cast<ABaseCharacter>(Owner);
 	if (!SourceCharacter) return;
@@ -159,54 +159,63 @@ void UAiEnableCollisionNotifyState::MakeSweepTrace(AActor* Owner, ABaseWeapon* W
 
 	// 무기 스켈레탈 메쉬를 얻어옴
 	USkeletalMeshComponent* SwordMesh = Weapon->GetWeaponSkeleton();
-	if (SwordMesh &&
-		SwordMesh->DoesSocketExist(FName("SwordBoneStart")) &&
-		SwordMesh->DoesSocketExist(FName("SwordBoneEnd")))
-	{
-		// 이번(현재) 프레임의 Start/End Bone 월드 위치
-		FVector CurrentStartLocation = SwordMesh->GetSocketLocation(FName("SwordBoneStart"));
-		FVector CurrentEndLocation = SwordMesh->GetSocketLocation(FName("SwordBoneEnd"));
 
-		// 첫 프레임(또는 초기화 직후)에는 Prev 위치가 (0,0,0)이므로
-		// 충돌 검사를 할 수 없으니 Prev 위치를 현재 위치로 세팅 후 바로 종료
-		if (PrevStartLocation == FVector::ZeroVector && PrevEndLocation == FVector::ZeroVector)
+	TArray<USkeletalMeshComponent*> SkeletalMeshComponents;
+	Owner->GetComponents<USkeletalMeshComponent>(SkeletalMeshComponents);
+	SkeletalMeshComponents.Add(SwordMesh);
+	for (USkeletalMeshComponent* MeshComponent : SkeletalMeshComponents)
+	{
+		// 각 SkeletalMeshComponent에 대해 소켓이 존재하는지 확인
+		if (MeshComponent &&
+			MeshComponent->DoesSocketExist(ActionSequenceData->CollisionData.StartBoneName) &&
+			MeshComponent->DoesSocketExist(ActionSequenceData->CollisionData.EndBoneName))
 		{
+			// 이번(현재) 프레임의 Start/End Bone 월드 위치
+			FVector CurrentStartLocation = MeshComponent->GetSocketLocation(ActionSequenceData->CollisionData.StartBoneName);
+			FVector CurrentEndLocation = MeshComponent->GetSocketLocation(ActionSequenceData->CollisionData.EndBoneName);
+
+			// 첫 프레임(또는 초기화 직후)에는 Prev 위치가 (0,0,0)이므로
+			// 충돌 검사를 할 수 없으니 Prev 위치를 현재 위치로 세팅 후 바로 종료
+			if (PrevStartLocation == FVector::ZeroVector && PrevEndLocation == FVector::ZeroVector)
+			{
+				Weapon->SetPrevStartLocation(CurrentStartLocation);
+				Weapon->SetPrevEndLocation(CurrentEndLocation);
+				return;
+			}
+
+
+			// 1) "StartBone"이 이동한 경로만큼 SweepTrace
+			TArray<FHitResult> HitResults;
+
+			FVector CurrentCenter = (CurrentStartLocation + CurrentEndLocation) * 0.5f;
+			FVector PrevCenter = (PrevStartLocation + PrevEndLocation) * 0.5f;
+			PerformShapeSweepTrace(Owner, PrevCenter, CurrentCenter, HitResults);
+
+			// ---------------------------------------------------------------------
+			// (디버그 표시) 
+			// - CollisionData.DebugDrawCollision()을 이용해 무기의 충돌 영역을 그려보고 싶다면,
+			//   특정 Bone을 기준으로 할 수 있도록 소켓 트랜스폼을 직접 구해 전달.
+			// ---------------------------------------------------------------------
+			FTransform StartBoneTransform = SwordMesh->GetSocketTransform(ActionSequenceData->CollisionData.StartBoneName, ERelativeTransformSpace::RTS_World);
+
+			ActionSequenceData->CollisionData.DebugDrawCollision(
+				Owner->GetWorld(),
+				SwordMesh,  // 디버그 그리기에 사용할 Bone 기준 트랜스폼
+				10.0f,                // 디버그 유지 시간(1초)
+				2.0f                 // 라인 두께
+			);
+
+			// Sweep 경로(이전 -> 현재)를 시각적으로 보여주는 디버그 라인
+			DrawDebugLine(Owner->GetWorld(), PrevStartLocation, CurrentStartLocation, FColor::Yellow, false, 1.0f);
+			DrawDebugLine(Owner->GetWorld(), PrevEndLocation, CurrentEndLocation, FColor::Yellow, false, 1.0f);
+
+			// 히트된 액터들에 대한 실제 로직(데미지 계산, 이펙트 생성 등)
+			ReactToHitActor(Owner, Weapon, HitResults);
+
+			// 이번 프레임 위치를 '다음 프레임의 이전 위치'로 저장
 			Weapon->SetPrevStartLocation(CurrentStartLocation);
 			Weapon->SetPrevEndLocation(CurrentEndLocation);
-			return;
 		}
-
-		// 1) "StartBone"이 이동한 경로만큼 SweepTrace
-		TArray<FHitResult> HitResults;
-
-		FVector CurrentCenter = (CurrentStartLocation + CurrentEndLocation) * 0.5f;
-		FVector PrevCenter = (PrevStartLocation + PrevEndLocation) * 0.5f;
-		PerformShapeSweepTrace(Owner, PrevCenter, CurrentCenter, HitResults);
-
-		// ---------------------------------------------------------------------
-		// (디버그 표시) 
-		// - CollisionData.DebugDrawCollision()을 이용해 무기의 충돌 영역을 그려보고 싶다면,
-		//   특정 Bone을 기준으로 할 수 있도록 소켓 트랜스폼을 직접 구해 전달.
-		// ---------------------------------------------------------------------
-		FTransform StartBoneTransform = SwordMesh->GetSocketTransform(ActionSequenceData->CollisionData.StartBoneName, ERelativeTransformSpace::RTS_World);
-
-		ActionSequenceData->CollisionData.DebugDrawCollision(
-			Owner->GetWorld(),
-			SwordMesh,  // 디버그 그리기에 사용할 Bone 기준 트랜스폼
-			10.0f,                // 디버그 유지 시간(1초)
-			2.0f                 // 라인 두께
-		);
-
-		// Sweep 경로(이전 -> 현재)를 시각적으로 보여주는 디버그 라인
-		DrawDebugLine(Owner->GetWorld(), PrevStartLocation, CurrentStartLocation, FColor::Yellow, false, 1.0f);
-		DrawDebugLine(Owner->GetWorld(), PrevEndLocation, CurrentEndLocation, FColor::Yellow, false, 1.0f);
-
-		// 히트된 액터들에 대한 실제 로직(데미지 계산, 이펙트 생성 등)
-		ReactToHitActor(Owner, Weapon, HitResults);
-
-		// 이번 프레임 위치를 '다음 프레임의 이전 위치'로 저장
-		Weapon->SetPrevStartLocation(CurrentStartLocation);
-		Weapon->SetPrevEndLocation(CurrentEndLocation);
 	}
 }
 
