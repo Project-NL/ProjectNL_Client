@@ -4,6 +4,7 @@
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectNL/Component/SkillComponent/TimeRecallComponent.h"
 #include "ProjectNL/Helper/AbilityHelper.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 
@@ -12,6 +13,7 @@ ABaseCharacter::ABaseCharacter()
 {
 	EntityType = EEntityCategory::Undefined;
 	EquipComponent = CreateDefaultSubobject<UEquipComponent>("Equip Component");
+	TimeRecallComponent=CreateDefaultSubobject<UTimeRecallComponent>("TimeRecallComponent");
 }
 
 void ABaseCharacter::BeginPlay()

@@ -16,9 +16,11 @@ struct FDamagedResponse
 {
 	GENERATED_BODY()
 
+	AActor* SourceActor;
 	float Damage;
 	EMovementDirection DamagedDirection;
 	ETargetHeight DamagedHeight;
+	bool IsHitStop;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, const FDamagedResponse&, DamageResponse);
@@ -42,5 +44,8 @@ public:
 	FOnDamageStartedNotifiedSignature OnDamageStartedNotified;
 	FOnDamageReactNotifiedSignature OnDamageReactNotified;
 private:
+	UPROPERTY(EditDefaultsOnly, Category="Options", meta = (AllowPrivateAccess = true))
+	uint16 LevelByDamaged = 10;
+	
 	bool IsInitialized = false;
 };
