@@ -8,6 +8,7 @@
 #include "ProjectNL/Helper/UtilHelper.h"
 #include "AT_TargetingEnemy.generated.h"
 
+class UPlayerCameraComponent;
 /**
  * 
  */
@@ -41,15 +42,33 @@ protected:
 	AActor* FindNearestTarget() const;
 	UFUNCTION()
 	void CameraRotation(float DeltaTime);
+
+	UFUNCTION()
+	bool BacktoSquareOne(float DeltaTime);
+	UFUNCTION()
+	void PlayerContollerRotation(float DeltaTime);
 	UFUNCTION()
 	void LockOnTarget(AActor* NewTarget);
 	// 스프링암 설정을 저장하는 함수
 	UFUNCTION()
 	void SaveSpringArmSettings(USpringArmComponent* SpringArm);
-
+	UFUNCTION()
+	void SaveCameraSettings(UPlayerCameraComponent* CameraComponent);
+	UFUNCTION()
+	void RestoreCameraRotation(UPlayerCameraComponent* CameraComponent,float DeltaTime);
+	// // 카메라 설정을 복원하는 함수
+	// UFUNCTION()
+	// void RestoreCameraSettings(UPlayerCameraComponent* CameraComponent,float DeltaTime);
 	// 스프링암 설정을 복원하는 함수
 	UFUNCTION()
 	void RestoreSpringArmSettings(USpringArmComponent* SpringArm);
+
+	UFUNCTION()
+	void RestoreSpringArmRotation(USpringArmComponent* SpringArm,float DeltaTime);
+
+
+
+
 
 private:
 	UPROPERTY()
@@ -78,4 +97,10 @@ private:
 	int8 bSavedEnableCameraLag;
 	
 
+	FVector SavedCameraWorldLocation;
+
+	FRotator SavedSpringArmWorldRotation;
+	FRotator SavedCameraWorldRotation;
+	
 };
+
