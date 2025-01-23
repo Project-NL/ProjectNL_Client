@@ -41,5 +41,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<UAT_TargetingEnemy> TargetingEnemyTask;
 
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Effect"
+		, meta=(AllowPrivateAccess = true))
+	TSubclassOf<UGameplayEffect> TargetingSpeedEffect;
+
 };
 	

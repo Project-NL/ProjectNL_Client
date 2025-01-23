@@ -17,7 +17,7 @@ void UGA_TargetingEnemy::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	FGameplayTagContainer EventTag;
-	TargetingEnemyTask = UAT_TargetingEnemy::InitialEvent(this);
+	TargetingEnemyTask = UAT_TargetingEnemy::InitialEvent(this,TargetingSpeedEffect);
 	TargetingEnemyTask->OnCanceled.AddDynamic(this, &UGA_TargetingEnemy::OnCancelled);
 	TargetingEnemyTask->ReadyForActivation();
 }

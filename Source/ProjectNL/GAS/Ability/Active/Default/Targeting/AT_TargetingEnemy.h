@@ -21,13 +21,13 @@ class PROJECTNL_API UAT_TargetingEnemy : public UAbilityTask
 
 
 public:
-	static UAT_TargetingEnemy* InitialEvent(UGameplayAbility* OwningAbility);
+	static UAT_TargetingEnemy* InitialEvent(UGameplayAbility* OwningAbility,TSubclassOf<UGameplayEffect> TargetingSpeedEffect);
 	
 	virtual void Activate() override;
 	
 	
 
-	GETTER_SETTER(int8,NearestEnemyCheck);
+	
 
 	virtual void TargetNearestEnemy();
 
@@ -56,12 +56,6 @@ protected:
 	void SaveCameraSettings(UPlayerCameraComponent* CameraComponent);
 	UFUNCTION()
 	void RestoreCameraRotation(UPlayerCameraComponent* CameraComponent,float DeltaTime);
-	// // 카메라 설정을 복원하는 함수
-	// UFUNCTION()
-	// void RestoreCameraSettings(UPlayerCameraComponent* CameraComponent,float DeltaTime);
-	// 스프링암 설정을 복원하는 함수
-	UFUNCTION()
-	void RestoreSpringArmSettings(USpringArmComponent* SpringArm);
 
 	UFUNCTION()
 	void RestoreSpringArmRotation(USpringArmComponent* SpringArm,float DeltaTime);
@@ -82,8 +76,7 @@ private:
 
 	
 	float OriginalCharacterSpeed;
-
-	int8 NearestEnemyCheck=false;
+	
 	
 	// 저장된 스프링암 설정
 	
@@ -99,8 +92,15 @@ private:
 
 	FVector SavedCameraWorldLocation;
 
+	FVector SavedTargetActorWorldLocation;
+	FVector SavedOwnerActorWorldLocation;
 	FRotator SavedSpringArmWorldRotation;
 	FRotator SavedCameraWorldRotation;
+
+
+	TSubclassOf<UGameplayEffect> TargetingSpeedEffect;
+	
+	FActiveGameplayEffectHandle ActiveHandle;
 	
 };
 

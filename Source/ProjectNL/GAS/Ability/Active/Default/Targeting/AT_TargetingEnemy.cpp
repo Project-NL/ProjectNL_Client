@@ -14,11 +14,11 @@
 #include "ProjectNL/GAS/Attribute/BaseAttributeSet.h"
 #include "ProjectNL/Helper/GameplayTagHelper.h"
 
-UAT_TargetingEnemy* UAT_TargetingEnemy::InitialEvent(UGameplayAbility* OwningAbility)
+UAT_TargetingEnemy* UAT_TargetingEnemy::InitialEvent(UGameplayAbility* OwningAbility,TSubclassOf<UGameplayEffect> TargetingSpeedEffect)
 {
 	UAT_TargetingEnemy* NewEvent = NewAbilityTask<UAT_TargetingEnemy>(
 		OwningAbility);
-
+	NewEvent->TargetingSpeedEffect=TargetingSpeedEffect;
 	return NewEvent;
 }
 
@@ -28,6 +28,7 @@ void UAT_TargetingEnemy::Activate()
 	bTickingTask = true;
 	OriginalCharacterSpeed = Cast<ACharacter>(GetAvatarActor())->GetCharacterMovement()->MaxWalkSpeed;
 
+	
 	SaveCameraSettings(GetAvatarActor()->FindComponentByClass<UPlayerCameraComponent>());//카메라의 초기 세팅을 저장해준다 복구할 때 사용
 	SaveSpringArmSettings(GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>()); 
 	TargetNearestEnemy();
@@ -38,12 +39,12 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
 
-	if (NearestEnemy && NearestEnemyCheck)
+	if (NearestEnemy)
 	{
 		// 먼저, 플레이어 캐릭터의 AbilitySystemComponent에서 현재 활성화된 GameplayTag들을 가져옵니다.
-		if (APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetAvatarActor()))
+		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor()))
 		{
-			if (UAbilitySystemComponent* ASC = PlayerChar->GetAbilitySystemComponent())
+			if (UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent())
 			{
 				FGameplayTagContainer ActiveTags;
 				ASC->GetOwnedGameplayTags(ActiveTags);
@@ -70,7 +71,7 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 		}
 		PlayerContollerRotation(DeltaTime);
 		// LockOnTarget과 CameraRotation은 기존처럼 항상 실행
-		CameraRotation(DeltaTime);
+		//CameraRotation(DeltaTime);
 	}
 	else
 	{
@@ -80,13 +81,42 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 
 void UAT_TargetingEnemy::TargetNearestEnemy()
 {
-	NearestEnemyCheck = !NearestEnemyCheck;
-	NearestEnemy = FindNearestTarget();
-	if (!NearestEnemyCheck)
+	if (!NearestEnemy)
 	{
-		//ReleaseLockOnTarget(); //어빌리티를 종료시킵니다.
+		NearestEnemy = FindNearestTarget();
+
+		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor()))
+		{
+			if (UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent())
+			{
+				if (TargetingSpeedEffect)
+				{
+					FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+					EffectContext.AddSourceObject(GetAvatarActor());
+
+					FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(
+						TargetingSpeedEffect, 1.0f, EffectContext);
+
+					if (SpecHandle.IsValid())
+					{
+						ActiveHandle = ASC->ApplyGameplayEffectSpecToSelf(
+							*SpecHandle.Data.Get());
+					}
+				}
+			}
+		}
+		UPlayerSpringArmComponent* SpringArm = GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>();
+		SpringArm->bEnableCameraLag = true; // 카메라 랙 활성화
+		SpringArm->CameraLagSpeed = 1.3f; // 카메라 랙 속도
+		SpringArm->CameraLagMaxDistance = 50.0f;
 	}
-	else if (NearestEnemyCheck && NearestEnemy) //클릭과 타겟 캐릭터 상대방이 둘다 있을경우
+	else 
+	{
+		ReleaseLockOnTarget();
+		NearestEnemy=nullptr;
+		// 카메라 랙 활성화
+	}
+	if (NearestEnemy) //클릭과 타겟 캐릭터 상대방이 둘다 있을경우
 	{
 		APlayerController* PlayerController = Cast<
 			APlayerController>(Cast<ACharacter>(GetAvatarActor())->GetController());
@@ -169,7 +199,19 @@ void UAT_TargetingEnemy::PlayerContollerRotation(float DeltaTime)
 	const FRotator InterpRotation = UKismetMathLibrary::RInterpTo(PlayerController->GetControlRotation(),
 																  LookAtRotation, DeltaTime, 10.f);
 
+	FVector OwnerLocation = GetAvatarActor()->GetActorLocation();
+	FVector TargetLocation = NearestEnemy->GetActorLocation();
+	float Distance = FVector::Dist(OwnerLocation, TargetLocation);
 
+	// 거리에 따라 Pitch 조정 (거리 조정 상수 설정 가능)
+	float MaxDistance = 700.0f; // 최대 거리 (원하는 대로 설정 가능)
+	float MinPitch = -18.5f; // 최소 Pitch 각도
+	float MaxPitch = -2.5f; // 최대 Pitch 각도
+
+	// 거리를 비율로 계산하여 Pitch 각도 보간
+	float NormalizedDistance = FMath::Clamp(Distance / MaxDistance, 0.0f, 1.0f);
+	float DynamicPitch = FMath::Lerp(MinPitch, MaxPitch, NormalizedDistance);
+	//InterpRotation.Pitch+
 	PlayerController->SetControlRotation(FRotator(InterpRotation.Pitch, InterpRotation.Yaw,
 												  PlayerController->GetControlRotation().Roll));
 
@@ -179,8 +221,8 @@ bool UAT_TargetingEnemy::BacktoSquareOne(float DeltaTime)
 {
 	
 	AActor* AvatarActor = GetAvatarActor();
-	RestoreCameraRotation(AvatarActor->FindComponentByClass<UPlayerCameraComponent>(),DeltaTime);
-	//RestoreSpringArmRotation(AvatarActor->FindComponentByClass<UPlayerSpringArmComponent>(),DeltaTime);
+	//RestoreCameraRotation(AvatarActor->FindComponentByClass<UPlayerCameraComponent>(),DeltaTime);
+	RestoreSpringArmRotation(AvatarActor->FindComponentByClass<UPlayerSpringArmComponent>(),DeltaTime);
 	
 
 
@@ -196,57 +238,60 @@ void UAT_TargetingEnemy::CameraRotation(float DeltaTime)
 		OwnerActor->GetActorLocation(), NearestEnemy->GetActorLocation());
 	const FRotator InterpRotation = UKismetMathLibrary::RInterpTo(PlayerController->GetControlRotation(),
 																  LookAtRotation, DeltaTime, 10.f);
-	UPlayerSpringArmComponent* SpringArm = OwnerActor->FindComponentByClass<UPlayerSpringArmComponent>();
-	if (SpringArm && CurrentTarget)
-	{
-		// 타겟과의 거리 계산
-		FVector CameraLocation = SpringArm->GetComponentLocation();
-		FVector TargetLocation = CurrentTarget->GetActorLocation();
-		float Distance = FVector::Dist(CameraLocation, TargetLocation);
-
-		// 거리에 따라 Pitch 조정 (거리 조정 상수 설정 가능)
-		float MaxDistance = 700.0f; // 최대 거리 (원하는 대로 설정 가능)
-		float MinPitch = -18.5f; // 최소 Pitch 각도
-		float MaxPitch = -2.5f; // 최대 Pitch 각도
-
-		// 거리를 비율로 계산하여 Pitch 각도 보간
-		float NormalizedDistance = FMath::Clamp(Distance / MaxDistance, 0.0f, 1.0f);
-		float DynamicPitch = FMath::Lerp(MinPitch, MaxPitch, NormalizedDistance);
-
-		// 계산된 DynamicPitch로 회전 설정
-		FRotator TargetRotation(DynamicPitch, InterpRotation.Yaw, 0.0f);
-		SpringArm->SetWorldRotation(TargetRotation);
-
-		SpringArm->TargetArmLength = 400.0f; // 카메라와 캐릭터 간 거리
-		SpringArm->bUsePawnControlRotation = false; // 플레이어 컨트롤러의 회전 사용 안함
-		SpringArm->bEnableCameraLag = true; // 카메라 랙 활성화
-		SpringArm->CameraLagSpeed = 1.3f; // 카메라 랙 속도
-		SpringArm->CameraLagMaxDistance = 100.0f;
-	}
-	UPlayerCameraComponent* Camera = OwnerActor->FindComponentByClass<UPlayerCameraComponent>();
-	if (Camera && CurrentTarget)
-	{
-		FRotator CurrentCameraRotation = Camera->GetComponentRotation();
-	
-		// 타겟의 위치를 바라보는 회전 계산
-		FVector TargetLocation = CurrentTarget->GetActorLocation();
-		FVector CameraLocation = Camera->GetComponentLocation();
-		FRotator CameraLookAtRotation = UKismetMathLibrary::FindLookAtRotation(CameraLocation, TargetLocation);
-	
-		// 보간하여 카메라 회전 설정
-		FRotator Rotation = FMath::RInterpTo(CurrentCameraRotation, CameraLookAtRotation, DeltaTime, 20.0f);
-	
-		Camera->SetWorldRotation(Rotation);
-	}
+	// UPlayerSpringArmComponent* SpringArm = OwnerActor->FindComponentByClass<UPlayerSpringArmComponent>();
+	// if (SpringArm && CurrentTarget)
+	// {
+	// 	// 타겟과의 거리 계산
+	// 	FVector CameraLocation = SpringArm->GetComponentLocation();
+	// 	FVector TargetLocation = CurrentTarget->GetActorLocation();
+	// 	float Distance = FVector::Dist(CameraLocation, TargetLocation);
+	//
+	// 	// 거리에 따라 Pitch 조정 (거리 조정 상수 설정 가능)
+	// 	float MaxDistance = 700.0f; // 최대 거리 (원하는 대로 설정 가능)
+	// 	float MinPitch = -18.5f; // 최소 Pitch 각도
+	// 	float MaxPitch = -2.5f; // 최대 Pitch 각도
+	//
+	// 	// 거리를 비율로 계산하여 Pitch 각도 보간
+	// 	float NormalizedDistance = FMath::Clamp(Distance / MaxDistance, 0.0f, 1.0f);
+	// 	float DynamicPitch = FMath::Lerp(MinPitch, MaxPitch, NormalizedDistance);
+	//
+	// 	// 계산된 DynamicPitch로 회전 설정
+	// 	FRotator TargetRotation(DynamicPitch, InterpRotation.Yaw, 0.0f);
+	// 	//SpringArm->SetWorldRotation(TargetRotation);
+	//
+	// 	SpringArm->TargetArmLength = 400.0f; // 카메라와 캐릭터 간 거리
+	// 	SpringArm->bUsePawnControlRotation = false; // 플레이어 컨트롤러의 회전 사용 안함
+	// 	SpringArm->bEnableCameraLag = true; // 카메라 랙 활성화
+	// 	SpringArm->CameraLagSpeed = 1.3f; // 카메라 랙 속도
+	// 	SpringArm->CameraLagMaxDistance = 100.0f;
+	//
+	// 	UE_LOG(LogTemp, Warning, 
+	// 		TEXT("UAT_TargetingEnemy::CameraRotation >> SpringArm Rotation: %s | Location: %s"),
+	// 		*SpringArm->GetComponentRotation().ToString(),
+	// 		*SpringArm->GetComponentLocation().ToString()
+	// 	);
+	// }
+	// UPlayerCameraComponent* Camera = OwnerActor->FindComponentByClass<UPlayerCameraComponent>();
+	// if (Camera && CurrentTarget)
+	// {
+	// 	FRotator CurrentCameraRotation = Camera->GetComponentRotation();
+	//
+	// 	// 타겟의 위치를 바라보는 회전 계산
+	// 	FVector TargetLocation = CurrentTarget->GetActorLocation();
+	// 	FVector CameraLocation = Camera->GetComponentLocation();
+	// 	FRotator CameraLookAtRotation = UKismetMathLibrary::FindLookAtRotation(CameraLocation, TargetLocation);
+	//
+	// 	// 보간하여 카메라 회전 설정
+	// 	FRotator Rotation = FMath::RInterpTo(CurrentCameraRotation, CameraLookAtRotation, DeltaTime, 20.0f);
+	//
+	// 	Camera->SetWorldRotation(Rotation);
+	// }
 }
 
 void UAT_TargetingEnemy::ReleaseLockOnTarget()
 {
-	NearestEnemyCheck = false;
 	AActor* OwnerActor = GetAvatarActor();
 	//캐릭터 속도를 다시 높임
-	float BaseSpeed=Cast<UBaseAttributeSet>(Cast<APlayerCharacter>(GetAvatarActor())->GetAbilitySystemComponent()->GetAttributeSet(UBaseAttributeSet::StaticClass()))->GetMovementSpeed();
-	Cast<ACharacter>(GetAvatarActor())->GetCharacterMovement()->MaxWalkSpeed = BaseSpeed;
 	APlayerController* PlayerController = Cast<APlayerController>(Cast<ACharacter>(OwnerActor)->GetController());
 	if(PlayerController)
 	{
@@ -255,11 +300,17 @@ void UAT_TargetingEnemy::ReleaseLockOnTarget()
 		// 플레이어 컨트롤러의 뷰 타겟을 플레이어로 설정 (필요시)
 		PlayerController->SetViewTarget(OwnerActor);
 	}
-	if(UPlayerSpringArmComponent* playerspringarm=GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>())
+	UPlayerSpringArmComponent* SpringArm = GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>();
+	SpringArm->bEnableCameraLag = false;
+	
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor()))
 	{
-	//	RestoreSpringArmSettings(playerspringarm);
+		if (UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent())
+		{
+			ASC->RemoveActiveGameplayEffectBySourceEffect(TargetingSpeedEffect, ASC);
+		}
 	}
-	//RestoreCameraSettings(GetAvatarActor()->FindComponentByClass<UPlayerCameraComponent>());
+	
 	OnCanceled.Broadcast();
 }
 
@@ -293,8 +344,8 @@ void UAT_TargetingEnemy::SaveSpringArmSettings(USpringArmComponent* SpringArm)
 {
 	if (SpringArm)
 	{
-		SavedRotation = SpringArm->GetRelativeRotation();
-		SavedLocation = SpringArm->GetRelativeLocation();
+		//SavedRotation = SpringArm->GetRelativeRotation();
+		//SavedLocation = SpringArm->GetRelativeLocation();
 		SavedTargetArmLength = SpringArm->TargetArmLength;
 		bSavedUsePawnControlRotation = SpringArm->bUsePawnControlRotation;
 		bSavedInheritPitch = SpringArm->bInheritPitch;
@@ -305,8 +356,8 @@ void UAT_TargetingEnemy::SaveSpringArmSettings(USpringArmComponent* SpringArm)
 		// 3. 회전 설정
 		//    - 단순히 캐릭터를 ‘정면’에서 바라보는 것이 아니라
 		//      캐릭터 ‘뒤’에서 바라보려면 캐릭터의 Yaw에 180도 더해주는 식을 자주 사용합니다.
-		SavedSpringArmWorldRotation = GetAvatarActor()->GetActorRotation();
-		SavedSpringArmWorldRotation.Yaw += 180.0f; // 뒤에서 바라보도록 Yaw를 180도 추가
+		// SavedSpringArmWorldRotation = GetAvatarActor()->GetActorRotation();
+		// SavedSpringArmWorldRotation.Yaw += 180.0f; // 뒤에서 바라보도록 Yaw를 180도 추가
 	}
 }
 
@@ -326,25 +377,14 @@ void UAT_TargetingEnemy::SaveCameraSettings(UPlayerCameraComponent* CameraCompon
 	  SavedCameraWorldLocation, 
 	  TargetLocation
   );
-	
+
+	SavedTargetActorWorldLocation = GetAvatarActor()->GetActorLocation();
+	SavedTargetActorWorldLocation += GetAvatarActor()->GetActorForwardVector() * 300.0f;
+	SavedOwnerActorWorldLocation= GetAvatarActor()->GetActorLocation();
 }
 
 
-void UAT_TargetingEnemy::RestoreSpringArmSettings(USpringArmComponent* SpringArm)
-{
-	if (SpringArm)
-	{
-		SpringArm->TargetArmLength = SavedTargetArmLength;
-		SpringArm->bUsePawnControlRotation = bSavedUsePawnControlRotation;
-		SpringArm->bInheritPitch = bSavedInheritPitch;
-		SpringArm->bInheritYaw = bSavedInheritYaw;
-		SpringArm->bInheritRoll = bSavedInheritRoll;
-		SpringArm->bEnableCameraLag = true;
-		SpringArm->SetRelativeRotation(SavedRotation);
-		SpringArm->CameraLagMaxDistance = 50.0f;
-	//	SpringArm->SetRelativeLocation(SavedLocation);
-	}
-}
+
 void UAT_TargetingEnemy::RestoreCameraRotation(UPlayerCameraComponent* CameraComponent, float DeltaTime)
 {
 	AActor* AvatarActor = GetAvatarActor();
@@ -407,24 +447,22 @@ void UAT_TargetingEnemy::RestoreCameraRotation(UPlayerCameraComponent* CameraCom
 
 void UAT_TargetingEnemy::RestoreSpringArmRotation(USpringArmComponent* SpringArm,float DeltaTime)
 {
-	// 캐릭터의 위치와 Forward Vector를 구합니다.
-	AActor* AvatarActor = GetAvatarActor();
+	AActor* OwnerActor = GetAvatarActor();
+	APlayerController* PlayerController = Cast<
+		APlayerController>(Cast<ACharacter>(OwnerActor)->GetController());
+	const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(
+		SavedOwnerActorWorldLocation, SavedTargetActorWorldLocation);
+	const FRotator InterpRotation = UKismetMathLibrary::RInterpTo(PlayerController->GetControlRotation(),
+																  LookAtRotation, DeltaTime, 10.f);
 
-	USpringArmComponent* SpringArmComp = AvatarActor->FindComponentByClass<USpringArmComponent>();
-	if (!SpringArmComp)
+
+	PlayerController->SetControlRotation(FRotator(InterpRotation.Pitch, InterpRotation.Yaw,
+												  PlayerController->GetControlRotation().Roll));
+	if ( InterpRotation.Equals(LookAtRotation, 0.8f))
 	{
-		return ;
+		UE_LOG(LogTemp, Log, TEXT("InterpLocation 성공적"));
+		ReleaseLockOnTarget();
+		//OnCanceled.Broadcast();
 	}
-
-	// 2. SpringArm 길과 Offset 설정
-	//    - 캐릭터 뒤로 400, 위로 200 지점
-	SpringArmComp->TargetArmLength = 400.0f;                  // 뒤로 400
-	SpringArmComp->SocketOffset    = FVector(0.f, 0.f, 200.f); // 위로 200
-
 	
-
-	// 3-1. 부드러운 회전을 원한다면 보간(RInterpTo) 사용
-	FRotator CurrentRotation = SpringArmComp->GetComponentRotation();
-	FRotator SpringInterpRotation     = FMath::RInterpTo(CurrentRotation, SavedSpringArmWorldRotation, DeltaTime, 5.0f);
-	SpringArmComp->SetWorldRotation(SpringInterpRotation);
 }

@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "ProjectNL/GAS/Ability/Utility/BaseInputTriggerAbility.h"
 #include "GA_Sprint.generated.h"
-
+class 	UAbilityTask_WaitDelay;
 UCLASS()
 class PROJECTNL_API UGA_Sprint : public UBaseInputTriggerAbility
 {
@@ -50,6 +50,8 @@ private:
 	FActiveGameplayEffectHandle ActiveHandle;
 
 	FDateTime ActiveTime;
+	
+	UAbilityTask_WaitDelay* WaitDelayTask;
 
 	UFUNCTION()
 	void EndEvade(FGameplayTag EventTag, FGameplayEventData EventData);

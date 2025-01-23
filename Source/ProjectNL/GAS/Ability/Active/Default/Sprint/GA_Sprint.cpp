@@ -40,43 +40,27 @@ void UGA_Sprint::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 								NAME_None, GetCurrentMontage(), FGameplayTagContainer());
 	Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
 	Task->ReadyForActivation();
-	UAbilityTask_WaitDelay* WaitDelayTask=UAbilityTask_WaitDelay ::WaitDelay(this,HoldExistTime);
+	WaitDelayTask=UAbilityTask_WaitDelay ::WaitDelay(this,HoldExistTime);
 	WaitDelayTask->OnFinish.AddDynamic(this, &UGA_Sprint::OnWaitTimeFinished);
 	WaitDelayTask->ReadyForActivation();
-	// if (BuffEffect)
-	// {
-	// 	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->
-	// 		MakeEffectContext();
-	// 	EffectContext.AddSourceObject(GetAvatarActorFromActorInfo());
-	//
-	// 	FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponentFromActorInfo()->MakeOutgoingSpec(
-	// 		BuffEffect, 1.0f, EffectContext);
-	//
-	// 	
-	// 	
-	// 	if (SpecHandle.IsValid())
-	// 	{
-	// 		ActiveHandle = GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(
-	// 			*SpecHandle.Data.Get());
-	// 	}
-	// }
+
 }
 void UGA_Sprint::OnWaitTimeFinished()
 {
-	// 아직 끝나지 않은 상태라면, HoldExistTime만큼 누르고 있었다고 판단 -> 버프 효과 적용
+	//아직 끝나지 않은 상태라면, HoldExistTime만큼 누르고 있었다고 판단 -> 버프 효과 적용
 	if (BuffEffect)
 	{
-		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-		if (ASC)
+		FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->
+			MakeEffectContext();
+		EffectContext.AddSourceObject(GetAvatarActorFromActorInfo());
+	
+		FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponentFromActorInfo()->MakeOutgoingSpec(
+			BuffEffect, 1.0f, EffectContext);
+		
+		if (SpecHandle.IsValid())
 		{
-			FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
-			EffectContext.AddSourceObject(GetAvatarActorFromActorInfo());
-
-			FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(BuffEffect, 1.0f, EffectContext);
-			if (SpecHandle.IsValid())
-			{
-				ActiveHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-			}
+			ActiveHandle = GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(
+				*SpecHandle.Data.Get());
 		}
 	}
 }
@@ -118,6 +102,10 @@ void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FG
 						ActiveHandle = GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(
 							*SpecHandle.Data.Get());
 					}
+				}
+				if (WaitDelayTask)
+				{
+					WaitDelayTask->OnFinish.RemoveDynamic(this, &UGA_Sprint::OnWaitTimeFinished);//달리는 테스크를 지우는 코드 이 코드가 없다면 달리는 버프가 활성화 되어서 문제가 됨 
 				}
 				SetCurrentMontage(EvadeAnim);
 				
