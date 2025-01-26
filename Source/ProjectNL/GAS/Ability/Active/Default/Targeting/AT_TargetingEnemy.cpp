@@ -26,8 +26,6 @@ void UAT_TargetingEnemy::Activate()
 {
 	Super::Activate();
 	bTickingTask = true;
-	OriginalCharacterSpeed = Cast<ACharacter>(GetAvatarActor())->GetCharacterMovement()->MaxWalkSpeed;
-
 	
 	SaveCameraSettings(GetAvatarActor()->FindComponentByClass<UPlayerCameraComponent>());//카메라의 초기 세팅을 저장해준다 복구할 때 사용
 	SaveSpringArmSettings(GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>()); 
@@ -48,12 +46,6 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 			{
 				FGameplayTagContainer ActiveTags;
 				ASC->GetOwnedGameplayTags(ActiveTags);
-
-				//static const FGameplayTag DodgeTag = NlGameplayTags::Status_Sprint;
-				for (const FGameplayTag& Tag : ActiveTags)
-				{
-					//UE_LOG(LogTemp, Log, TEXT("Active Tag: %s"), *Tag.ToString());
-				}
 				// "Status_dodge" 태그 활성화 여부 체크
 				if (ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Sprint")))||ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Dodge")))||
 					ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Roll"))))
@@ -167,6 +159,13 @@ AActor* UAT_TargetingEnemy::FindNearestTarget() const
 				AEnemyCharacter* OverlappedActor = Cast<AEnemyCharacter>(Result.GetActor());
 				if (OverlappedActor && OverlappedActor != GetAvatarActor())
 				{
+					// 1.화면에 표시되는지 체크**
+					if (!IsActorOnScreen(OverlappedActor))
+						continue;
+
+					// 2. 시야 방해물이 없는지 체크**
+					if (!HasLineOfSight(OverlappedActor))
+						continue;
 					float Distance = FVector::Dist(PlayerLocation, OverlappedActor->GetActorLocation());
 					if (Distance < NearestDistance)
 					{
@@ -238,54 +237,6 @@ void UAT_TargetingEnemy::CameraRotation(float DeltaTime)
 		OwnerActor->GetActorLocation(), NearestEnemy->GetActorLocation());
 	const FRotator InterpRotation = UKismetMathLibrary::RInterpTo(PlayerController->GetControlRotation(),
 																  LookAtRotation, DeltaTime, 10.f);
-	// UPlayerSpringArmComponent* SpringArm = OwnerActor->FindComponentByClass<UPlayerSpringArmComponent>();
-	// if (SpringArm && CurrentTarget)
-	// {
-	// 	// 타겟과의 거리 계산
-	// 	FVector CameraLocation = SpringArm->GetComponentLocation();
-	// 	FVector TargetLocation = CurrentTarget->GetActorLocation();
-	// 	float Distance = FVector::Dist(CameraLocation, TargetLocation);
-	//
-	// 	// 거리에 따라 Pitch 조정 (거리 조정 상수 설정 가능)
-	// 	float MaxDistance = 700.0f; // 최대 거리 (원하는 대로 설정 가능)
-	// 	float MinPitch = -18.5f; // 최소 Pitch 각도
-	// 	float MaxPitch = -2.5f; // 최대 Pitch 각도
-	//
-	// 	// 거리를 비율로 계산하여 Pitch 각도 보간
-	// 	float NormalizedDistance = FMath::Clamp(Distance / MaxDistance, 0.0f, 1.0f);
-	// 	float DynamicPitch = FMath::Lerp(MinPitch, MaxPitch, NormalizedDistance);
-	//
-	// 	// 계산된 DynamicPitch로 회전 설정
-	// 	FRotator TargetRotation(DynamicPitch, InterpRotation.Yaw, 0.0f);
-	// 	//SpringArm->SetWorldRotation(TargetRotation);
-	//
-	// 	SpringArm->TargetArmLength = 400.0f; // 카메라와 캐릭터 간 거리
-	// 	SpringArm->bUsePawnControlRotation = false; // 플레이어 컨트롤러의 회전 사용 안함
-	// 	SpringArm->bEnableCameraLag = true; // 카메라 랙 활성화
-	// 	SpringArm->CameraLagSpeed = 1.3f; // 카메라 랙 속도
-	// 	SpringArm->CameraLagMaxDistance = 100.0f;
-	//
-	// 	UE_LOG(LogTemp, Warning, 
-	// 		TEXT("UAT_TargetingEnemy::CameraRotation >> SpringArm Rotation: %s | Location: %s"),
-	// 		*SpringArm->GetComponentRotation().ToString(),
-	// 		*SpringArm->GetComponentLocation().ToString()
-	// 	);
-	// }
-	// UPlayerCameraComponent* Camera = OwnerActor->FindComponentByClass<UPlayerCameraComponent>();
-	// if (Camera && CurrentTarget)
-	// {
-	// 	FRotator CurrentCameraRotation = Camera->GetComponentRotation();
-	//
-	// 	// 타겟의 위치를 바라보는 회전 계산
-	// 	FVector TargetLocation = CurrentTarget->GetActorLocation();
-	// 	FVector CameraLocation = Camera->GetComponentLocation();
-	// 	FRotator CameraLookAtRotation = UKismetMathLibrary::FindLookAtRotation(CameraLocation, TargetLocation);
-	//
-	// 	// 보간하여 카메라 회전 설정
-	// 	FRotator Rotation = FMath::RInterpTo(CurrentCameraRotation, CameraLookAtRotation, DeltaTime, 20.0f);
-	//
-	// 	Camera->SetWorldRotation(Rotation);
-	// }
 }
 
 void UAT_TargetingEnemy::ReleaseLockOnTarget()
@@ -344,20 +295,13 @@ void UAT_TargetingEnemy::SaveSpringArmSettings(USpringArmComponent* SpringArm)
 {
 	if (SpringArm)
 	{
-		//SavedRotation = SpringArm->GetRelativeRotation();
-		//SavedLocation = SpringArm->GetRelativeLocation();
+		
 		SavedTargetArmLength = SpringArm->TargetArmLength;
 		bSavedUsePawnControlRotation = SpringArm->bUsePawnControlRotation;
 		bSavedInheritPitch = SpringArm->bInheritPitch;
 		bSavedInheritYaw = SpringArm->bInheritYaw;
 		bSavedInheritRoll = SpringArm->bInheritRoll;
 		bSavedEnableCameraLag = SpringArm->bEnableCameraLag;
-
-		// 3. 회전 설정
-		//    - 단순히 캐릭터를 ‘정면’에서 바라보는 것이 아니라
-		//      캐릭터 ‘뒤’에서 바라보려면 캐릭터의 Yaw에 180도 더해주는 식을 자주 사용합니다.
-		// SavedSpringArmWorldRotation = GetAvatarActor()->GetActorRotation();
-		// SavedSpringArmWorldRotation.Yaw += 180.0f; // 뒤에서 바라보도록 Yaw를 180도 추가
 	}
 }
 
@@ -465,4 +409,79 @@ void UAT_TargetingEnemy::RestoreSpringArmRotation(USpringArmComponent* SpringArm
 		//OnCanceled.Broadcast();
 	}
 	
+}
+bool UAT_TargetingEnemy::IsActorOnScreen(AActor* Actor) const
+{
+	if (Actor == nullptr) 
+		return false;
+
+	// 플레이어 컨트롤러 가져오기
+	AActor* OwnerActor = GetAvatarActor();
+	APlayerController* PlayerController = Cast<
+		APlayerController>(Cast<ACharacter>(OwnerActor)->GetController());
+	if (PlayerController == nullptr) 
+		return false;
+
+	// 월드 위치 -> 스크린 좌표 변환
+	FVector2D ScreenPosition;
+	bool bProjected = PlayerController->ProjectWorldLocationToScreen(
+		Actor->GetActorLocation(),
+		ScreenPosition
+	);
+
+	// 변환 실패 시 화면에 안 보인다고 판단
+	if (!bProjected)
+		return false;
+
+	// 현재 뷰포트 사이즈 얻기
+	int32 ScreenX, ScreenY;
+	PlayerController->GetViewportSize(ScreenX, ScreenY);
+
+	// 스크린 좌표가 0~ScreenX, 0~ScreenY 안쪽이면 보인다고 간주
+	return (ScreenPosition.X >= 0 && ScreenPosition.X <= ScreenX &&
+			ScreenPosition.Y >= 0 && ScreenPosition.Y <= ScreenY);
+}
+bool UAT_TargetingEnemy::HasLineOfSight(AActor* Actor) const
+{
+	if (!Actor || !GetWorld())
+		return false;
+
+	// 플레이어 컨트롤러(카메라) 뷰포인트 가져오기
+	// 플레이어 컨트롤러 가져오기
+	AActor* OwnerActor = GetAvatarActor();
+	APlayerController* PlayerController = Cast<
+		APlayerController>(Cast<ACharacter>(OwnerActor)->GetController());
+	if (!PlayerController)
+		return false;
+
+	FVector CamLoc;
+	FRotator CamRot;
+	PlayerController->GetPlayerViewPoint(CamLoc, CamRot);
+
+	// 라인 트레이스 세팅
+	FHitResult Hit;
+	FCollisionQueryParams TraceParams(SCENE_QUERY_STAT(LineOfSight), /*bTraceComplex=*/ true);
+	// 자기 자신(플레이어)이나 Actor는 충돌 무시(필요에 맞게 추가)
+	TraceParams.AddIgnoredActor(GetAvatarActor());
+	TraceParams.AddIgnoredActor(Actor);
+
+	// 카메라 -> 대상 액터까지 라인 트레이스
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		CamLoc,
+		Actor->GetActorLocation(),
+		ECC_Visibility,
+		TraceParams
+	);
+
+	if (bHit)
+	{
+		// 맞은 액터가 타겟 액터 자신이 아니라면, 중간에 무언가 막고 있다는 의미
+		if (Hit.GetActor() != Actor)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

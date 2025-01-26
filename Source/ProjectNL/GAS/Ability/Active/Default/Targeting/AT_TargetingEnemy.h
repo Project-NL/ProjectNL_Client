@@ -59,10 +59,8 @@ protected:
 
 	UFUNCTION()
 	void RestoreSpringArmRotation(USpringArmComponent* SpringArm,float DeltaTime);
-
-
-
-
+	bool IsActorOnScreen(AActor* Actor) const;
+	bool HasLineOfSight(AActor* Actor) const;
 
 private:
 	UPROPERTY()
@@ -75,7 +73,7 @@ private:
 	float TargetingRange = 1000.0f;
 
 	
-	float OriginalCharacterSpeed;
+	
 	
 	
 	// 저장된 스프링암 설정

@@ -109,10 +109,10 @@ void UGA_Sprint::InputReleased(const FGameplayAbilitySpecHandle Handle, const FG
 				}
 				SetCurrentMontage(EvadeAnim);
 				
-				UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
-                				NAME_None, GetCurrentMontage(), FGameplayTagContainer());
-                Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
-                Task->ReadyForActivation();
+					UPlayMontageWithEvent* Task = UPlayMontageWithEvent::InitialEvent(this,
+									NAME_None, GetCurrentMontage(), FGameplayTagContainer());
+					Task->OnCompleted.AddDynamic(this, &ThisClass::EndEvade);
+					Task->ReadyForActivation();
 				
 			} else
 			{
