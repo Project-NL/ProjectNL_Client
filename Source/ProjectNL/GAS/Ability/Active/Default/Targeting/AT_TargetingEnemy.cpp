@@ -50,14 +50,14 @@ void UAT_TargetingEnemy::TickTask(float DeltaTime)
 				if (ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Sprint")))||ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Dodge")))||
 					ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Roll"))))
 				{
-					UE_LOG(LogTemp, Log, TEXT("Status_dodge 태그 활성화됨 -> PlayerContollerRotation 실행"));
+				//	UE_LOG(LogTemp, Log, TEXT("Status_dodge 태그 활성화됨 -> PlayerContollerRotation 실행"));
 					
 				}
 				else
 				{
 					
 					LockOnTarget(NearestEnemy);
-					UE_LOG(LogTemp, Log, TEXT("Status_dodge 태그 비활성화됨 -> PlayerContollerRotation 실행"));
+				//	UE_LOG(LogTemp, Log, TEXT("Status_dodge 태그 비활성화됨 -> PlayerContollerRotation 실행"));
 				}	
 			}
 		}
