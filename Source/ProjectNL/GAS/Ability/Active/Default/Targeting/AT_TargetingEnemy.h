@@ -36,6 +36,7 @@ public:
 
 protected:
 	virtual void TickTask(float DeltaTime) override;
+	void TargetingNearestEnemy(float DeltaTime);
 	UFUNCTION()
 	void ReleaseLockOnTarget();
 	UFUNCTION()
@@ -48,7 +49,7 @@ protected:
 	UFUNCTION()
 	void PlayerContollerRotation(float DeltaTime);
 	UFUNCTION()
-	void LockOnTarget(AActor* NewTarget);
+	void LockOnTarget(AActor* NewTarget,float DeltaTime);
 	// 스프링암 설정을 저장하는 함수
 	UFUNCTION()
 	void SaveSpringArmSettings(USpringArmComponent* SpringArm);
@@ -61,6 +62,7 @@ protected:
 	void RestoreSpringArmRotation(USpringArmComponent* SpringArm,float DeltaTime);
 	bool IsActorOnScreen(AActor* Actor) const;
 	bool HasLineOfSight(AActor* Actor) const;
+	void CheckNearestEnemyDistance(float MaxDistance);
 
 private:
 	UPROPERTY()
@@ -89,15 +91,15 @@ private:
 	
 
 	FVector SavedCameraWorldLocation;
-
 	FVector SavedTargetActorWorldLocation;
 	FVector SavedOwnerActorWorldLocation;
 	FRotator SavedSpringArmWorldRotation;
 	FRotator SavedCameraWorldRotation;
+	FRotator SavedLockonActorRotation;
+	
 
 
 	TSubclassOf<UGameplayEffect> TargetingSpeedEffect;
-	
 	FActiveGameplayEffectHandle ActiveHandle;
 	
 };

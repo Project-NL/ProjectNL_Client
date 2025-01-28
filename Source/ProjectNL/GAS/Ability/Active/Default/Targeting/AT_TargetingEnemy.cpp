@@ -36,39 +36,45 @@ void UAT_TargetingEnemy::Activate()
 void UAT_TargetingEnemy::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
-
-	if (NearestEnemy)
+	
+	// 예: 최대 거리 1000.0f (원하는 값으로 조절하세요)
+	CheckNearestEnemyDistance(1700.0f);
+	TargetingNearestEnemy(DeltaTime);
+}
+void UAT_TargetingEnemy::TargetingNearestEnemy(float DeltaTime)
+{
+	if (!NearestEnemy)
 	{
-		// 먼저, 플레이어 캐릭터의 AbilitySystemComponent에서 현재 활성화된 GameplayTag들을 가져옵니다.
-		if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor()))
+		// NearestEnemy가 없으면 캐릭터 상태 원복
+		BacktoSquareOne(DeltaTime);
+		return;
+	}
+
+	// 플레이어 캐릭터 확인
+	if (APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActor()))
+	{
+		// ASC 확인
+		if (UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent())
 		{
-			if (UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent())
+			FGameplayTagContainer ActiveTags;
+			ASC->GetOwnedGameplayTags(ActiveTags);
+
+			// 태그(Status.Sprint, Status.Dodge, Status.Roll) 활성화 여부 체크
+			if (ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Sprint"))) ||
+				ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Dodge"))) ||
+				ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Roll"))))
 			{
-				FGameplayTagContainer ActiveTags;
-				ASC->GetOwnedGameplayTags(ActiveTags);
-				// "Status_dodge" 태그 활성화 여부 체크
-				if (ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Sprint")))||ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Dodge")))||
-					ActiveTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Status.Roll"))))
-				{
-				//	UE_LOG(LogTemp, Log, TEXT("Status_dodge 태그 활성화됨 -> PlayerContollerRotation 실행"));
-					
-				}
-				else
-				{
-					
-					LockOnTarget(NearestEnemy);
-				//	UE_LOG(LogTemp, Log, TEXT("Status_dodge 태그 비활성화됨 -> PlayerContollerRotation 실행"));
-				}	
+				SavedLockonActorRotation = PlayerCharacter->GetActorRotation();
+			}
+			else
+			{
+				LockOnTarget(NearestEnemy, DeltaTime);
 			}
 		}
-		PlayerContollerRotation(DeltaTime);
-		// LockOnTarget과 CameraRotation은 기존처럼 항상 실행
-		//CameraRotation(DeltaTime);
 	}
-	else
-	{
-		BacktoSquareOne(DeltaTime);
-	}
+
+	// 플레이어 컨트롤러 회전(카메라 혹은 캐릭터 회전)에 관한 로직
+	PlayerContollerRotation(DeltaTime);
 }
 
 void UAT_TargetingEnemy::TargetNearestEnemy()
@@ -95,25 +101,24 @@ void UAT_TargetingEnemy::TargetNearestEnemy()
 							*SpecHandle.Data.Get());
 					}
 				}
+				SavedLockonActorRotation=PlayerCharacter->GetActorRotation();
 			}
+			
 		}
 		UPlayerSpringArmComponent* SpringArm = GetAvatarActor()->FindComponentByClass<UPlayerSpringArmComponent>();
 		SpringArm->bEnableCameraLag = true; // 카메라 랙 활성화
 		SpringArm->CameraLagSpeed = 1.3f; // 카메라 랙 속도
 		SpringArm->CameraLagMaxDistance = 50.0f;
+
+		APlayerController* PlayerController = Cast<
+		APlayerController>(Cast<ACharacter>(GetAvatarActor())->GetController());
+		PlayerController->SetIgnoreLookInput(true); // 회전 입력 비활성화
 	}
 	else 
 	{
 		ReleaseLockOnTarget();
 		NearestEnemy=nullptr;
 		// 카메라 랙 활성화
-	}
-	if (NearestEnemy) //클릭과 타겟 캐릭터 상대방이 둘다 있을경우
-	{
-		APlayerController* PlayerController = Cast<
-			APlayerController>(Cast<ACharacter>(GetAvatarActor())->GetController());
-		PlayerController->SetIgnoreLookInput(true); // 회전 입력 비활성화
-		Cast<ACharacter>(GetAvatarActor())->GetCharacterMovement()->MaxWalkSpeed = 250.0f; //속도 감소
 	}
 }
 
@@ -265,7 +270,7 @@ void UAT_TargetingEnemy::ReleaseLockOnTarget()
 	OnCanceled.Broadcast();
 }
 
-void UAT_TargetingEnemy::LockOnTarget(AActor* NewTarget)
+void UAT_TargetingEnemy::LockOnTarget(AActor* NewTarget,float DeltaTime)
 {
 	CurrentTarget = NewTarget;
 	if (CurrentTarget)
@@ -277,8 +282,11 @@ void UAT_TargetingEnemy::LockOnTarget(AActor* NewTarget)
 			FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(
 				OwnerActor->GetActorLocation(), TargetLocation);
 			NewRotation.Pitch = 0.0f;
-			OwnerActor->SetActorRotation(NewRotation);
 			UWorld* World = GetWorld();
+
+			SavedLockonActorRotation = UKismetMathLibrary::RInterpTo(SavedLockonActorRotation,
+															  NewRotation, DeltaTime, 10.f);
+			OwnerActor->SetActorRotation(SavedLockonActorRotation);
 			if (CurrentTarget && World)
 			{
 				// 가장 가까운 적의 위치에 디버그 스피어 그리기
@@ -484,4 +492,29 @@ bool UAT_TargetingEnemy::HasLineOfSight(AActor* Actor) const
 	}
 
 	return true;
+}
+void UAT_TargetingEnemy::CheckNearestEnemyDistance(float MaxDistance)
+{
+	// NearestEnemy가 유효한지 먼저 확인
+	if (!NearestEnemy)
+	{
+		return;
+	}
+
+	// Avatar(플레이어) 액터가 유효한지 확인
+	AActor* AvatarActor = GetAvatarActor();
+	if (!AvatarActor)
+	{
+		return;
+	}
+
+	// 플레이어와 적 간의 거리 계산
+	float Distance = FVector::Distance(NearestEnemy->GetActorLocation(), AvatarActor->GetActorLocation());
+
+	// 지정된 MaxDistance 이상 멀어졌다면 NearestEnemy를 nullptr로
+	if (Distance > MaxDistance)
+	{
+		ReleaseLockOnTarget();
+		NearestEnemy=nullptr;
+	}
 }
