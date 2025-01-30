@@ -36,7 +36,8 @@ protected:
 private:
 	UFUNCTION()
 	void OnDamaged(const FDamagedResponse& DamagedResponse);
-	
+	void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
 		, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -55,4 +56,8 @@ private:
 	/** 플레이어 카메라 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UPlayerCameraComponent* PlayerCamera;
+
+	FOnMontageEnded MontageEndedDelegate;
+
+	FDamagedResponse DamageResponse;
 };
