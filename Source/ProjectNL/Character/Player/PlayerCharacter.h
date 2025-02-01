@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ProjectNL/Character/BaseCharacter.h"
+#include "ProjectNL/Interface/InteractionInterface.h"
 #include "PlayerCharacter.generated.h"
 
 class UPlayerSpringArmComponent;
@@ -12,7 +13,7 @@ class UInputMappingContext;
 struct FInputActionValue;
 
 UCLASS()
-class PROJECTNL_API APlayerCharacter : public ABaseCharacter
+class PROJECTNL_API APlayerCharacter : public ABaseCharacter,public IInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -34,10 +35,11 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 private:
+	//IInteractionInterface
 	UFUNCTION()
-	void OnDamaged(const FDamagedResponse& DamagedResponse);
-	void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-
+	virtual void OnDamaged(const FDamagedResponse& DamagedResponse) override;
+	virtual void OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterrupted) override;
+	virtual void OnKnockback(const FDamagedResponse& DamagedResponse,float DamageMontageLength) override;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input
 		, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -60,4 +62,7 @@ private:
 	FOnMontageEnded MontageEndedDelegate;
 
 	FDamagedResponse DamageResponse;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	TSubclassOf<UGameplayAbility> KnockbackAbility;
 };

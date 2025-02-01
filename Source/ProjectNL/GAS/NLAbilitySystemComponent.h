@@ -19,6 +19,7 @@ struct FDamagedResponse
 	AActor* SourceActor;
 	
 	float Damage;
+	
 	EMovementDirection DamagedDirection;
 
 	ETargetHeight DamagedHeight;
@@ -26,6 +27,8 @@ struct FDamagedResponse
 	TSubclassOf<UGameplayEffect> DamageEffect;
 	
 	bool IsHitStop;
+
+
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDamageStartedNotifiedSignature, const FDamagedResponse&, DamageResponse);

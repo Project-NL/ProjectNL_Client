@@ -7,6 +7,7 @@
 #include "ProjectNL/Component/CameraComponent/PlayerCameraComponent.h"
 #include "ProjectNL/Component/CameraComponent/PlayerSpringArmComponent.h"
 #include "ProjectNL/Component/EquipComponent/EquipComponent.h"
+#include "ProjectNL/GAS/Ability/Active/Default/Knockback/GA_Knockback.h"
 #include "ProjectNL/GAS/Attribute/PlayerAttributeSet.h"
 #include "ProjectNL/Player/BasePlayerState.h"
 #include "ProjectNL/Helper/EnumHelper.h"
@@ -67,7 +68,7 @@ void APlayerCharacter::OnRep_PlayerState()
 			this, &ThisClass::MovementSpeedChanged);
 		
 		AbilitySystemComponent->OnDamageReactNotified
-		.AddDynamic(this, &ThisClass::OnDamaged);
+		.AddDynamic(this, &APlayerCharacter::OnDamaged);
 		Initialize();
 	}
 }
@@ -193,6 +194,7 @@ void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 
 	// 애니메이션 재생
 	float MontageDuration = PlayAnimMontage(DamagedMontage);
+	
 	if (MontageDuration > 0.f)
 	{
 		// 애니메이션 인스턴스 가져오기
@@ -226,6 +228,8 @@ void APlayerCharacter::OnDamaged(const FDamagedResponse& DamagedResponse)
 																					, DamagedMontage);
 		}
 	}
+	float MontageLength = DamagedMontage->GetPlayLength();
+	OnKnockback(DamagedResponse,MontageLength);
 }
 
 // Montage가 끝나면 호출되는 함수
@@ -245,5 +249,19 @@ void APlayerCharacter::OnDamagedMontageEnded(UAnimMontage* Montage, bool bInterr
 	if (AnimInstance)
 	{
 		AnimInstance->OnMontageEnded.RemoveDynamic(this, &APlayerCharacter::OnDamagedMontageEnded);
+	}
+}
+
+void APlayerCharacter::OnKnockback(const FDamagedResponse& DamagedResponse,	float DamageMontageLength)
+{
+	
+	UGA_Knockback* ActivatedKnockbackAbility =Cast<UGA_Knockback>( 	AbilitySystemComponent->FindAbilitySpecFromClass(InitializeData.KnockAbility)->GetPrimaryInstance());
+
+	ActivatedKnockbackAbility->SetDamageResponse(DamageResponse);
+	ActivatedKnockbackAbility->SetDamageMontageLength(DamageMontageLength);
+	bool bActivated = AbilitySystemComponent->TryActivateAbilityByClass(InitializeData.KnockAbility);
+	if(!bActivated)
+	{
+		return;
 	}
 }
