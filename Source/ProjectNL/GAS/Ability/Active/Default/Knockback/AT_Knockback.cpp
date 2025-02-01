@@ -11,7 +11,7 @@ UAT_Knockback* UAT_Knockback::InitialEvent(UGameplayAbility* OwningAbility, FDam
 	UAT_Knockback* MyTask = NewAbilityTask<UAT_Knockback>(OwningAbility);
 
 	MyTask->DamagedResponse = DamageResponse;
-	MyTask->KnockbackDuration=DamageMontageLength*0.7;
+	MyTask->KnockbackDuration=DamageMontageLength*0.4;
 
 	return MyTask;
 }
